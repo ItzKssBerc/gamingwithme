@@ -13,22 +13,14 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '12');
     const offset = (page - 1) * limit;
 
-    // Build where conditions for filtering
     const whereConditions: any = {
-      // Exclude admin users from public gamers list
       isAdmin: false,
     };
 
-    // Add status filter
     if (status && status !== 'All') {
-      if (status === 'active') {
-        whereConditions.isActive = true;
-      } else if (status === 'inactive') {
-        whereConditions.isActive = false;
-      }
+      whereConditions.isActive = status === 'active';
     }
 
-    // Add search query conditions
     if (query) {
       whereConditions.OR = [
         { username: { contains: query, mode: 'insensitive' } },
@@ -62,66 +54,29 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // Get users with their related data
     const users = await prisma.user.findMany({
       where: whereConditions,
       include: {
-        userGames: {
-          include: {
-            game: true
-          }
-        },
+        userGames: { include: { game: true } },
         userLanguages: true,
         userTags: true,
-        userAvailability: {
-          where: {
-            isActive: true
-          }
-        }
+        userAvailability: { where: { isActive: true } },
+        reviewsReceived: { select: { rating: true } },
       },
       skip: offset,
       take: limit,
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: { createdAt: 'desc' },
     });
 
-    // Get total count for pagination
-    const totalCount = await prisma.user.count({
-      where: whereConditions
-    });
+    const totalCount = await prisma.user.count({ where: whereConditions });
 
-    // Get all ratings and calculate averages
-    const averageRatings = await prisma.review.groupBy({
-      by: ['reviewedId'],
-      _avg: {
-        rating: true,
-      },
-      where: {
-        reviewedId: {
-          in: users.map(u => u.id),
-        },
-      },
-    });
-
-    const ratingsMap = new Map<string, number>();
-    averageRatings.forEach(r => {
-      if (r._avg.rating !== null) {
-        ratingsMap.set(r.reviewedId, Math.round(r._avg.rating * 10) / 10);
-      }
-    });
-
-    // Transform users to gamer format
     const gamers = users.map(user => {
-      const rating = ratingsMap.get(user.id) || 0;
-      
+      const totalRating = user.reviewsReceived.reduce((sum, review) => sum + review.rating, 0);
+      const averageRating = user.reviewsReceived.length > 0 ? totalRating / user.reviewsReceived.length : 0;
+
       const avgHourlyRate = user.userAvailability.length > 0
         ? user.userAvailability.reduce((sum, avail) => sum + avail.price, 0) / user.userAvailability.length
         : 0;
-
-      const availability = user.userAvailability.length > 0
-        ? `${user.userAvailability.length} time slots available`
-        : 'No availability set';
 
       return {
         id: user.id,
@@ -130,41 +85,33 @@ export async function GET(request: NextRequest) {
         bio: user.bio || 'No bio available',
         games: user.userGames.map(ug => ug.game.name),
         languages: user.userLanguages.map(ul => ul.language),
-        rating: rating,
+        rating: Math.round(averageRating * 10) / 10,
         hourlyRate: Math.round(avgHourlyRate),
-        availability: availability,
-        tags: user.userTags
-          .filter(ut => !ut.tag.startsWith('category:'))
-          .map(ut => ut.tag),
+        availability: user.userAvailability.length > 0 ? `${user.userAvailability.length} time slots available` : 'No availability set',
+        tags: user.userTags.filter(ut => !ut.tag.startsWith('category:')).map(ut => ut.tag),
         isActive: user.isActive,
-        createdAt: user.createdAt.toISOString()
+        createdAt: user.createdAt.toISOString(),
       };
     });
 
-    // Calculate pagination info
     const totalPages = Math.ceil(totalCount / limit);
-    const hasNext = page < totalPages;
-    const hasPrev = page > 1;
 
     return NextResponse.json({
-      gamers: gamers,
+      gamers,
       pagination: {
         page,
         limit,
         total: totalCount,
         totalPages,
-        hasNext,
-        hasPrev,
-        nextPage: hasNext ? page + 1 : null,
-        prevPage: hasPrev ? page - 1 : null
-      }
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+        nextPage: page < totalPages ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+      },
     });
 
   } catch (error) {
     console.error('Error fetching gamers:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch gamers' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch gamers' }, { status: 500 });
   }
 }

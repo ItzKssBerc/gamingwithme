@@ -37,21 +37,15 @@ export async function GET(request: NextRequest) {
     // Calculate statistics
     const totalServices = services.length;
     const activeServices = services.filter(service => service.isActive).length;
-    const totalOrders = services.reduce((sum, service) => sum + service.orders.length, 0);
     const completedOrders = services.flatMap(service => 
       service.orders.filter(order => order.status === 'completed')
     );
     const totalEarnings = completedOrders.reduce((sum, order) => sum + order.price, 0);
     
-    // Calculate average rating (placeholder for now)
-    const averageRating = totalOrders > 0 ? 4.5 : 0;
-
     const stats = {
       totalServices,
       activeServices,
-      totalOrders,
       totalEarnings,
-      averageRating
     };
 
     return NextResponse.json(stats);

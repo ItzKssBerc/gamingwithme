@@ -108,5 +108,16 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
+  events: {
+    async signIn(message) { /* successful sign in */ },
+    async signOut(message) { /* sign out */ },
+    async createUser(message) { /* user created */ },
+    async updateUser(message) { /* user updated - e.g. their email was verified */ },
+    async linkAccount(message) { /* account linked to a user */ },
+    async session(message) { /* session is active */ },
+    async error(message) {
+      console.error("NextAuth error:", message)
+    }
+  },
   debug: process.env.NODE_ENV === 'development',
 }

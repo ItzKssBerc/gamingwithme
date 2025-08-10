@@ -95,6 +95,20 @@ model UserAvailability {
   @@map("user_availability")
 }
 
+model Platform {
+  id        String   @id @default(cuid())
+  igdbId    Int      @unique
+  name      String
+  slug      String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  fixedServices FixedService[]
+
+  @@map("platforms")
+}
+
 model Game {
   id          String   @id @default(cuid())
   name        String
@@ -125,6 +139,7 @@ model Game {
   gameNews    GameNews[]
   gameEvents  GameEvent[]
   gameEasterEggs GameEasterEgg[]
+  fixedServices FixedService[]
 
   @@map("games")
 }
@@ -160,17 +175,18 @@ model FixedService {
   description String
   price       Float
   duration    Int      // minutes
-  gameId      String?  // IGDB game ID
-  gameName    String?  // IGDB game name
-  platformId  String?  // IGDB platform ID
-  platformName String? // IGDB platform name
+  slots       Int
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  provider User @relation(fields: [providerId], references: [id], onDelete: Cascade)
-  orders    ServiceOrder[]
+  provider    User     @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  gameId      String?
+  game        Game?    @relation(fields: [gameId], references: [id], onDelete: SetNull)
+  platformId  String?
+  platform    Platform?@relation(fields: [platformId], references: [id], onDelete: SetNull)
+  orders      ServiceOrder[]
 
   @@map("fixed_services")
 }

@@ -15,7 +15,8 @@ import {
   Search,
   Gamepad2,
   Monitor,
-  X
+  X,
+  Users
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
@@ -33,6 +34,7 @@ export default function CreateServicePage() {
     description: '',
     price: '',
     duration: '',
+    slots: '',
     gameId: '',
     gameName: '',
     platformId: '',
@@ -68,7 +70,7 @@ export default function CreateServicePage() {
         }, 2000)
       } else {
         const data = await response.json()
-        setError(data.error || 'Failed to create service')
+        setError(data.error || JSON.stringify(data) || 'Failed to create service')
       }
     } catch (error) {
       console.error('Error creating service:', error)
@@ -345,14 +347,10 @@ export default function CreateServicePage() {
                        )}
                      </div>
 
-                                           {/* Platform Selection */}
+                    {/* Platform Selection */}
+                    {formData.gameId && (
                       <div className="space-y-2">
-                        <Label className="text-white">Platform (Optional)</Label>
-                        {formData.gameName && !formData.platformName && gamePlatforms.length > 0 && (
-                          <div className="text-sm text-yellow-300 bg-yellow-600/20 border border-yellow-500/30 rounded-lg p-3">
-                            💡 Tip: {formData.gameName} is available on {gamePlatforms.length} platform(s). Consider selecting one for better visibility.
-                          </div>
-                        )}
+                        <Label className="text-white">Platform</Label>
                         {formData.platformName ? (
                           <div className="flex items-center gap-2 p-3 bg-white/10 border border-white/20 rounded-lg">
                             <Monitor className="h-5 w-5 text-blue-400" />
@@ -369,28 +367,23 @@ export default function CreateServicePage() {
                           </div>
                         ) : (
                           <div className="relative">
-                                                         {gamePlatforms.length > 0 ? (
-                               <div className="space-y-2">
-                                 <div className="text-sm text-gray-300 mb-2">
-                                   Select a platform for {formData.gameName}:
-                                 </div>
-                                 <Button
-                                   type="button"
-                                   variant="outline"
-                                   onClick={() => setShowGamePlatformSelect(!showGamePlatformSelect)}
-                                   className="w-full border-white/20 text-white hover:bg-white/10 justify-start"
-                                 >
-                                   <Gamepad2 className="h-4 w-4 mr-2" />
-                                   Select platform ({gamePlatforms.length} available)
-                                 </Button>
-                               </div>
-                             ) : (
-                               <div className="text-sm text-gray-400">
-                                 No platforms available for this game
-                               </div>
-                             )}
-                            
-                            
+                            {gamePlatforms.length > 0 ? (
+                              <div className="space-y-2">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={() => setShowGamePlatformSelect(!showGamePlatformSelect)}
+                                  className="w-full border-white/20 text-white hover:bg-white/10 justify-start"
+                                >
+                                  <Gamepad2 className="h-4 w-4 mr-2" />
+                                  Select platform ({gamePlatforms.length} available)
+                                </Button>
+                              </div>
+                            ) : (
+                              <div className="text-sm text-gray-400">
+                                No platforms available for this game.
+                              </div>
+                            )}
 
                             {showGamePlatformSelect && gamePlatforms.length > 0 && (
                               <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-white/20 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
@@ -415,6 +408,7 @@ export default function CreateServicePage() {
                           </div>
                         )}
                       </div>
+                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
@@ -448,6 +442,22 @@ export default function CreateServicePage() {
                           required
                         />
                       </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="slots" className="text-white">Available Slots *</Label>
+                      <Input
+                        id="slots"
+                        name="slots"
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={formData.slots}
+                        onChange={handleInputChange}
+                        placeholder="10"
+                        className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                        required
+                      />
                     </div>
 
                     <div className="flex gap-4 pt-6">
@@ -489,4 +499,4 @@ export default function CreateServicePage() {
       </section>
     </div>
   )
-} 
+}

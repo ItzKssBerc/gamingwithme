@@ -1151,14 +1151,14 @@ export default function OnboardingPage() {
                    <div>
                      <h3 className="text-white font-medium mb-2">Games</h3>
                      <div className="space-y-2">
-                                               {selectedGames.map((userGame) => {
+                                               {selectedGames.map((userGame, index) => {
                           const game = allGames.find(g => g.id === userGame.gameId) || 
                                       searchResults.find(g => g.id === userGame.gameId) || 
                                       { name: userGame.name || `Game ${userGame.gameId}`, platform: userGame.platform || "" }
                           const level = SKILL_LEVELS.find(l => l.value === userGame.level)
                           
                                                      return (
-                             <div key={userGame.gameId} className="flex items-center justify-between p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
+                             <div key={index} className="flex items-center justify-between p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
                                <div>
                                  <span className="text-white">{game.name}</span>
                                  {userGame.platform && (

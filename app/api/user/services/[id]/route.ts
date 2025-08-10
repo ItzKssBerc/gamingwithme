@@ -1,7 +1,54 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/app/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const serviceId = params.id;
+
+    if (!serviceId) {
+      return NextResponse.json({ error: "Service ID is required" }, { status: 400 });
+    }
+
+    const service = await prisma.fixedService.findUnique({
+      where: {
+        id: serviceId,
+        deletedAt: null, // Ensure the service is not soft-deleted
+      },
+      include: {
+        members: {
+          include: {
+            user: true, // Include the user details for each member
+          },
+        },
+        user: true, // Include the service owner's details
+      },
+    });
+
+    if (!service) {
+      return NextResponse.json({ error: "Service not found" }, { status: 404 });
+    }
+
+    // Format the members data to only include necessary fields
+    const formattedMembers = service.members.map(member => ({
+      id: member.user.id,
+      username: member.user.username,
+      avatar: member.user.avatar,
+    }));
+
+    const response = {
+      ...service,
+      members: formattedMembers,
+    };
+
+    return NextResponse.json({ service: response });
+  } catch (error) {
+    console.error("Failed to fetch service details:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: `Backend Error: ${message}` }, { status: 500 });
+  }
+}
 
 export async function PATCH(
   request: NextRequest,
@@ -107,4 +154,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}

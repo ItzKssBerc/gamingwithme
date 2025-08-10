@@ -16,15 +16,11 @@ import {
 import Link from "next/link"
 import { useState, useEffect } from "react"
 
-// Changed interface from Game to User
 interface User {
   id: string
   username: string
-  slug: string
-  bio?: string | null
-  image?: string | null
+  avatar?: string | null
   country?: string | null
-  createdAt?: Date | null
 }
 
 interface Pagination {
@@ -38,36 +34,29 @@ interface Pagination {
   prevPage: number | null
 }
 
-// Changed component name
 export default function GamersPage() {
-  // Changed state variable names
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [pagination, setPagination] = useState<Pagination | null>(null)
   
-  // State for user inputs
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [retryCount, setRetryCount] = useState(0);
 
-  // Debounced search query for API calls
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery)
 
-  // Debounce the search input and reset page to 1
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-      setCurrentPage(1); // Reset page when search query is updated
-    }, 500); // 500ms delay
+      setCurrentPage(1);
+    }, 500);
     return () => {
       clearTimeout(handler);
     };
   }, [searchQuery]);
 
-  // The main effect that triggers the data fetch
   useEffect(() => {
-    // Changed function name
     const fetchUsers = async () => {
         setLoading(true);
         setError(null);
@@ -81,15 +70,13 @@ export default function GamersPage() {
         }
 
         try {
-            // Changed API endpoint
-            const response = await fetch(`/api/users?${params.toString()}`);
+            const response = await fetch(`/api/gamers?${params.toString()}`);
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to fetch users');
             }
             const data = await response.json();
-            // Changed state update
-            setUsers(data.users || []);
+            setUsers(data.gamers || []);
             setPagination(data.pagination);
         } catch (err: any) {
             console.error('Error fetching users:', err);
@@ -212,12 +199,12 @@ export default function GamersPage() {
             <>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {users.map((user) => (
-                  <Link href={`/gamers/${user.slug}`} key={user.id} className="block group">
+                  <Link href={`/profile/${user.username}`} key={user.id} className="block group">
                     <Card className="h-full bg-slate-800/50 border-slate-700/50 rounded-lg overflow-hidden transition-all duration-300 hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/10 flex flex-col">
                       <div className="aspect-square overflow-hidden">
-                        {user.image ? (
+                        {user.avatar ? (
                           <img
-                            src={user.image}
+                            src={user.avatar}
                             alt={user.username}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />

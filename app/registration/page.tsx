@@ -10,13 +10,14 @@ import {
   EyeOff,
   User,
   CheckCircle,
-  Gamepad2,
   Sparkles,
   Shield,
   Trophy,
   Users,
   Star,
-  Zap
+  Zap,
+  Chrome,
+  Twitch
 } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
@@ -42,7 +43,7 @@ export default function RegistrationPage() {
     setIsLoading(true)
     
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords don't match")
+      setError("Passwords don\'t match")
       setIsLoading(false)
       return
     }
@@ -87,90 +88,11 @@ export default function RegistrationPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex">
-      {/* Left Column - Gaming Content */}
-              <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600/20 to-green-800/20 relative overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0">
-                      <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-          <div className="absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-center items-center text-center px-12">
-          <div className="w-32 h-32 bg-gradient-to-br from-green-600 to-green-700 rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
-            <Gamepad2 className="h-16 w-16 text-white" />
-          </div>
-          
-          <h1 className="text-5xl font-bold text-white mb-6">
-            Join the Ultimate
-            <span className="block bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent">
-              Gaming Community
-            </span>
-          </h1>
-          
-          <p className="text-xl text-gray-300 mb-12 max-w-md">
-            Ready to level up? Create your account and start your gaming journey with thousands of players!
-          </p>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 w-full max-w-md">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-400 mb-2">50K+</div>
-              <div className="text-gray-400 text-sm">Members</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-400 mb-2">1000+</div>
-              <div className="text-gray-400 text-sm">Tournaments</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-400 mb-2">$1M+</div>
-              <div className="text-gray-400 text-sm">Prize Pool</div>
-            </div>
-          </div>
-
-          {/* Features */}
-          <div className="mt-12 space-y-4">
-            <div className="flex items-center gap-3 text-gray-300">
-              <Zap className="h-5 w-5 text-yellow-400" />
-              <span>Instant matchmaking</span>
-            </div>
-            <div className="flex items-center gap-3 text-gray-300">
-              <Trophy className="h-5 w-5 text-green-400" />
-              <span>Compete in tournaments</span>
-            </div>
-            <div className="flex items-center gap-3 text-gray-300">
-              <Users className="h-5 w-5 text-green-400" />
-              <span>Build your team</span>
-            </div>
-            <div className="flex items-center gap-3 text-gray-300">
-              <Star className="h-5 w-5 text-green-400" />
-              <span>Earn rewards & badges</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Column - Registration Form */}
+      {/* Left Column - Registration Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <Card className="w-full max-w-md gaming-card border-0 bg-gradient-to-br from-green-600/10 to-green-800/10 backdrop-blur-sm">
-          <CardHeader className="text-center">
-                          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-              <Gamepad2 className="h-8 w-8 text-white" />
-            </div>
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="h-5 w-5 text-green-400" />
-              <span className="text-green-400 text-sm font-medium">Join the Gaming Community!</span>
-              <Sparkles className="h-5 w-5 text-green-400" />
-            </div>
-            <CardTitle className="text-3xl font-bold text-white mb-2">
-              Create Account
-            </CardTitle>
-            <CardDescription className="text-gray-300 text-lg">
-              Ready to level up? Let's get you started on your gaming journey!
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+          
+          <CardContent className="pt-8">
             {error && (
               <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
                 {error}
@@ -281,7 +203,7 @@ export default function RegistrationPage() {
                       <Shield className="h-4 w-4 text-red-400" />
                     )}
                     <span className={doPasswordsMatch ? "text-green-400" : "text-red-400"}>
-                      {doPasswordsMatch ? "Passwords match!" : "Passwords don't match"}
+                      {doPasswordsMatch ? "Passwords match!" : "Passwords don\'t match"}
                     </span>
                   </div>
                 )}
@@ -343,6 +265,42 @@ export default function RegistrationPage() {
           </CardContent>
         </Card>
       </div>
+      {/* Right Column - Video Showcase */}
+      <div className="hidden lg:flex lg:w-1/2 p-0 overflow-hidden relative group">
+        <video
+          className="w-full h-full object-cover transition-all duration-1000 ease-in-out group-hover:scale-105"
+          src="/videos/signinsignup2.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+        <div className="absolute inset-0 bg-green-900/20 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20"></div>
+        <div className="absolute inset-0 bg-green-950/30 mix-blend-multiply"></div>
+        <div className="absolute inset-0 flex flex-col items-start justify-start text-left p-16 pointer-events-none">
+            <h1 className="text-5xl font-bold text-white drop-shadow-xl mb-2">
+              Join the Gaming Community!
+            </h1>
+            <h2 className="text-4xl font-bold text-green-400 drop-shadow-lg mb-6">
+              Create Account
+            </h2>
+            <p className="text-xl text-gray-200 max-w-md drop-shadow-lg mb-8">
+              Ready to level up? Let\'s get you started on your gaming journey!
+            </p>
+            <div className="w-full flex flex-col items-center pointer-events-auto mt-8">
+              <p className="text-lg text-gray-300 mb-6">Or continue with</p>
+              <div className="flex gap-8">
+                <button className="h-28 w-28 flex items-center justify-center rounded-full bg-white/10 border border-green-500/30 text-white hover:bg-white/20 transition-all duration-300">
+                  <Chrome className="h-14 w-14" />
+                </button>
+                <button className="h-28 w-28 flex items-center justify-center rounded-full bg-white/10 border border-green-500/30 text-white hover:bg-white/20 transition-all duration-300">
+                  <Twitch className="h-14 w-14" />
+                </button>
+              </div>
+            </div>
+        </div>
+      </div>
     </div>
   )
-} 
+}

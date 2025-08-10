@@ -112,9 +112,11 @@ export default function Navigation() {
                     <Button variant="ghost" className="p-0 h-auto bg-transparent border-none hover:bg-transparent">
                       <div className="p-1 rounded-full hover:bg-emerald-600/20 transition-colors">
                         {userProfile?.avatar ? (
-                          <img 
+                          <Image 
                             src={userProfile.avatar} 
                             alt="Profile" 
+                            width={32}
+                            height={32}
                             className="w-8 h-8 rounded-full object-cover border-2 border-emerald-400/50 hover:border-emerald-300/70 transition-colors"
                           />
                         ) : (
@@ -229,9 +231,11 @@ export default function Navigation() {
                         <Button variant="ghost" className="p-0 h-auto bg-transparent border-none hover:bg-transparent w-full justify-start">
                           <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg w-full hover:bg-green-600/20 transition-colors">
                             {userProfile?.avatar ? (
-                              <img 
+                              <Image 
                                 src={userProfile.avatar} 
                                 alt="Profile" 
+                                width={40}
+                                height={40}
                                 className="w-10 h-10 rounded-full object-cover border-2 border-green-500/30"
                               />
                             ) : (
@@ -304,4 +308,4 @@ export default function Navigation() {
       </div>
     </nav>
   )
-} 
+}

@@ -133,7 +133,7 @@ export default function UserProfilePage() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch(`/api/user/profile/${username}`)
+      const response = await fetch(`/api/user/profile/${username}`, { cache: 'no-store' })
       if (response.ok) {
         const data = await response.json()
         setProfile(data.profile)
@@ -152,7 +152,7 @@ export default function UserProfilePage() {
   const fetchReviews = async () => {
     try {
       setReviewsLoading(true)
-      const response = await fetch(`/api/user/profile/${username}/reviews`)
+      const response = await fetch(`/api/user/profile/${username}/reviews`, { cache: 'no-store' })
       if (response.ok) {
         const data = await response.json()
         setReviewsData(data)
@@ -896,4 +896,4 @@ export default function UserProfilePage() {
        </Dialog>
      </div>
    )
- } 
+ }

@@ -10,8 +10,7 @@ import {
   Mail, 
   Lock, 
   Eye, 
-  EyeOff,
-  Gamepad2
+  EyeOff
 } from "lucide-react"
 import Link from "next/link"
 
@@ -59,26 +58,23 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex">
-      {/* Left Column - Gaming Content */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600/20 to-green-800/20 relative overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-          <div className="absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-center items-center text-center px-12">
-          <div className="w-32 h-32 bg-gradient-to-br from-green-600 to-green-700 rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
-            <Gamepad2 className="h-16 w-16 text-white" />
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 grid md:grid-cols-2">
+      {/* Video Section */}
+      <div className="hidden md:block h-screen relative">
+        <video 
+          className="w-full h-full object-cover" 
+          src="/videos/signinsignup.mp4" 
+          autoPlay 
+          muted 
+          loop 
+          playsInline
+        />
+        <div className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-slate-900"></div>
       </div>
 
-      {/* Right Column - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      {/* Login Form */}
+      <div className="relative flex items-center justify-center p-8">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-green-900/50 to-transparent blur-3xl -translate-x-1/2"></div>
         <Card className="w-full max-w-md gaming-card border-0 bg-gradient-to-br from-green-600/10 to-green-800/10 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold text-white mb-2">

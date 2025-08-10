@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 // GET - Fetch reviews for a user
 export async function GET(
   request: NextRequest,
@@ -16,8 +18,13 @@ export async function GET(
     }
 
     // Get the user being reviewed
-    const reviewedUser = await prisma.user.findUnique({
-      where: { username },
+    const reviewedUser = await prisma.user.findFirst({
+      where: { 
+        username: {
+          equals: username,
+          mode: 'insensitive',
+        },
+       },
       select: { id: true }
     });
 
@@ -83,8 +90,13 @@ export async function POST(
     }
 
     // Get the user being reviewed
-    const reviewedUser = await prisma.user.findUnique({
-      where: { username },
+    const reviewedUser = await prisma.user.findFirst({
+      where: { 
+        username: {
+          equals: username,
+          mode: 'insensitive',
+        },
+      },
       select: { id: true, username: true }
     });
 
@@ -142,4 +154,4 @@ export async function POST(
       { status: 500 }
     );
   }
-} 
+}
