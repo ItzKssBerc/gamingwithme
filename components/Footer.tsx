@@ -1,134 +1,105 @@
-import { 
-  Github, 
-  Twitter, 
-  Instagram, 
-  Youtube,
-  Mail,
-  Heart
-} from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
+import { DribbbleIcon, GithubIcon, InstagramIcon, TwitterIcon } from "lucide-react";
+import Link from "next/link";
 
-export default function Footer() {
-  const currentYear = new Date().getFullYear()
+const socials = [
+    {
+        icon: <TwitterIcon />,
+        href: "#",
+    },
+    {
+        icon: <InstagramIcon />,
+        href: "#",
+    },
+    {
+        icon: <DribbbleIcon />,
+        href: "#",
+    },
+    {
+        icon: <GithubIcon />,
+        href: "#",
+    },
+];
 
-  return (
-    <footer className="bg-black border-t border-green-700">
-      <div className="container mx-auto px-4 py-8 md:py-12">
-        <div className="flex justify-between items-start">
-          {/* Mobile: 3 columns, Desktop: 4 columns */}
-          <div className="grid grid-cols-3 md:grid-cols-4 gap-6 md:gap-8 flex-grow">
-            {/* Brand - Full width on mobile, first column on desktop */}
-            <div className="col-span-3 md:col-span-1 space-y-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-white">GamingWithYou</span>
-                <Image src="/logo/logo.png" alt="GamingWithYou Logo" width={30} height={30} />
-              </div>
-              <p className="text-gray-300 text-sm text-justify">
-                Connect with gamers, book sessions, and discover amazing gaming experiences.
-              </p>
-              <div className="flex justify-center space-x-4">
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Twitter className="h-5 w-5" />
-                </Link>
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Instagram className="h-5 w-5" />
-                </Link>
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Youtube className="h-5 w-5" />
-                </Link>
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Github className="h-5 w-5" />
-                </Link>
-              </div>
+const links = [
+    {
+        title: "Support",
+        links: [
+            {
+                label: "FAQ",
+                href: "#",
+            },
+            {
+                label: "Contact Us",
+                href: "#",
+            },
+        ],
+    },
+    {
+        title: "Legal",
+        links: [
+            {
+                label: "Privacy Policy",
+                href: "#",
+            },
+            {
+                label: "Cookie Policy",
+                href: "#",
+            },
+        ],
+    },
+];
+
+const Footer = () => {
+    return (
+        <footer className="bg-black text-white border-t border-green-700">
+            <div className="container mx-auto py-8 px-4 md:px-6">
+                {/* Upper section with brand info and links */}
+                <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 text-center md:text-left">
+                    {/* Left side: Brand and social */}
+                    <div className="flex flex-col items-center md:items-start gap-4 md:w-1/3">
+                        <h2 className="text-2xl font-bold">GamingWithYou</h2>
+                        <div className="max-w-xs">
+                            <p className="text-gray-300 text-justify">
+                                GamingWithYou is a platform for gamers to connect and play together.
+                            </p>
+                        </div>
+                        <div className="flex gap-4 mt-2 justify-center md:justify-start">
+                            {socials.map((social, index) => (
+                                <Link key={index} href={social.href} className="text-gray-300 hover:text-white">
+                                    {social.icon}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Right side: Links */}
+                    <div className="grid grid-cols-2 md:w-2/3 md:border-l border-green-700 divide-x divide-green-700">
+                        {links.map((column) => (
+                            <div key={column.title} className="flex flex-col gap-4 px-6">
+                                <h3 className="font-bold text-lg text-white">{column.title}</h3>
+                                <ul className="flex flex-col gap-2">
+                                    {column.links.map((link) => (
+                                        <li key={link.label}>
+                                            <Link href={link.href} className="text-gray-300 hover:text-white text-sm">
+                                                {link.label}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
 
-            {/* Platform */}
-            <div className="space-y-3 md:space-y-4">
-              <h3 className="text-white font-semibold text-sm md:text-base">Platform</h3>
-              <ul className="space-y-2 text-xs md:text-sm">
-                <li>
-                  <Link href="/games" className="text-gray-300 hover:text-white transition-colors">
-                    Games
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/gamers" className="text-gray-300 hover:text-white transition-colors">
-                    Find Gamers
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/events" className="text-gray-300 hover:text-white transition-colors">
-                    Events
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/services" className="text-gray-300 hover:text-white transition-colors">
-                    Services
-                  </Link>
-                </li>
-              </ul>
+            {/* Bottom section with copyright */}
+            <div className="border-t border-green-700">
+                <div className="container mx-auto py-8 text-center text-gray-400">
+                    <p>© 2025 GamingWithYou. All rights reserved.</p>
+                </div>
             </div>
+        </footer>
+    );
+};
 
-            {/* Support */}
-            <div className="space-y-3 md:space-y-4">
-              <h3 className="text-white font-semibold text-sm md:text-base">Support</h3>
-              <ul className="space-y-2 text-xs md:text-sm">
-                <li>
-                  <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
-                    Contact Us
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/faq" className="text-gray-300 hover:text-white transition-colors">
-                    Faq
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div className="space-y-3 md:space-y-4">
-              <h3 className="text-white font-semibold text-sm md:text-base">Legal</h3>
-              <ul className="space-y-2 text-xs md:text-sm">
-                <li>
-                  <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/cookies" className="text-gray-300 hover:text-white transition-colors">
-                    Cookie Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/security" className="text-gray-300 hover:text-white transition-colors">
-                    Security
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-
-        {/* Bottom Bar */}
-        <div className="border-t border-green-700 mt-6 md:mt-8 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <p className="text-gray-400 text-xs md:text-sm text-center md:text-left">
-            © {currentYear} GamingWithYou. All rights reserved.
-          </p>
-          <div className="flex items-center space-x-2 text-gray-400 text-xs md:text-sm">
-            <span>Made with</span>
-            <Heart className="h-3 w-3 md:h-4 md:w-4 text-red-400" />
-            <span>by the GamingWithYou Team</span>
-          </div>
-        </div>
-      </div>
-    </footer>
-  )
-}
+export default Footer;
