@@ -78,7 +78,7 @@ export default function LoginForm() {
         <Card className="w-full max-w-md gaming-card border-0 bg-gradient-to-br from-green-600/10 to-green-800/10 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold text-white mb-2">
-              Sign In
+              Login
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -155,12 +155,12 @@ export default function LoginForm() {
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Signing In...</span>
+                    <span>Logging In...</span>
                   </div>
                 ) : (
                   <>
                     <LogIn className="h-5 w-5 mr-2" />
-                    Sign In
+                    Login
                   </>
                 )}
               </Button>
@@ -172,7 +172,7 @@ export default function LoginForm() {
                   href="/registration" 
                   className="text-green-400 hover:text-green-300 underline font-medium transition-colors"
                 >
-                  Create an account
+                  Register
                 </Link>
               </div>
             </form>

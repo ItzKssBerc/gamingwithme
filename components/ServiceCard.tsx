@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Button } from './ui/button';
 
 interface ServiceCardProps {
   service: {
@@ -11,9 +12,10 @@ interface ServiceCardProps {
     isActive: boolean;
   };
   memberCount: number;
+  onDelete: (id: string) => void;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ service, memberCount }) => {
+const ServiceCard: React.FC<ServiceCardProps> = ({ service, memberCount, onDelete }) => {
   return (
     <div className="border rounded-lg p-4 flex flex-col justify-between h-full">
       <div>
@@ -31,6 +33,11 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, memberCount }) => {
             {service.isActive ? 'Active' : 'Inactive'}
           </span>
         </div>
+      </div>
+      <div className="mt-4 flex justify-end">
+        <Button variant="destructive" size="sm" onClick={() => onDelete(service.id)}>
+          Delete
+        </Button>
       </div>
     </div>
   );

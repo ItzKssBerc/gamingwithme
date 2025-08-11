@@ -162,12 +162,12 @@ export default function Navigation() {
               <>
                 <Button asChild className="bg-green-600/20 backdrop-blur-sm border border-green-500/30 text-white hover:bg-green-600/30 hover:border-green-400/50 transition-all duration-300">
                   <Link href="/login">
-                    Sign In
+                    Login
                   </Link>
                 </Button>
                 <Button asChild className="gaming-button">
                   <Link href="/registration">
-                    Sign Up
+                    Register
                   </Link>
                 </Button>
               </>
@@ -291,12 +291,12 @@ export default function Navigation() {
                   <div className="flex flex-col space-y-2">
                     <Button asChild className="bg-green-600/20 backdrop-blur-sm border border-green-500/30 text-white hover:bg-green-600/30 hover:border-green-400/50 transition-all duration-300">
                       <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                        Sign In
+                        Login
                       </Link>
                     </Button>
                     <Button asChild className="gaming-button">
                       <Link href="/registration" onClick={() => setIsMenuOpen(false)}>
-                        Sign Up
+                        Register
                       </Link>
                     </Button>
                   </div>

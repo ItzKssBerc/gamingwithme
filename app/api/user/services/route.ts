@@ -81,19 +81,19 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, description, price, duration, slots, game, platform } = body;
+    const { title, description, price, duration, capacity, game, platform } = body;
 
     // --- Data Validation ---
-    if (!title || !description || !price || !duration || !slots) {
+    if (!title || !description || !price || !duration || !capacity) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const parsedPrice = parseFloat(price);
     const parsedDuration = parseInt(duration, 10);
-    const parsedSlots = parseInt(slots, 10);
+    const parsedCapacity = parseInt(capacity, 10);
 
-    if (isNaN(parsedPrice) || isNaN(parsedDuration) || isNaN(parsedSlots) || parsedPrice <= 0 || parsedDuration <= 0 || parsedSlots <= 0) {
-      return NextResponse.json({ error: 'Price, duration, and slots must be valid positive numbers.' }, { status: 400 });
+    if (isNaN(parsedPrice) || isNaN(parsedDuration) || isNaN(parsedCapacity) || parsedPrice <= 0 || parsedDuration <= 0 || parsedCapacity <= 0) {
+      return NextResponse.json({ error: 'Price, duration, and capacity must be valid positive numbers.' }, { status: 400 });
     }
 
     // --- Prepare Service Data ---
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       description,
       price: parsedPrice,
       duration: parsedDuration,
-      slots: parsedSlots,
+      capacity: parsedCapacity,
       isActive: true,
     };
 

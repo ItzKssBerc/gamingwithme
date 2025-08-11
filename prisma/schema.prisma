@@ -175,7 +175,7 @@ model FixedService {
   description String
   price       Float
   duration    Int      // minutes
-  slots       Int
+  capacity    Int      @default(1)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
