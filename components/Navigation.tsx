@@ -97,9 +97,6 @@ export default function Navigation() {
               <Link href="/support" className="text-green-200 hover:text-white transition-colors">
                 Support
               </Link>
-              <Link href="/services" className="text-green-200 hover:text-white transition-colors">
-                Services
-              </Link>
             </div>
           </div>
 
@@ -138,12 +135,6 @@ export default function Navigation() {
                       <Link href="/profile" className="flex items-center space-x-2 cursor-pointer py-2">
                         <Settings className="h-4 w-4" />
                         <span>Settings</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                      <Link href="/profile/services/dashboard" className="flex items-center space-x-2 cursor-pointer py-2">
-                        <Gamepad2 className="h-4 w-4" />
-                        <span>Services</span>
                       </Link>
                     </DropdownMenuItem>
 
@@ -213,14 +204,6 @@ export default function Navigation() {
                 <Settings className="h-5 w-5" />
                 <span>Support</span>
               </Link>
-              <Link 
-                href="/services" 
-                className="text-green-200 hover:text-white transition-colors flex items-center space-x-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Gamepad2 className="h-5 w-5" />
-                <span>Services</span>
-              </Link>
               
               <div className="pt-4 border-t border-green-700">
                 {session ? (
@@ -264,12 +247,6 @@ export default function Navigation() {
                           <Link href="/profile" className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
                             <Settings className="h-4 w-4" />
                             <span>Settings</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                          <Link href="/services" className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
-                            <Gamepad2 className="h-4 w-4" />
-                            <span>Services</span>
                           </Link>
                         </DropdownMenuItem>
 
