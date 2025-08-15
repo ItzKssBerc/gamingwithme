@@ -94,9 +94,25 @@ export default function Navigation() {
               <Link href="/gamers" className="text-green-200 hover:text-white transition-colors">
                 Gamers
               </Link>
-              <Link href="/support" className="text-green-200 hover:text-white transition-colors">
-                Support
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="text-green-200 hover:text-white transition-colors flex items-center gap-1 px-2 py-1 rounded-md">
+                    Support <ChevronDown className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/50 text-white rounded-lg shadow-xl min-w-[140px]" align="start">
+                  <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
+                    <Link href="/support/contactus" className="flex items-center space-x-2 cursor-pointer py-2">
+                      <span>Contact us</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
+                    <Link href="/support/faq" className="flex items-center space-x-2 cursor-pointer py-2">
+                      <span>FAQ</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
