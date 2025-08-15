@@ -21,6 +21,7 @@ interface User {
   username: string
   avatar?: string | null
   country?: string | null
+  rating?: number
 }
 
 interface Pagination {
@@ -197,30 +198,35 @@ export default function GamersPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {users.map((user) => (
-                  <Link href={`/profile/${user.username}`} key={user.id} className="block group">
-                    <Card className="h-full bg-slate-800/50 border-slate-700/50 rounded-lg overflow-hidden transition-all duration-300 hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/10 flex flex-col">
-                      <div className="aspect-square overflow-hidden">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-12 gap-y-10">
+                  {users.map((user) => (
+                    <Link href={`/profile/${user.username}`} key={user.id} className="block group">
+                      <Card className="relative h-[220px] w-[160px] p-0 mx-auto overflow-hidden border-4 border-green-400/40 bg-green-300/10 shadow-lg rounded-2xl">
                         {user.avatar ? (
                           <img
                             src={user.avatar}
                             alt={user.username}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            className="absolute inset-0 w-full h-full object-cover rounded-2xl shadow-xl group-hover:scale-105 transition-all duration-300"
+                            style={{ aspectRatio: '4/5' }}
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-slate-800">
-                            <Users className="h-10 w-10 text-slate-500" />
+                          <div className="absolute inset-0 w-full h-full rounded-2xl flex items-center justify-center bg-gradient-to-br from-green-700 to-slate-800 shadow-xl" style={{ aspectRatio: '4/5' }}>
+                            <Users className="h-10 w-10 text-white" />
                           </div>
                         )}
-                      </div>
-                      <div className="p-2 text-center">
-                        <h3 className="font-semibold text-white text-sm truncate group-hover:text-green-400 transition-colors">{user.username}</h3>
-                        <p className="text-xs text-gray-400 mt-1">{user.country || 'Unknown'}</p>
-                      </div>
-                    </Card>
-                  </Link>
-                ))}
+                        {/* Név badge a kép alján, balra igazítva */}
+                        <div className="absolute bottom-2 left-2 bg-green-500/90 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg border border-green-700 w-fit max-w-[80%] truncate z-10 text-left">
+                          {user.username}
+                        </div>
+                        {/* Értékelés badge jobb felső sarokban */}
+                        {typeof user.rating === 'number' && (
+                          <div className="absolute top-2 right-2 z-10 bg-yellow-400/90 text-black text-xs font-bold px-2 py-1 rounded-full shadow border border-yellow-600 flex items-center gap-1">
+                            {user.rating}
+                          </div>
+                        )}
+                      </Card>
+                    </Link>
+                  ))}
               </div>
 
               {/* Pagination */}

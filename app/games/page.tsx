@@ -236,34 +236,37 @@ export default function GamesPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-x-8 gap-y-12">
                 {games.map((game) => (
                   <Link href={`/games/${game.slug}`} key={game.id} className="block group">
-                    <Card className="h-full bg-slate-800/50 border-slate-700/50 rounded-lg overflow-hidden transition-all duration-300 hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/10 flex flex-col">
-                      <div className="aspect-[3/4] overflow-hidden">
-                        {game.igdbCoverUrl ? (
-                          <img
-                            src={game.igdbCoverUrl}
-                            alt={game.name}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-slate-800">
-                            <Gamepad2 className="h-10 w-10 text-slate-500" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-2">
-                        <h3 className="font-semibold text-white text-sm truncate group-hover:text-green-400 transition-colors">{game.name}</h3>
-                        <div className="flex justify-between items-center text-xs text-gray-400 mt-1">
-                          <span>{game.releaseDate ? new Date(game.releaseDate).getFullYear() : '----'}</span>
-                          {typeof game.igdbRating === 'number' && (
-                            <div className="flex items-center gap-1 font-bold text-yellow-400">
-                              <Star className="h-3 w-3 fill-current" />
-                              <span>{Math.round(game.igdbRating)}</span>
-                            </div>
-                          )}
+                    <Card className="relative w-full aspect-[3/4] max-w-[260px] mx-auto overflow-hidden rounded-2xl shadow-lg border-none">
+                      {/* Sötétítő + belső árnyék overlay */}
+                      <div className="absolute inset-0 w-full h-full bg-black/30 z-10 pointer-events-none rounded-2xl shadow-[inset_0_0_40px_10px_rgba(0,0,0,0.5)]"></div>
+                      {game.igdbCoverUrl ? (
+                        <img
+                          src={game.igdbCoverUrl}
+                          alt={game.name}
+                          className="absolute inset-0 w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-all duration-300 z-0"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-slate-800 rounded-2xl z-0">
+                          <Gamepad2 className="h-10 w-10 text-slate-500" />
                         </div>
+                      )}
+                      {/* Év badge bal felső sarokban */}
+                      <div className="absolute top-2 left-2 z-20 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded-full shadow border border-white/20">
+                        {game.releaseDate ? new Date(game.releaseDate).getFullYear() : '----'}
+                      </div>
+                      {/* Értékelés badge jobb felső sarokban */}
+                      {typeof game.igdbRating === 'number' && (
+                        <div className="absolute top-2 right-2 z-20 bg-yellow-400/90 text-black text-xs font-bold px-2 py-1 rounded-full shadow border border-yellow-600 flex items-center gap-1">
+                          <Star className="h-3 w-3 fill-current text-black" />
+                          <span>{Math.round(game.igdbRating)}</span>
+                        </div>
+                      )}
+                      {/* Overlay feliratok */}
+                      <div className="absolute bottom-0 left-0 w-full py-3 px-4 flex flex-col gap-2 z-20">
+                        <h3 className="font-bold text-sm text-white truncate group-hover:text-green-400 transition-colors mb-0 w-full">{game.name}</h3>
                       </div>
                     </Card>
                   </Link>
