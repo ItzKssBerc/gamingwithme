@@ -10,12 +10,18 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || '';
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '12');
+    // Trending esetén mindig 100-as limit
+    let limit = parseInt(searchParams.get('limit') || '12');
+    const now = new Date();
+    const currentYear = now.getFullYear();
     const genre = searchParams.get('genre');
     const platform = searchParams.get('platform');
     
-    // This is the corrected logic. It reads the 'orderBy' parameter sent by the frontend.
-    const orderByParam = searchParams.get('orderBy') || '-rating'; // Default to -rating (Trending)
+    // Trending: popularity szerint rendezünk, ha nincs orderBy megadva
+    let orderByParam = searchParams.get('orderBy');
+    if (!orderByParam || orderByParam === '-rating') {
+      orderByParam = '-rating_count';
+    }
 
     // Parse the orderBy parameter into a field and a direction (asc/desc)
     let sortField = orderByParam;
@@ -29,10 +35,12 @@ export async function GET(request: NextRequest) {
 
     // Build the WHERE clause for the IGDB query
     const nowInSeconds = Math.floor(Date.now() / 1000);
-    // Corrected logic: Filter for main games that have a release date in the past.
-    // This is a more reliable way to define "released" than using the status field, which can be inconsistent.
-    // Also, only show games that have a rating.
+  // Trending: minden idők legmagasabb értékelésű játékok
     let whereClauses = ['version_parent = null', 'category = 0', `first_release_date <= ${nowInSeconds}`, 'rating != null'];
+    // Ha keresés van, ne legyen rating_count szűrés
+    if (!query.trim() && (!orderByParam || orderByParam === '-rating' || orderByParam === '-rating_count' || orderByParam === '-popularity')) {
+      whereClauses.push('rating_count >= 1000');
+    }
     if (query.trim()) {
       whereClauses.push(`name ~ *\"${query}\"*`);
     }

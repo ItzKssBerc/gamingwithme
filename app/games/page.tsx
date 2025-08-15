@@ -63,7 +63,7 @@ export default function GamesPage() {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery)
 
   const orderByDisplayMap: { [key: string]: string } = {
-    '-rating': 'Trending',
+    '-rating': 'Popular',
     'first_release_date': 'Oldest First',
     '-first_release_date': 'Newest First',
     'name': 'A-Z',
@@ -196,7 +196,7 @@ export default function GamesPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-slate-800 text-white border-slate-700">
-                      <DropdownMenuItem onSelect={() => handleOrderByChange('-rating')}>Trending</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => handleOrderByChange('-rating')}>Popular</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => handleOrderByChange('-first_release_date')}>Newest First</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => handleOrderByChange('first_release_date')}>Oldest First</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => handleOrderByChange('name')}>A-Z</DropdownMenuItem>
