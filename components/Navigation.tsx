@@ -76,7 +76,7 @@ export default function Navigation() {
                 className="h-8 w-auto"
                 priority
               />
-              <span className="text-xl font-bold text-white">GamingWithYou</span>
+              <span className="text-xl font-bold text-white">GamingWithMe</span>
             </Link>
           </div>
 
@@ -212,14 +212,30 @@ export default function Navigation() {
                 <Users className="h-5 w-5" />
                 <span>Gamers</span>
               </Link>
-              <Link 
-                href="/support" 
-                className="text-green-200 hover:text-white transition-colors flex items-center space-x-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Settings className="h-5 w-5" />
-                <span>Support</span>
-              </Link>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="text-green-200 hover:text-white transition-colors flex items-center justify-between w-full space-x-2">
+                      <div className="flex items-center space-x-2">
+                          <Settings className="h-5 w-5" />
+                          <span>Support</span>
+                      </div>
+                      <ChevronDown className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[calc(100vw-2rem)] bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/50 text-white rounded-lg shadow-xl" side="bottom" align="start" sideOffset={10}>
+                  <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
+                    <Link href="/support/contactus" className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
+                      <span>Contact us</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
+                    <Link href="/support/faq" className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
+                      <span>FAQ</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               
               <div className="pt-4 border-t border-green-700">
                 {session ? (
@@ -287,7 +303,7 @@ export default function Navigation() {
                         Login
                       </Link>
                     </Button>
-                    <Button asChild className="gaming-button">
+                    <Button asChild className="bg-green-700/40 backdrop-blur-md border border-green-700/70 text-white shadow-lg hover:bg-green-700/60 hover:border-green-500/80 transition-all duration-300">
                       <Link href="/registration" onClick={() => setIsMenuOpen(false)}>
                         Register
                       </Link>

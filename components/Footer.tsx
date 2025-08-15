@@ -57,10 +57,10 @@ const Footer = () => {
                 <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 text-center md:text-left">
                     {/* Left side: Brand and social */}
                     <div className="flex flex-col items-center md:items-start gap-4 md:w-1/3">
-                        <h2 className="text-2xl font-bold">GamingWithYou</h2>
+                        <h2 className="text-2xl font-bold">GamingWithMe</h2>
                         <div className="max-w-xs">
                             <p className="text-gray-300 text-justify">
-                                GamingWithYou is a platform for gamers to connect and play together.
+                                GamingWithMe is a platform for gamers to connect and play together.
                             </p>
                         </div>
                         <div className="flex gap-4 mt-2 justify-center md:justify-start">
@@ -95,7 +95,7 @@ const Footer = () => {
             {/* Bottom section with copyright */}
             <div className="border-t border-green-700">
                 <div className="container mx-auto py-8 text-center text-gray-400">
-                    <p>© 2025 GamingWithYou. All rights reserved.</p>
+                    <p>© 2025 GamingWithMe. All rights reserved.</p>
                 </div>
             </div>
         </footer>
