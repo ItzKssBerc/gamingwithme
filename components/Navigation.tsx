@@ -151,12 +151,12 @@ export default function Navigation() {
               </div>
             ) : (
               <>
-                <Button asChild className="bg-green-600/20 backdrop-blur-sm border border-green-500/30 text-white hover:bg-green-600/30 hover:border-green-400/50 transition-all duration-300">
+                <Button asChild className="bg-green-300/30 backdrop-blur-md border border-green-300/50 text-white shadow-lg hover:bg-green-300/50 hover:border-green-400/70 transition-all duration-300">
                   <Link href="/login">
                     Login
                   </Link>
                 </Button>
-                <Button asChild className="gaming-button">
+                <Button asChild className="bg-green-700/40 backdrop-blur-md border border-green-700/70 text-white shadow-lg hover:bg-green-700/60 hover:border-green-500/80 transition-all duration-300">
                   <Link href="/registration">
                     Register
                   </Link>

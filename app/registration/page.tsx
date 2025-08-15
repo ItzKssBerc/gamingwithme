@@ -233,7 +233,7 @@ export default function RegistrationPage() {
               {/* Submit Button */}
               <Button 
                 type="submit" 
-                className="w-full gaming-button text-lg py-3"
+                className="w-full text-lg py-3 bg-green-700/40 backdrop-blur-md border border-green-700/70 text-white shadow-lg hover:bg-green-700/60 hover:border-green-500/80 hover:scale-105 transition-all duration-300 font-bold rounded-xl"
                 disabled={!agreedToTerms || isLoading}
               >
                 {isLoading ? (

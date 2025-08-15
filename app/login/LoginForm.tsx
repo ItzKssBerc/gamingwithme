@@ -149,7 +149,7 @@ export default function LoginForm() {
               {/* Submit Button */}
               <Button 
                 type="submit" 
-                className="w-full gaming-button text-lg py-3"
+                className="w-full text-lg py-3 bg-green-300/30 backdrop-blur-md border border-green-300/50 text-white shadow-lg hover:bg-green-300/50 hover:border-green-400/70 hover:scale-105 transition-all duration-300 font-bold rounded-xl"
                 disabled={isLoading}
               >
                 {isLoading ? (

@@ -1,64 +1,109 @@
-"use client"
 
-import * as React from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
+"use client";
+import React, { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+const WEEKDAYS = ["H", "K", "Sz", "Cs", "P", "Szo", "V"];
+const MONTHS = [
+  "Január", "Február", "Március", "Április", "Május", "Június",
+  "Július", "Augusztus", "Szeptember", "Október", "November", "December"
+];
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
-
-function Calendar({
-  className,
-  classNames,
-  showOutsideDays = true,
-  ...props
-}: CalendarProps) {
-  return (
-    <DayPicker
-      showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
-      classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-        month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
-        nav: "space-x-1 flex items-center",
-        nav_button: cn(
-          buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-        ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
-        table: "w-full border-collapse space-y-1",
-        head_row: "flex",
-        head_cell:
-          "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-        row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
-        ),
-        day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
-        day_outside: "day-outside text-muted-foreground opacity-50",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
-        ...classNames,
-      }}
-      components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
-      }}
-      {...props}
-    />
-  )
+function getDaysInMonth(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate();
 }
-Calendar.displayName = "Calendar"
 
-export { Calendar }
+function getFirstDayOfMonth(year: number, month: number) {
+  return new Date(year, month, 1).getDay();
+}
+
+export interface CalendarProps {
+  value?: Date;
+  onChange?: (date: Date) => void;
+  className?: string;
+}
+
+export function Calendar({ value, onChange, className }: CalendarProps) {
+  const today = new Date();
+  const [selected, setSelected] = useState<Date | undefined>(value);
+  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
+
+  const daysInMonth = getDaysInMonth(year, month);
+  const firstDay = getFirstDayOfMonth(year, month);
+
+  function handleSelect(day: number) {
+    const date = new Date(year, month, day);
+    setSelected(date);
+    onChange?.(date);
+  }
+
+  function prevMonth() {
+    if (month === 0) {
+      setMonth(11);
+      setYear(year - 1);
+    } else {
+      setMonth(month - 1);
+    }
+  }
+
+  function nextMonth() {
+    if (month === 11) {
+      setMonth(0);
+      setYear(year + 1);
+    } else {
+      setMonth(month + 1);
+    }
+  }
+
+  return (
+  <div className={`rounded-xl border-2 border-green-500 shadow-green-500/20 shadow-lg bg-slate-900 p-4 w-full max-w-sm mx-auto ${className ?? ""}`}> 
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={prevMonth} className="p-2 rounded-full hover:bg-primary/20 transition">
+          <ChevronLeft className="h-5 w-5 text-primary" />
+        </button>
+  <div className="text-lg font-bold text-green-400">
+          {MONTHS[month]} {year}
+        </div>
+        <button onClick={nextMonth} className="p-2 rounded-full hover:bg-primary/20 transition">
+          <ChevronRight className="h-5 w-5 text-primary" />
+        </button>
+      </div>
+  <div className="grid grid-cols-7 gap-1 mb-2">
+        {WEEKDAYS.map((wd) => (
+          <div key={wd} className="text-center text-green-400 font-semibold">{wd}</div>
+        ))}
+      </div>
+  <div className="grid grid-cols-7 gap-1">
+        {Array(firstDay === 0 ? 6 : firstDay - 1).fill(null).map((_, i) => (
+          <div key={"empty-" + i}></div>
+        ))}
+        {Array.from({ length: daysInMonth }, (_, i) => {
+          const day = i + 1;
+          const date = new Date(year, month, day);
+          const isToday =
+            date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
+          const isSelected =
+            selected &&
+            date.getDate() === selected.getDate() &&
+            date.getMonth() === selected.getMonth() &&
+            date.getFullYear() === selected.getFullYear();
+          return (
+            <button
+              key={day}
+              onClick={() => handleSelect(day)}
+              className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-base transition-all duration-200 m-1
+                ${isSelected ? "bg-green-500 text-white shadow-lg scale-110 border-2 border-green-400" : "bg-slate-700 text-white hover:bg-green-700 hover:scale-105"}
+                ${isToday ? "border-2 border-green-400 font-extrabold" : ""}
+              `}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
