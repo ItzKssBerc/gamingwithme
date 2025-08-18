@@ -16,7 +16,6 @@ import {
   Users,
   Star,
   Zap,
-  Chrome,
   Twitch
 } from "lucide-react"
 import Link from "next/link"
@@ -43,7 +42,7 @@ export default function RegistrationPage() {
     setIsLoading(true)
     
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords don\'t match")
+      setError("Passwords don't match")
       setIsLoading(false)
       return
     }
@@ -203,7 +202,7 @@ export default function RegistrationPage() {
                       <Shield className="h-4 w-4 text-red-400" />
                     )}
                     <span className={doPasswordsMatch ? "text-green-400" : "text-red-400"}>
-                      {doPasswordsMatch ? "Passwords match!" : "Passwords don\'t match"}
+                      {doPasswordsMatch ? "Passwords match!" : "Passwords don't match"}
                     </span>
                   </div>
                 )}
@@ -286,13 +285,13 @@ export default function RegistrationPage() {
               Create Account
             </h2>
             <p className="text-xl text-gray-200 max-w-md drop-shadow-lg mb-8">
-              Ready to level up? Let\'s get you started on your gaming journey!
+              Ready to level up? Let's get you started on your gaming journey!
             </p>
             <div className="w-full flex flex-col items-center pointer-events-auto mt-8">
               <p className="text-lg text-gray-300 mb-6">Or continue with</p>
               <div className="flex gap-8">
                 <button className="h-28 w-28 flex items-center justify-center rounded-full bg-white/10 border border-green-500/30 text-white hover:bg-white/20 transition-all duration-300">
-                  <Chrome className="h-14 w-14" />
+                  <span className="text-5xl font-bold">G</span>
                 </button>
                 <button className="h-28 w-28 flex items-center justify-center rounded-full bg-white/10 border border-green-500/30 text-white hover:bg-white/20 transition-all duration-300">
                   <Twitch className="h-14 w-14" />

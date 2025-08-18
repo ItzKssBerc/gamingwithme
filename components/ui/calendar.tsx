@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const WEEKDAYS = ["H", "K", "Sz", "Cs", "P", "Szo", "V"];
@@ -14,7 +14,9 @@ function getDaysInMonth(year: number, month: number) {
 }
 
 function getFirstDayOfMonth(year: number, month: number) {
-  return new Date(year, month, 1).getDay();
+  // Adjust for Monday-first week (getDay() is 0 for Sunday)
+  const day = new Date(year, month, 1).getDay();
+  return day === 0 ? 6 : day - 1;
 }
 
 export interface CalendarProps {
@@ -25,35 +27,37 @@ export interface CalendarProps {
 
 export function Calendar({ value, onChange, className }: CalendarProps) {
   const today = new Date();
-  const [selected, setSelected] = useState<Date | undefined>(value);
-  const [month, setMonth] = useState(today.getMonth());
-  const [year, setYear] = useState(today.getFullYear());
+  // Internal state for month/year navigation
+  const [currentDate, setCurrentDate] = useState(value || today);
+
+  // Update internal state only if the external value changes
+  useEffect(() => {
+    if (value && value.getTime() !== currentDate.getTime()) {
+      setCurrentDate(value);
+    }
+  }, [value, currentDate]);
+
+  const month = currentDate.getMonth();
+  const year = currentDate.getFullYear();
 
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfMonth(year, month);
 
   function handleSelect(day: number) {
     const date = new Date(year, month, day);
-    setSelected(date);
     onChange?.(date);
   }
 
+  function setDisplayMonth(newDate: Date) {
+    setCurrentDate(newDate);
+  }
+
   function prevMonth() {
-    if (month === 0) {
-      setMonth(11);
-      setYear(year - 1);
-    } else {
-      setMonth(month - 1);
-    }
+    setDisplayMonth(new Date(year, month - 1, 1));
   }
 
   function nextMonth() {
-    if (month === 11) {
-      setMonth(0);
-      setYear(year + 1);
-    } else {
-      setMonth(month + 1);
-    }
+    setDisplayMonth(new Date(year, month + 1, 1));
   }
 
   return (
@@ -75,7 +79,7 @@ export function Calendar({ value, onChange, className }: CalendarProps) {
         ))}
       </div>
   <div className="grid grid-cols-7 gap-1">
-        {Array(firstDay === 0 ? 6 : firstDay - 1).fill(null).map((_, i) => (
+        {Array(firstDay).fill(null).map((_, i) => (
           <div key={"empty-" + i}></div>
         ))}
         {Array.from({ length: daysInMonth }, (_, i) => {
@@ -86,17 +90,17 @@ export function Calendar({ value, onChange, className }: CalendarProps) {
             date.getMonth() === today.getMonth() &&
             date.getFullYear() === today.getFullYear();
           const isSelected =
-            selected &&
-            date.getDate() === selected.getDate() &&
-            date.getMonth() === selected.getMonth() &&
-            date.getFullYear() === selected.getFullYear();
+            value &&
+            date.getDate() === value.getDate() &&
+            date.getMonth() === value.getMonth() &&
+            date.getFullYear() === value.getFullYear();
           return (
             <button
               key={day}
               onClick={() => handleSelect(day)}
               className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-base transition-all duration-200 m-1
                 ${isSelected ? "bg-green-500 text-white shadow-lg scale-110 border-2 border-green-400" : "bg-slate-700 text-white hover:bg-green-700 hover:scale-105"}
-                ${isToday ? "border-2 border-green-400 font-extrabold" : ""}
+                ${isToday && !isSelected ? "border-2 border-green-400 font-extrabold" : ""}
               `}
             >
               {day}
