@@ -146,133 +146,142 @@ export default function BookSessionPage() {
   };
 
   return (
-    <div className="bg-muted/40 min-h-screen">
-      <div className="container mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          {/* Left Column: Coach Profile */}
-          <div className="md:col-span-1">
-             {isLoading ? <Loader2 className="mx-auto h-12 w-12 animate-spin" /> : coach && (
-              <div className="space-y-4 text-center md:text-left pt-8">
-                  <Avatar className="h-28 w-28 mb-4 border-2 border-primary/20 mx-auto md:mx-0">
-                    <AvatarImage src={coach.avatarUrl} alt={`@${coach.name}`} />
-                    <AvatarFallback>
-                      <User className="h-12 w-12" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <h1 className="text-3xl font-bold tracking-tight">{coach.name}</h1>
-                  <p className="text-muted-foreground">{coach.bio}</p>
-                  <Separator className="my-6" />
-                  <p className="text-sm text-muted-foreground">
-                    {coach.longDescription}
-                  </p>
-              </div>
-             )}
-          </div>
+    <div className="bg-muted/40 min-h-screen w-full flex items-center justify-center">
+      {services.length === 0 && !isLoading ? (
+        <div className="flex flex-col items-center justify-center w-full">
+          <User className="h-16 w-16 text-muted-foreground mb-4" />
+          <h2 className="text-2xl font-bold mb-2 text-center">No bookable services</h2>
+          <p className="text-muted-foreground text-lg text-center max-w-md">
+            This user has not created any services yet, so you cannot book a session.
+          </p>
+        </div>
+      ) : (
+        <div className="container mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {/* Left Column: Coach Profile */}
+            <div className="md:col-span-1">
+               {isLoading ? <Loader2 className="mx-auto h-12 w-12 animate-spin" /> : coach && (
+                <div className="space-y-4 text-center md:text-left pt-8">
+                    <Avatar className="h-28 w-28 mb-4 border-2 border-primary/20 mx-auto md:mx-0">
+                      <AvatarImage src={coach.avatarUrl} alt={`@${coach.name}`} />
+                      <AvatarFallback>
+                        <User className="h-12 w-12" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <h1 className="text-3xl font-bold tracking-tight">{coach.name}</h1>
+                    <p className="text-muted-foreground">{coach.bio}</p>
+                    <Separator className="my-6" />
+                    <p className="text-sm text-muted-foreground">
+                      {coach.longDescription}
+                    </p>
+                </div>
+               )}
+            </div>
 
-          {/* Right Column: Booking Form */}
-          <div className="md:col-span-2">
-            <Card className="border-none shadow-lg">
-              <CardHeader>
-                <CardTitle className="tracking-tight">Schedule Your Session</CardTitle>
-                <CardDescription className="text-muted-foreground">
-                  Complete the steps below to book your time.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-8">
-                {isLoading ? <Loader2 className="mx-auto h-8 w-8 animate-spin" /> : (
-                  <>
-                    {/* Step 1: Select Service */}
-                    <div className="space-y-4">
-                      <h3 className="text-base font-semibold text-muted-foreground">1. Select a Service</h3>
-                        <div className="grid grid-cols-1 gap-4">
-                          {services.map((service) => (
-                            <div
-                              key={service.id}
-                              className={cn(
-                                "rounded-lg border p-4 cursor-pointer transition-all flex justify-between items-center",
-                                selectedService === service.id
-                                  ? "bg-muted border-primary/50"
-                                  : "border-muted-foreground/20 hover:border-muted-foreground/50"
-                              )}
-                              onClick={() => setSelectedService(service.id)}
-                            >
-                              <div className="space-y-1">
-                                <h4 className="font-semibold">{service.name}</h4>
-                                <p className="text-sm text-muted-foreground">{service.description}</p>
+            {/* Right Column: Booking Form or Warning */}
+            <div className="md:col-span-2">
+              <Card className="border-none shadow-lg">
+                <CardHeader>
+                  <CardTitle className="tracking-tight">Schedule Your Session</CardTitle>
+                  <CardDescription className="text-muted-foreground">
+                    Complete the steps below to book your time.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                  {isLoading ? <Loader2 className="mx-auto h-8 w-8 animate-spin" /> : (
+                    <>
+                      {/* ...existing code... */}
+                      <div className="space-y-4">
+                        <h3 className="text-base font-semibold text-muted-foreground">1. Select a Service</h3>
+                          <div className="grid grid-cols-1 gap-4">
+                            {services.map((service) => (
+                              <div
+                                key={service.id}
+                                className={cn(
+                                  "rounded-lg border p-4 cursor-pointer transition-all flex justify-between items-center",
+                                  selectedService === service.id
+                                    ? "bg-muted border-primary/50"
+                                    : "border-muted-foreground/20 hover:border-muted-foreground/50"
+                                )}
+                                onClick={() => setSelectedService(service.id)}
+                              >
+                                <div className="space-y-1">
+                                  <h4 className="font-semibold">{service.name}</h4>
+                                  <p className="text-sm text-muted-foreground">{service.description}</p>
+                                </div>
+                                <p className="text-lg font-semibold">{service.price}</p>
                               </div>
-                              <p className="text-lg font-semibold">{service.price}</p>
+                            ))}
+                          </div>
+                      </div>
+
+                      <Separator />
+
+                      <div className="space-y-4">
+                          <h3 className="text-base font-semibold text-muted-foreground">2. Pick a Date & Time</h3>
+                          <div className="flex w-full items-start space-x-4">
+                            <div className="w-1/2">
+                              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                                  <PopoverTrigger asChild>
+                                  <Button
+                                      variant={"outline"}
+                                      className={cn(
+                                      "w-full justify-start text-left font-normal h-12 text-base",
+                                      !date && "text-muted-foreground"
+                                      )}
+                                      disabled={!coach} // Disable if no coach data yet
+                                  >
+                                      <CalendarIcon className="mr-2 h-4 w-4" />
+                                      {date ? format(date, "PPP") : <span>Select a date</span>}
+                                  </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0">
+                                  <Calendar
+                                      value={date}
+                                      onChange={handleDateSelect}
+                                  />
+                                  </PopoverContent>
+                              </Popover>
                             </div>
-                          ))}
-                        </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Step 2: Pick a Date & Time */}
-                    <div className="space-y-4">
-                        <h3 className="text-base font-semibold text-muted-foreground">2. Pick a Date & Time</h3>
-                        <div className="flex w-full items-start space-x-4">
-                          <div className="w-1/2">
-                            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                                <PopoverTrigger asChild>
-                                <Button
-                                    variant={"outline"}
-                                    className={cn(
-                                    "w-full justify-start text-left font-normal h-12 text-base",
-                                    !date && "text-muted-foreground"
-                                    )}
-                                    disabled={!coach} // Disable if no coach data yet
-                                >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {date ? format(date, "PPP") : <span>Select a date</span>}
-                                </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
-                                <Calendar
-                                    value={date}
-                                    onChange={handleDateSelect}
-                                />
-                                </PopoverContent>
-                            </Popover>
+                            <div className="w-1/2">
+                              <Select
+                                  value={selectedTime || undefined}
+                                  onValueChange={setSelectedTime}
+                                  disabled={availableTimes.length === 0}
+                              >
+                                  <SelectTrigger className="w-full h-12 text-base">
+                                      <SelectValue placeholder="Select a time..." />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                      {availableTimes.map(time => (
+                                      <SelectItem key={time} value={time}>
+                                          {time}
+                                      </SelectItem>
+                                      ))}
+                                  </SelectContent>
+                              </Select>
+                              {availableTimes.length === 0 && !isLoading && (
+                                  <p className="text-sm text-muted-foreground pt-2">No available times for this date.</p>
+                              )}
+                            </div>
                           </div>
-                          <div className="w-1/2">
-                            <Select
-                                value={selectedTime || undefined}
-                                onValueChange={setSelectedTime}
-                                disabled={availableTimes.length === 0}
-                            >
-                                <SelectTrigger className="w-full h-12 text-base">
-                                    <SelectValue placeholder="Select a time..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {availableTimes.map(time => (
-                                    <SelectItem key={time} value={time}>
-                                        {time}
-                                    </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {availableTimes.length === 0 && !isLoading && (
-                                <p className="text-sm text-muted-foreground pt-2">No available times for this date.</p>
-                            )}
-                          </div>
-                        </div>
-                    </div>
+                      </div>
 
-                    <Button onClick={handleBooking} disabled={isBookingLoading || !date || !selectedService || !selectedTime} size="lg" className="w-full text-base py-6">
-                      {isBookingLoading ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        "Book Session"
-                      )}
-                    </Button>
-                  </>
-                )}
-              </CardContent>
-            </Card>
+                      <Button onClick={handleBooking} disabled={isBookingLoading || !date || !selectedService || !selectedTime} size="lg" className="w-full text-base py-6">
+                        {isBookingLoading ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          "Book Session"
+                        )}
+                      </Button>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
