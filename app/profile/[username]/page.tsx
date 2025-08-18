@@ -326,11 +326,10 @@ export default function UserProfilePage() {
           {/* Left Column - Profile Info */}
           <div className="lg:col-span-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 bg-white/10 border border-white/20">
-                <TabsTrigger value="overview" className="text-white data-[state=active]:bg-green-600">Overview</TabsTrigger>
-                <TabsTrigger value="games" className="text-white data-[state=active]:bg-green-600">Games</TabsTrigger>
-                <TabsTrigger value="services" className="text-white data-[state=active]:bg-green-600">Services</TabsTrigger>
-                <TabsTrigger value="reviews" className="text-white data-[state=active]:bg-green-600">Reviews</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 gap-1 bg-white/10 border border-white/20 p-1 rounded-lg">
+                <TabsTrigger value="overview" className="text-white data-[state=active]:bg-green-600 px-2 py-1 text-sm">Overview</TabsTrigger>
+                <TabsTrigger value="games" className="text-white data-[state=active]:bg-green-600 px-2 py-1 text-sm">Games</TabsTrigger>
+                <TabsTrigger value="reviews" className="text-white data-[state=active]:bg-green-600 px-2 py-1 text-sm">Reviews</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="mt-6">
@@ -520,62 +519,7 @@ export default function UserProfilePage() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="services" className="mt-6">
-                <Card className="gaming-card">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Briefcase className="h-5 w-5" />
-                      Services
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {profile.fixedServices && profile.fixedServices.length > 0 ? (
-                      <div className="space-y-4">
-                        {profile.fixedServices.map((service) => (
-                          <Card key={service.id} className="bg-white/5 border-white/20 hover:bg-white/10 transition-colors">
-                            <CardContent className="p-4">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <h4 className="text-white font-semibold text-lg">{service.title}</h4>
-                                  <p className="text-gray-300 text-sm mt-2">
-                                    {service.description}
-                                  </p>
-                                  <div className="flex items-center gap-4 mt-3">
-                                    <div className="flex items-center gap-1">
-                                      <Clock className="h-4 w-4 text-gray-400" />
-                                      <span className="text-gray-400 text-sm">
-                                        {service.duration} minutes
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                      <Calendar className="h-4 w-4 text-gray-400" />
-                                      <span className="text-gray-400 text-sm">
-                                        Created {new Date(service.createdAt).toLocaleDateString()}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="text-right ml-4">
-                                  <p className="text-green-400 font-semibold text-lg">${service.price}</p>
-                                  <p className="text-gray-400 text-sm">per service</p>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8">
-                        <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-400">No services available yet</p>
-                        <p className="text-gray-500 text-sm mt-2">
-                          This user hasn't created any services yet
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
+              {/* ...existing code... (Services tab törölve) */}
 
               <TabsContent value="reviews" className="mt-6">
                 <Card className="gaming-card">
