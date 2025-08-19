@@ -13,9 +13,10 @@ import {
   SelectItem,
 } from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose, DialogHeader } from '@/components/ui/dialog'
 
 // Simple weekly calendar component (Mon - Sun)
-function WeeklyCalendar({ selected, onToggle }: { selected: string[]; onToggle: (iso: string) => void }) {
+function WeeklyCalendar({ selected, onToggle, onOpenDay }: { selected: string[]; onToggle: (iso: string) => void; onOpenDay?: (iso: string) => void }) {
   const startOfWeek = (() => {
     const d = new Date()
     const day = d.getDay() // 0 Sun .. 6 Sat
@@ -31,7 +32,7 @@ function WeeklyCalendar({ selected, onToggle }: { selected: string[]; onToggle: 
   const days = Array.from({ length: 7 }).map((_, i) => {
     const dd = new Date(startOfWeek)
     dd.setDate(startOfWeek.getDate() + i)
-    const iso = dd.toISOString().slice(0,10)
+  const iso = `${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}-${String(dd.getDate()).padStart(2,'0')}`
     const label = englishShort[i]
     return { iso, label, number: dd.getDate() }
   })
@@ -42,7 +43,16 @@ function WeeklyCalendar({ selected, onToggle }: { selected: string[]; onToggle: 
         <button
           key={d.iso}
           type="button"
-          onClick={() => onToggle(d.iso)}
+          onClick={() => {
+            // If an onOpenDay handler is provided, open the day modal instead of toggling immediately.
+            // This prevents the button from flipping selection every time you open the details dialog.
+            if (onOpenDay) {
+              onOpenDay(d.iso)
+              return
+            }
+            // toggle selection (only when no modal handler is used)
+            onToggle(d.iso)
+          }}
           className={`flex flex-col items-center p-3 rounded-lg transition-colors duration-150 ${selected.includes(d.iso) ? 'bg-green-500 text-black' : 'bg-gray-800/40 text-green-200'}`}
         >
           <span className="text-sm font-semibold">{d.label.charAt(0)}</span>
@@ -51,6 +61,30 @@ function WeeklyCalendar({ selected, onToggle }: { selected: string[]; onToggle: 
       ))}
     </div>
   )
+}
+
+// SlotAdder component for modal
+function SlotAdder({ onAdd }: { onAdd: (time: string, cap: number) => void }) {
+  const [time, setTime] = useState('')
+  const [cap, setCap] = useState('1')
+  return (
+    <div className="flex items-center space-x-2">
+      <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="h-9 rounded px-2 bg-black/30 text-green-100" />
+      <input type="number" min={1} value={cap} onChange={(e) => setCap(e.target.value)} className="w-20 h-9 rounded px-2 bg-black/30 text-green-100" />
+      <button type="button" onClick={() => { if (time) { onAdd(time, Number(cap || 1)); setTime(''); setCap('1') } }} className="text-sm bg-green-500 px-2 rounded text-black">Add slot</button>
+    </div>
+  )
+}
+
+// Helper: parse YYYY-MM-DD into a local Date to avoid timezone shifts when formatting
+function isoToLocalDate(iso?: string | null) {
+  if (!iso) return null
+  const parts = iso.split('-')
+  if (parts.length !== 3) return new Date(iso)
+  const y = Number(parts[0])
+  const m = Number(parts[1]) - 1
+  const d = Number(parts[2])
+  return new Date(y, m, d)
 }
 
 export default function CreateServicePage() {
@@ -67,6 +101,8 @@ export default function CreateServicePage() {
   const [error, setError] = useState('')
   const [step, setStep] = useState(1) // 1..3
   const [selectedWeekDates, setSelectedWeekDates] = useState<string[]>([])
+  const [slotsMap, setSlotsMap] = useState<Record<string, Array<{ id: string; time: string; capacity: number }>>>({})
+  const [openDayIso, setOpenDayIso] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -127,10 +163,16 @@ export default function CreateServicePage() {
     setError('')
     setLoading(true)
     try {
+      // serialize slotsMap into an array of { date, time, capacity }
+      const slotsPayload: Array<{ date: string; time: string; capacity: number }> = []
+      for (const [date, list] of Object.entries(slotsMap)) {
+        for (const s of list) slotsPayload.push({ date, time: s.time, capacity: s.capacity })
+      }
+
       const res = await fetch('/api/user/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, gameId: gameId || null, platform: platform || null, price: Number(price) })
+        body: JSON.stringify({ title, description, gameId: gameId || null, platform: platform || null, price: Number(price), slots: slotsPayload })
       })
       if (!res.ok) throw new Error('Failed to create')
       router.push('/profile/my-services')
@@ -140,6 +182,18 @@ export default function CreateServicePage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const addSlot = (iso: string, time: string, cap: number) => {
+    setSlotsMap((prev) => {
+      const list = prev[iso] ? [...prev[iso]] : []
+      const id = `${iso}-${time}-${Date.now()}`
+      return { ...prev, [iso]: [...list, { id, time, capacity: cap }] }
+    })
+  }
+
+  const removeSlot = (iso: string, id: string) => {
+    setSlotsMap((prev) => ({ ...prev, [iso]: (prev[iso] || []).filter((s) => s.id !== id) }))
   }
 
   const handleContinue = (e?: React.FormEvent) => {
@@ -250,9 +304,56 @@ export default function CreateServicePage() {
                         return [...prev, iso]
                       })
                     }}
+                    onOpenDay={(iso) => setOpenDayIso(iso)}
                   />
               </div>
             )}
+
+            {/* Day details dialog */}
+            <Dialog open={!!openDayIso} onOpenChange={(isOpen) => { if (!isOpen) setOpenDayIso(null) }}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{openDayIso ? isoToLocalDate(openDayIso)!.toLocaleDateString('en-US', { weekday: 'long' }) : 'Day details'}</DialogTitle>
+                  <DialogDescription>{openDayIso ? `Manage slots for ${isoToLocalDate(openDayIso)!.toLocaleDateString('en-US', { weekday: 'long' })}` : ''}</DialogDescription>
+                </DialogHeader>
+                <div className="mt-4 space-y-3">
+                  <p className="text-green-100">Selected: {openDayIso ? (selectedWeekDates.includes(openDayIso) ? 'Yes' : 'No') : '—'}</p>
+
+                  {/* Explicit toggle control so opening the dialog doesn't flip selection unexpectedly */}
+                  {openDayIso && (
+                    <div className="mt-2">
+                      {selectedWeekDates.includes(openDayIso) ? (
+                        <button type="button" onClick={() => setSelectedWeekDates((prev) => prev.filter((d) => d !== openDayIso!))} className="px-3 py-1 bg-red-600 text-white rounded">Mark day inactive</button>
+                      ) : (
+                        <button type="button" onClick={() => setSelectedWeekDates((prev) => (prev.includes(openDayIso!) ? prev : [...prev, openDayIso!]))} className="px-3 py-1 bg-green-500 text-black rounded">Mark day active</button>
+                      )}
+                    </div>
+                  )}
+
+                  <div>
+                    <div className="text-sm text-green-200 mb-2">Slots</div>
+                    <div className="space-y-2">
+                      {(openDayIso && slotsMap[openDayIso]) ? (
+                        slotsMap[openDayIso].map((s) => (
+                          <div key={s.id} className="flex items-center justify-between bg-gray-900/40 px-3 py-2 rounded">
+                            <div className="text-green-100">{s.time} • {s.capacity}p</div>
+                            <button type="button" onClick={() => removeSlot(openDayIso, s.id)} className="text-xs text-red-400">Remove</button>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-green-300 text-sm">No slots yet.</div>
+                      )}
+                    </div>
+                    <div className="mt-3">
+                      <SlotAdder onAdd={(time, cap) => { if (openDayIso) addSlot(openDayIso, time, cap) }} />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end">
+                  <DialogClose className="bg-gray-800/40 px-4 py-2 rounded text-green-100">Close</DialogClose>
+                </div>
+              </DialogContent>
+            </Dialog>
 
             {/* Step 3: Review */}
             {step === 3 && (
