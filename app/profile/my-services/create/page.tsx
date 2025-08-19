@@ -190,10 +190,21 @@ export default function CreateServicePage() {
       const id = `${iso}-${time}-${Date.now()}`
       return { ...prev, [iso]: [...list, { id, time, capacity: cap }] }
     })
+    // Ensure the day is marked active when the first slot is added
+    setSelectedWeekDates((prev) => (prev.includes(iso) ? prev : [...prev, iso]))
   }
 
   const removeSlot = (iso: string, id: string) => {
-    setSlotsMap((prev) => ({ ...prev, [iso]: (prev[iso] || []).filter((s) => s.id !== id) }))
+    setSlotsMap((prev) => {
+      const list = (prev[iso] || []).filter((s) => s.id !== id)
+      const next = { ...prev, [iso]: list }
+      // if no slots remain for that day, remove the key and unselect the day
+      if (!list || list.length === 0) {
+        delete next[iso]
+        setSelectedWeekDates((sel) => sel.filter((d) => d !== iso))
+      }
+      return next
+    })
   }
 
   const handleContinue = (e?: React.FormEvent) => {
@@ -221,6 +232,10 @@ export default function CreateServicePage() {
     setError('')
     if (step > 1) setStep(step - 1)
   }
+
+  // computed slot counts
+  const totalSlotsCount = Object.values(slotsMap).reduce((acc, list) => acc + (list?.length || 0), 0)
+  const slotsThisWeekCount = selectedWeekDates.reduce((acc, iso) => acc + ((slotsMap[iso] && slotsMap[iso].length) || 0), 0)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-green-900 py-12">
@@ -325,7 +340,19 @@ export default function CreateServicePage() {
                       {selectedWeekDates.includes(openDayIso) ? (
                         <button type="button" onClick={() => setSelectedWeekDates((prev) => prev.filter((d) => d !== openDayIso!))} className="px-3 py-1 bg-red-600 text-white rounded">Mark day inactive</button>
                       ) : (
-                        <button type="button" onClick={() => setSelectedWeekDates((prev) => (prev.includes(openDayIso!) ? prev : [...prev, openDayIso!]))} className="px-3 py-1 bg-green-500 text-black rounded">Mark day active</button>
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedWeekDates((prev) => (prev.includes(openDayIso!) ? prev : [...prev, openDayIso!]))}
+                            className={`px-3 py-1 rounded ${((slotsMap[openDayIso!] && slotsMap[openDayIso!].length > 0) ? 'bg-green-500 text-black' : 'bg-gray-700 text-green-200 cursor-not-allowed')}`}
+                            disabled={!(slotsMap[openDayIso!] && slotsMap[openDayIso!].length > 0)}
+                          >
+                            Mark day active
+                          </button>
+                          {!(slotsMap[openDayIso!] && slotsMap[openDayIso!].length > 0) && (
+                            <div className="text-sm text-yellow-300 mt-2">Please add at least one slot to activate the day.</div>
+                          )}
+                        </div>
                       )}
                     </div>
                   )}
@@ -365,6 +392,10 @@ export default function CreateServicePage() {
                   <p className="text-green-100"><strong>Platform:</strong> {platform || '—'}</p>
                   <p className="text-green-100"><strong>Price:</strong> ${price}</p>
                   <p className="text-green-100 mt-2"><strong>Description:</strong> {description || '—'}</p>
+                    <div className="mt-3 text-green-100">
+                      <p><strong>Total sessions (slots) added:</strong> {totalSlotsCount}</p>
+                      <p><strong>Slots in selected week:</strong> {slotsThisWeekCount} {selectedWeekDates.length > 0 ? `(across ${selectedWeekDates.length} selected day(s))` : ''}</p>
+                    </div>
                 </div>
               </div>
             )}
