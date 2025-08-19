@@ -154,7 +154,7 @@ export default function Navigation() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                      <Link href={`/profile/${session.user?.username}/my-services`} className="flex items-center space-x-2 cursor-pointer py-2">
+                      <Link href="/profile/my-services" className="flex items-center space-x-2 cursor-pointer py-2">
                         <Settings className="h-4 w-4" />
                         <span>My Services</span>
                       </Link>
@@ -294,7 +294,7 @@ export default function Navigation() {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                          <Link href={`/profile/${session.user?.username}/my-services`} className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
+                          <Link href="/profile/my-services" className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
                             <Settings className="h-4 w-4" />
                             <span>My Services</span>
                           </Link>
