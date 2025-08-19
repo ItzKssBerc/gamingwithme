@@ -12,6 +12,11 @@ interface Service {
   duration: number;
   isActive: boolean;
   sessionsPerWeek?: number;
+  game?: { id: string; name: string } | null;
+  platform?: { id: string; name: string } | null;
+  gameName?: string | null;
+  platformName?: string | null;
+  gamePlatform?: string | null;
 }
 
 export default function MyServicesPage() {
@@ -23,11 +28,29 @@ export default function MyServicesPage() {
     fetch("/api/user/services")
       .then((res) => res.json())
       .then((data) => {
-        setServices(data.services || []);
+        const incoming = (data.services || []) as any[]
+        const mapped = incoming.map(s => ({
+          ...s,
+          gameName: s?.game?.name ?? null,
+          gamePlatform: s?.game?.platform ?? null,
+          platformName: s?.platform?.name ?? null,
+        }))
+        setServices(mapped);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
+
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch('/api/user/services', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+      if (!res.ok) throw new Error('Delete failed')
+      setServices(prev => prev.filter(s => s.id !== id))
+    } catch (e) {
+      console.error('Failed to delete service', e)
+      alert('Could not delete service')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-green-900 relative overflow-hidden">
@@ -129,16 +152,23 @@ export default function MyServicesPage() {
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <div className="relative z-10">
-                        <ServiceCard
-                          service={service}
-                          memberCount={service.sessionsPerWeek || 0}
-                          onDelete={() => {}}
-                        />
-                        <div className="mt-4 p-3 bg-green-900/20 rounded-lg border border-green-500/20">
+                          <ServiceCard
+                            service={service}
+                            memberCount={service.sessionsPerWeek || 0}
+                            onDelete={handleDelete}
+                            gameName={service.gameName}
+                            gamePlatform={service.gamePlatform}
+                            platformName={service.platformName}
+                          />
+                        <div className="mt-4 p-3 bg-green-900/20 rounded-lg border border-green-500/20 flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                             <span className="text-sm font-semibold text-green-200">Sessions per week:</span>
                             <span className="text-sm text-green-100 font-medium">{service.sessionsPerWeek ?? "N/A"}</span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <button onClick={() => window.location.href = `/profile/my-services/plan?id=${service.id}`} className="text-sm text-green-200 hover:text-green-100">Plan</button>
+                            <button onClick={() => handleDelete(service.id)} className="text-sm text-red-400 hover:text-red-500">Delete</button>
                           </div>
                         </div>
                       </div>

@@ -174,11 +174,26 @@ export default function CreateServicePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, description, gameId: gameId || null, platform: platform || null, price: Number(price), slots: slotsPayload })
       })
-      if (!res.ok) throw new Error('Failed to create')
+
+      if (!res.ok) {
+        // try to extract helpful error details from the response
+        let body: any = null
+        try {
+          body = await res.json()
+        } catch (e) {
+          try { body = await res.text() } catch (_) { body = null }
+        }
+        console.error('Create service failed', { status: res.status, body })
+        const details = body?.details ? (Array.isArray(body.details) ? body.details.join('; ') : String(body.details)) : (body?.error || String(body))
+        setError(`Create failed: ${res.status} ${details || res.statusText}`)
+        setLoading(false)
+        return
+      }
+
       router.push('/profile/my-services')
     } catch (err) {
       console.error(err)
-      setError('Failed to create service')
+      setError((err as any)?.message || 'Failed to create service')
     } finally {
       setLoading(false)
     }

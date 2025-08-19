@@ -186,9 +186,23 @@ model FixedService {
   game        Game?    @relation(fields: [gameId], references: [id], onDelete: SetNull)
   platformId  String?
   platform    Platform?@relation(fields: [platformId], references: [id], onDelete: SetNull)
+  serviceSlots ServiceSlot[]
   orders      ServiceOrder[]
 
   @@map("fixed_services")
+}
+
+model ServiceSlot {
+  id        String   @id @default(cuid())
+  serviceId String
+  date      String   // YYYY-MM-DD
+  time      String   // HH:mm
+  capacity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  service FixedService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@map("service_slots")
 }
 
 model ServiceOrder {
