@@ -160,16 +160,9 @@ export default function MyServicesPage() {
                             gamePlatform={service.gamePlatform}
                             platformName={service.platformName}
                           />
-                        <div className="mt-4 p-3 bg-green-900/20 rounded-lg border border-green-500/20 flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                            <span className="text-sm font-semibold text-green-200">Sessions per week:</span>
-                            <span className="text-sm text-green-100 font-medium">{service.sessionsPerWeek ?? "N/A"}</span>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <button onClick={() => window.location.href = `/profile/my-services/plan?id=${service.id}`} className="text-sm text-green-200 hover:text-green-100">Plan</button>
-                            <button onClick={() => handleDelete(service.id)} className="text-sm text-red-400 hover:text-red-500">Delete</button>
-                          </div>
+                        <div className="mt-4 p-3 bg-green-900/20 rounded-lg border border-green-500/20 flex items-center justify-start space-x-3">
+                          <button onClick={() => window.location.href = `/profile/my-services/plan?id=${service.id}`} className="text-sm text-green-200 hover:text-green-100">Plan</button>
+                          <button onClick={() => handleDelete(service.id)} className="text-sm text-red-400 hover:text-red-500">Delete</button>
                         </div>
                       </div>
                     </div>
