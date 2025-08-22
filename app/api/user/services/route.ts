@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     if (id) {
       const s = await prisma.fixedService.findFirst({
         where: { id, providerId: user.id },
-        include: { serviceSlots: true, game: { select: { id: true, name: true, platform: true } }, platform: { select: { id: true, name: true } } }
+        include: { serviceSlots: true, weeklyServiceSlots: true, game: { select: { id: true, name: true, platform: true } }, platform: { select: { id: true, name: true } } }
       })
       if (!s) return NextResponse.json({ service: null })
       const single = {
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 
     const servicesRaw = await prisma.fixedService.findMany({
       where: { providerId: user.id },
-      include: { serviceSlots: true, game: { select: { id: true, name: true, platform: true } }, platform: { select: { id: true, name: true } } }
+      include: { serviceSlots: true, weeklyServiceSlots: true, game: { select: { id: true, name: true, platform: true } }, platform: { select: { id: true, name: true } } }
     })
 
     // map to a simpler shape including explicit platform/game strings
@@ -65,14 +65,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
-    const { title, description, gameId, platform, price, slots } = body || {}
+  const { title, description, gameId, platform, price, slots, weeklySlots } = body || {}
 
     const errors: string[] = []
     if (!title || typeof title !== 'string') errors.push('title is required and must be a string')
     if (price === undefined || typeof price !== 'number' || Number.isNaN(price)) errors.push('price is required and must be a number')
 
     // validate slots if provided
-    const validatedSlots: Array<{ date: string; time: string; capacity: number }> = []
+  const validatedSlots: Array<{ date: string; time: string; capacity: number }> = []
+  const validatedWeekly: Array<{ dayOfWeek: number; time: string; capacity: number }> = []
     if (slots !== undefined) {
       if (!Array.isArray(slots)) {
         errors.push('slots must be an array')
@@ -88,6 +89,24 @@ export async function POST(req: NextRequest) {
           const capNum = Number(capacity ?? 1)
           if (!Number.isFinite(capNum) || capNum <= 0) errors.push(`slots[${idx}].capacity must be a positive number`)
           validatedSlots.push({ date, time, capacity: capNum })
+        })
+      }
+    }
+
+    // validate weeklySlots if provided
+    if (weeklySlots !== undefined) {
+      if (!Array.isArray(weeklySlots)) {
+        errors.push('weeklySlots must be an array')
+      } else {
+        weeklySlots.forEach((s: any, idx: number) => {
+          if (!s || typeof s !== 'object') { errors.push(`weeklySlots[${idx}] must be an object`); return }
+          const dow = Number(s.dayOfWeek)
+          const time = s.time
+          const capNum = Number(s.capacity ?? 1)
+          if (!Number.isFinite(dow) || dow < 0 || dow > 6) errors.push(`weeklySlots[${idx}].dayOfWeek must be 0-6`)
+          if (!time || typeof time !== 'string' || !/^\d{2}:\d{2}$/.test(time)) errors.push(`weeklySlots[${idx}].time must be HH:mm`)
+          if (!Number.isFinite(capNum) || capNum <= 0) errors.push(`weeklySlots[${idx}].capacity must be a positive number`)
+          validatedWeekly.push({ dayOfWeek: dow, time, capacity: capNum })
         })
       }
     }
@@ -135,7 +154,7 @@ export async function POST(req: NextRequest) {
     // create service with validated slots
     let service
     try {
-      service = await prisma.fixedService.create({
+          service = await prisma.fixedService.create({
         data: {
           providerId: user.id,
           title: String(title),
@@ -147,6 +166,9 @@ export async function POST(req: NextRequest) {
           platformId: platformId,
           serviceSlots: {
             create: validatedSlots
+          },
+          weeklyServiceSlots: {
+            create: validatedWeekly
           }
         },
         include: { serviceSlots: true, platform: { select: { id: true, name: true } }, game: { select: { id: true, name: true, platform: true } } }
@@ -227,7 +249,7 @@ export async function PATCH(req: NextRequest) {
     // If slots provided, we'll replace existing slots with provided list (simple approach)
     try {
       let result
-      if (Array.isArray(slots)) {
+  if (Array.isArray(slots) || Array.isArray(weeklySlots)) {
         // normalize slots: [{date,time,capacity}]
         // perform transaction: delete old slots, create new
         result = await prisma.$transaction(async (tx) => {
@@ -235,6 +257,14 @@ export async function PATCH(req: NextRequest) {
           if (slots.length > 0) {
             const createMany = slots.map((s: any) => ({ serviceId: id, date: s.date, time: s.time, capacity: Number(s.capacity || 1) }))
             await tx.serviceSlot.createMany({ data: createMany })
+          }
+          // replace weekly slots if provided
+          if (Array.isArray(weeklySlots)) {
+            await tx.weeklyServiceSlot.deleteMany({ where: { serviceId: id } })
+            if (validatedWeekly.length > 0) {
+              const createManyWeekly = validatedWeekly.map(w => ({ serviceId: id, dayOfWeek: w.dayOfWeek, time: w.time, capacity: Number(w.capacity || 1) }))
+              await tx.weeklyServiceSlot.createMany({ data: createManyWeekly })
+            }
           }
           if (Object.keys(data).length > 0) {
             return tx.fixedService.update({ where: { id }, data: data, include: { serviceSlots: true } })

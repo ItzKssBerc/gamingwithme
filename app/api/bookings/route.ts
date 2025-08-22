@@ -1,81 +1,80 @@
 
 import { NextResponse } from 'next/server';
-import path from 'path';
-import fs from 'fs/promises';
-import { v4 as uuidv4 } from 'uuid';
+import { prisma } from '@/lib/prisma';
 
-// Force the route to be evaluated in the Node.js runtime
 export const runtime = 'nodejs';
 
-// Helper function to get the path to the db.json file
-function getDbPath() {
-  return path.join(process.cwd(), 'app', 'lib', 'db.json');
-}
-
-// GET all bookings (can be filtered by user)
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const username = searchParams.get('username');
-  const dbPath = getDbPath();
-
   try {
-    const data = await fs.readFile(dbPath, 'utf-8');
-    const db = JSON.parse(data);
-
-    let bookings = db.bookings;
-
     if (username) {
-      bookings = bookings.filter(booking => booking.user === username);
+      const user = await prisma.user.findUnique({ where: { username } });
+      if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      const bookings = await prisma.booking.findMany({ where: { providerId: user.id } });
+      return NextResponse.json(bookings);
     }
-
-    return NextResponse.json(bookings);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to read bookings' }, { status: 500 });
+    const all = await prisma.booking.findMany({});
+    return NextResponse.json(all);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: 'Failed to fetch bookings' }, { status: 500 });
   }
 }
 
-// POST a new booking
 export async function POST(request: Request) {
-  const dbPath = getDbPath();
-
   try {
-    const bookingDetails = await request.json();
-    const { coachUsername, serviceId, date, time, user } = bookingDetails;
+    const body = await request.json();
+    const { providerId, serviceId, date, time, customerId, gameId, price, duration } = body
 
-    if (!coachUsername || !serviceId || !date || !time || !user) {
-        return NextResponse.json({ error: 'Missing booking details' }, { status: 400 });
+    if (!providerId || !serviceId || !date || !time || !customerId) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const data = await fs.readFile(dbPath, 'utf-8');
-    const db = JSON.parse(data);
+    // Find service slot (per-date) if exists
+    const slot = await prisma.serviceSlot.findFirst({ where: { serviceId, date, time } })
 
-    // Check if the time slot is available
-    const dateString = new Date(date).toISOString().split('T')[0];
-    const availableTimes = db.availability[coachUsername]?.[dateString] || [];
-    if (!availableTimes.includes(time)) {
-      return NextResponse.json({ error: 'Time slot not available' }, { status: 409 });
+    // Use slot.capacity or fallback to weekly recurring slot capacity or service capacity
+    let capacity = slot?.capacity ?? 0
+    if (capacity === 0) {
+      // check weekly recurring slot for this service matching dayOfWeek and time
+      const d = new Date(date)
+      const dow = d.getDay()
+      const weekly = await prisma.weeklyServiceSlot.findFirst({ where: { serviceId, dayOfWeek: dow, time } })
+      if (weekly) capacity = weekly.capacity ?? 0
+    }
+    if (capacity === 0) {
+      const svc = await prisma.fixedService.findUnique({ where: { id: serviceId } })
+      capacity = svc?.capacity ?? 1
     }
 
-    // Create new booking
-    const newBooking = {
-      id: uuidv4(),
-      ...bookingDetails,
+    // Count existing bookings for this provider/date/time
+    const existingCount = await prisma.booking.count({ where: { providerId, date: new Date(date), startTime: time } })
+
+    if (existingCount >= capacity) {
+      return NextResponse.json({ error: 'Time slot is full' }, { status: 409 })
+    }
+
+    const start = new Date(date)
+  const [sh, sm] = time.split(':').map((v: string) => Number(v))
+    start.setHours(sh, sm, 0, 0)
+  const end = new Date(start.getTime() + (Number(duration || 60) * 60000))
+
+    const booking = await prisma.booking.create({ data: {
+      providerId,
+      customerId,
+      gameId: gameId || null,
+      date: start,
+      startTime: time,
+      endTime: end.toTimeString().slice(0,5),
+  duration: Number(duration || 60),
+      price: Number(price || 0),
       status: 'confirmed'
-    };
+    }})
 
-    // Add booking to the list
-    db.bookings.push(newBooking);
-
-    // Remove the booked time slot from availability
-    db.availability[coachUsername][dateString] = availableTimes.filter(t => t !== time);
-
-    // Write updated data back to the file
-    await fs.writeFile(dbPath, JSON.stringify(db, null, 2));
-
-    return NextResponse.json(newBooking, { status: 201 });
-
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 });
+    return NextResponse.json(booking, { status: 201 })
+  } catch (e) {
+    console.error(e)
+    return NextResponse.json({ error: 'Failed to create booking', detail: (e as any)?.message ?? String(e) }, { status: 500 })
   }
 }

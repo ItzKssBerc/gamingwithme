@@ -210,16 +210,29 @@ export default function CreateServicePage() {
     setError('')
     setLoading(true)
     try {
-      // serialize slotsMap into an array of { date, time, capacity }
-      const slotsPayload: Array<{ date: string; time: string; capacity: number }> = []
-      for (const [date, list] of Object.entries(slotsMap)) {
-        for (const s of list) slotsPayload.push({ date, time: s.time, capacity: s.capacity })
+      // convert slotsMap (iso dates for weekdays) into weeklySlots: { dayOfWeek, time, capacity }
+      const weeklyMap = new Map<number, Map<string, number>>() // dayOfWeek -> time -> capacity (last wins)
+      for (const [iso, list] of Object.entries(slotsMap)) {
+        const d = isoToLocalDate(iso)
+        if (!d) continue
+        const dow = d.getDay()
+        if (!weeklyMap.has(dow)) weeklyMap.set(dow, new Map())
+        const tm = weeklyMap.get(dow)!
+        for (const s of list) {
+          tm.set(s.time, Number(s.capacity || 1))
+        }
+      }
+      const weeklySlots: Array<{ dayOfWeek: number; time: string; capacity: number }> = []
+      for (const [dow, times] of weeklyMap.entries()) {
+        for (const [time, cap] of times.entries()) {
+          weeklySlots.push({ dayOfWeek: dow, time, capacity: cap })
+        }
       }
 
       const res = await fetch('/api/user/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, gameId: gameId || null, platform: platform || null, price: Number(price), slots: slotsPayload })
+        body: JSON.stringify({ title, description, gameId: gameId || null, platform: platform || null, price: Number(price), weeklySlots })
       })
 
       if (!res.ok) {

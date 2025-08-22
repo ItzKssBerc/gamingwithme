@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const WEEKDAYS = ["H", "K", "Sz", "Cs", "P", "Szo", "V"];
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = [
-  "Január", "Február", "Március", "Április", "Május", "Június",
-  "Július", "Augusztus", "Szeptember", "Október", "November", "December"
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
 ];
 
 function getDaysInMonth(year: number, month: number) {

@@ -44,6 +44,15 @@ export async function GET(request: Request, { params }: { params: { username: st
             capacity: true,
           }
         }
+        ,
+        weeklyServiceSlots: {
+          select: {
+            id: true,
+            dayOfWeek: true,
+            time: true,
+            capacity: true,
+          }
+        }
       }
     });
 

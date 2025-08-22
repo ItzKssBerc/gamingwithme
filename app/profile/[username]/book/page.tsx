@@ -57,6 +57,8 @@ interface TimeSlot {
   start: Date
   end: Date
   price: number
+  capacity?: number
+  serviceId?: string
 }
 
 export default function BookSessionPage() {
@@ -105,7 +107,7 @@ export default function BookSessionPage() {
           for (const ss of svc.serviceSlots) {
             const date = String(ss.date)
             if (!slotsByDate[date]) slotsByDate[date] = []
-            slotsByDate[date].push({ time: ss.time, capacity: ss.capacity })
+            slotsByDate[date].push({ time: ss.time, capacity: ss.capacity, serviceId: svc.id })
           }
         }
       }
@@ -177,9 +179,9 @@ export default function BookSessionPage() {
         console.debug('Booking page: selectedDate', selectedDate, 'dayOfWeek', dayOfWeek, 'availabilitiesForDay', availabilities)
       }
 
-      const slots: TimeSlot[] = []
+  const slots: TimeSlot[] = []
 
-      for (const a of availabilities) {
+  for (const a of availabilities) {
         // parse times robustly by splitting to avoid format mismatches like "9:00" vs "09:00"
         const [sh, sm] = (a.startTime || '').split(':').map((v: string) => Number(v))
         const [eh, em] = (a.endTime || '').split(':').map((v: string) => Number(v))
@@ -194,19 +196,20 @@ export default function BookSessionPage() {
         // guard: if end is before or equal to start, skip
         if (endTime.getTime() <= startTime.getTime()) continue
 
-        // generate 30-minute slots
-        while (startTime.getTime() < endTime.getTime()) {
-          const slotEnd = add(startTime, { minutes: 30 })
+        // generate 60-minute slots (base slot duration)
+          while (startTime.getTime() < endTime.getTime()) {
+          const slotEnd = add(startTime, { minutes: 60 })
           // don't push a slot that exceeds endTime
           if (slotEnd.getTime() > endTime.getTime()) break
-          slots.push({ start: new Date(startTime), end: slotEnd, price: a.price })
-          startTime = add(startTime, { minutes: 30 })
+          // userAvailability slots are not tied to a service; leave serviceId undefined and capacity default
+          slots.push({ start: new Date(startTime), end: slotEnd, price: a.price, capacity: a.isActive ? (a.price ? 1 : 1) : 1 })
+          startTime = add(startTime, { minutes: 60 })
         }
       }
       if (slots.length > 0) {
         setAvailableTimes(slots)
       } else {
-        // fallback to per-service slots by exact date (YYYY-MM-DD)
+            // fallback to per-service slots by exact date (YYYY-MM-DD)
         if (selectedDate) {
           const iso = localIso(selectedDate)
           const slotsMap = (profile as any).slotsByDate || {}
@@ -215,11 +218,31 @@ export default function BookSessionPage() {
             const parsed: TimeSlot[] = daySlots.map((s: any) => {
               const [h, m] = (s.time || '').split(':').map((v:string) => Number(v))
               const st = new Date(selectedDate!.getTime()); st.setHours(h||0, m||0, 0, 0)
-              return { start: st, end: add(st, { minutes: 30 }), price: 0 }
+              return { start: st, end: add(st, { minutes: 60 }), price: 0, capacity: s.capacity, serviceId: s.serviceId }
             })
             setAvailableTimes(parsed)
           } else {
-            setAvailableTimes([])
+            // No per-date slots: check weekly recurring slots from services
+            const dow = getDay(selectedDate)
+            const weeklyTimes: Array<{ time: string; capacity?: number; serviceId?: string }> = []
+            if (Array.isArray((profile as any).userGames)) {
+              for (const svc of (profile as any).userGames) {
+                if (!Array.isArray(svc.weeklyServiceSlots)) continue
+                for (const ws of svc.weeklyServiceSlots) {
+                  if (Number(ws.dayOfWeek) === dow) weeklyTimes.push({ time: ws.time, capacity: ws.capacity, serviceId: svc.id })
+                }
+              }
+            }
+            if (weeklyTimes.length > 0) {
+              const parsed: TimeSlot[] = weeklyTimes.map((s: any) => {
+                const [h, m] = (s.time || '').split(':').map((v:string) => Number(v))
+                const st = new Date(selectedDate!.getTime()); st.setHours(h||0, m||0, 0, 0)
+                return { start: st, end: add(st, { minutes: 60 }), price: 0, capacity: s.capacity, serviceId: s.serviceId }
+              })
+              setAvailableTimes(parsed)
+            } else {
+              setAvailableTimes([])
+            }
           }
         } else {
           setAvailableTimes([])
@@ -254,6 +277,38 @@ export default function BookSessionPage() {
       setSelectedTime(null)
     }
   }, [availableTimes])
+
+  // Fetch bookings count for the selected slot and compute capacity info
+  const [slotSignupCount, setSlotSignupCount] = useState<number | null>(null)
+  const [slotCapacity, setSlotCapacity] = useState<number | null>(null)
+
+  useEffect(() => {
+    const loadCounts = async () => {
+      if (!profile || !selectedDate || !selectedTime) { setSlotSignupCount(null); setSlotCapacity(null); return }
+      // find the slot object
+      const slotObj = availableTimes.find(s => s.start.toISOString() === selectedTime)
+      const capacity = slotObj?.capacity ?? null
+      setSlotCapacity(capacity)
+
+      try {
+        const username = profile.username
+        const resp = await fetch(`/api/bookings?username=${encodeURIComponent(username)}`)
+        if (!resp.ok) { setSlotSignupCount(null); return }
+        const bookings = await resp.json()
+        const iso = localIso(selectedDate)
+        // bookings store date as ISO DateTime; compare by date and startTime
+        const matching = (bookings || []).filter((b: any) => {
+          const bDate = new Date(b.date)
+          const bIso = localIso(bDate)
+          return bIso === iso && (b.startTime || b.start_time || b.start) === (slotObj ? slotObj.start.toTimeString().slice(0,5) : '')
+        })
+        setSlotSignupCount(matching.length)
+      } catch (e) {
+        setSlotSignupCount(null)
+      }
+    }
+    loadCounts()
+  }, [profile, selectedDate, selectedTime, availableTimes])
 
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return
@@ -386,6 +441,12 @@ export default function BookSessionPage() {
                           </Select>
                           {availableTimes.length === 0 && !isLoading && (
                               <p className="text-sm text-muted-foreground pt-2">No available times for this date.</p>
+                          )}
+                          {/* Capacity info */}
+                          {selectedTime && (
+                            <div className="mt-2 text-sm text-green-200/80">
+                              <div>{selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''} — booked: {slotSignupCount ?? '–'} / capacity: {slotCapacity ?? '–'}</div>
+                            </div>
                           )}
                            {/* Debug info for availability */}
                            <div className="mt-2 text-xs text-slate-400">

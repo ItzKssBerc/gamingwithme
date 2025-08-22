@@ -188,6 +188,7 @@ model FixedService {
   platformId  String?
   platform    Platform?@relation(fields: [platformId], references: [id], onDelete: SetNull)
   serviceSlots ServiceSlot[]
+  weeklyServiceSlots WeeklyServiceSlot[]
   orders      ServiceOrder[]
   requests    ServiceRequest[]
 
@@ -205,6 +206,19 @@ model ServiceSlot {
   service FixedService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   @@map("service_slots")
+}
+
+model WeeklyServiceSlot {
+  id        String   @id @default(cuid())
+  serviceId String
+  dayOfWeek Int      // 0-6 (Sunday-Saturday)
+  time      String   // HH:mm
+  capacity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  service FixedService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@map("weekly_service_slots")
 }
 
 model ServiceOrder {
