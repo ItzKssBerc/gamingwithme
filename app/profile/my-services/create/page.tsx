@@ -64,14 +64,60 @@ function WeeklyCalendar({ selected, onToggle, onOpenDay }: { selected: string[];
 }
 
 // SlotAdder component for modal
-function SlotAdder({ onAdd }: { onAdd: (time: string, cap: number) => void }) {
-  const [time, setTime] = useState('')
-  const [cap, setCap] = useState('1')
+function SlotAdder({ onAdd, editSlot }: { 
+  onAdd: (time: string, cap: number) => void,
+  editSlot?: { time: string, capacity: number } | null
+}) {
+  const [time, setTime] = useState(editSlot?.time || '')
+  const [cap, setCap] = useState(editSlot?.capacity?.toString() || '1')
+
+  // Update form when editSlot changes
+  useEffect(() => {
+    if (editSlot) {
+      setTime(editSlot.time)
+      setCap(editSlot.capacity.toString())
+    }
+  }, [editSlot])
+
   return (
-    <div className="flex items-center space-x-2">
-      <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="h-9 rounded px-2 bg-black/30 text-green-100" />
-      <input type="number" min={1} value={cap} onChange={(e) => setCap(e.target.value)} className="w-20 h-9 rounded px-2 bg-black/30 text-green-100" />
-      <button type="button" onClick={() => { if (time) { onAdd(time, Number(cap || 1)); setTime(''); setCap('1') } }} className="text-sm bg-green-500 px-2 rounded text-black">Add slot</button>
+    <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
+      <div className="flex-1 space-y-1">
+        <label className="text-sm text-green-300">Time</label>
+        <input 
+          type="time" 
+          value={time} 
+          onChange={(e) => setTime(e.target.value)} 
+          className="w-full h-12 rounded-xl px-3 bg-black/40 border border-green-700/30 text-green-100 focus:border-green-500 transition-colors"
+        />
+      </div>
+      <div className="w-full sm:w-32 space-y-1">
+        <label className="text-sm text-green-300">Capacity</label>
+        <input 
+          type="number" 
+          min={1} 
+          value={cap} 
+          onChange={(e) => setCap(e.target.value)} 
+          className="w-full h-12 rounded-xl px-3 bg-black/40 border border-green-700/30 text-green-100 focus:border-green-500 transition-colors"
+        />
+      </div>
+      <div className="sm:self-end">
+        <button 
+          type="button" 
+          onClick={() => { 
+            if (time) { 
+              onAdd(time, Number(cap || 1))
+              if (!editSlot) {
+                setTime('')
+                setCap('1')
+              }
+            } 
+          }}
+          className="w-full sm:w-auto h-12 px-6 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-400 hover:to-emerald-400 text-black font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!time}
+        >
+          {editSlot ? 'Update Slot' : 'Add Slot'}
+        </button>
+      </div>
     </div>
   )
 }
@@ -103,6 +149,7 @@ export default function CreateServicePage() {
   const [selectedWeekDates, setSelectedWeekDates] = useState<string[]>([])
   const [slotsMap, setSlotsMap] = useState<Record<string, Array<{ id: string; time: string; capacity: number }>>>({})
   const [openDayIso, setOpenDayIso] = useState<string | null>(null)
+  const [editingSlot, setEditingSlot] = useState<{ time: string, capacity: number } | null>(null)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -253,27 +300,34 @@ export default function CreateServicePage() {
   const slotsThisWeekCount = selectedWeekDates.reduce((acc, iso) => acc + ((slotsMap[iso] && slotsMap[iso].length) || 0), 0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-green-900 py-12">
-      <div className="container mx-auto max-w-3xl px-4">
-        <div className="bg-gradient-to-br from-black/60 to-green-900/30 border border-green-700/20 rounded-3xl p-8 shadow-2xl">
-          <h1 className="text-3xl font-bold text-white mb-4">Create Service</h1>
-          <p className="text-green-200 mb-6">Fill in the details to add a new coaching service.</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-green-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-3xl">
+        <div className="bg-gradient-to-br from-black/70 to-green-900/30 border border-green-700/30 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-sm">
+          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500 text-center mb-2">Create Service</h1>
+          <p className="text-green-200/80 text-center mb-8">Fill in the details to add a new coaching service.</p>
 
-          <form onSubmit={handleContinue} className="space-y-4">
+          <form onSubmit={handleContinue} className="space-y-8">
             {/* Step 1: Title + Game + Description + Price */}
             {step === 1 && (
               <div>
-                <Label>Title</Label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Competitive LoL coaching" />
-                <div className="mt-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-green-300 ml-1">Service Title</Label>
+                  <Input 
+                    value={title} 
+                    onChange={(e) => setTitle(e.target.value)} 
+                    placeholder="e.g. Competitive LoL coaching" 
+                    className="bg-black/40 border-green-700/30 text-green-100 h-12 rounded-xl focus:border-green-500 transition-colors"
+                  />
+                </div>
+                <div className="mt-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <Label>Choose game</Label>
+                      <Label className="text-green-300 ml-1">Choose Game</Label>
                       <Select value={gameId} onValueChange={(val) => setGameId(val)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a game..." />
+                        <SelectTrigger className="bg-black/40 border-green-700/30 text-green-100 h-12 rounded-xl">
+                          <SelectValue placeholder="Select a game" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-gray-900 border-green-700/30">
                           {userGames && userGames.length > 0 ? (
                             userGames.map((g) => (
                               <SelectItem key={g.id} value={String(g.id)}>{g.name}</SelectItem>
@@ -291,12 +345,12 @@ export default function CreateServicePage() {
                       </Select>
                     </div>
                     <div>
-                      <Label>Platform</Label>
+                      <Label className="text-green-300 ml-1">Platform</Label>
                       <Select value={platform} onValueChange={(val) => setPlatform(val)} disabled={!gameId}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select platform..." />
+                        <SelectTrigger className="bg-black/40 border-green-700/30 text-green-100 h-12 rounded-xl">
+                          <SelectValue placeholder="Select platform" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-gray-900 border-green-700/30">
                           {gameId && platformsMap && platformsMap[gameId] && platformsMap[gameId].length > 0 ? (
                             platformsMap[gameId].map((p) => (
                               <SelectItem key={p} value={p}>{p}</SelectItem>
@@ -310,22 +364,39 @@ export default function CreateServicePage() {
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <Label>Description</Label>
-                  <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe your service" />
+                <div className="mt-6 space-y-2">
+                  <Label className="text-green-300 ml-1">Description</Label>
+                  <Textarea 
+                    value={description} 
+                    onChange={(e) => setDescription(e.target.value)} 
+                    placeholder="Describe your service" 
+                    className="bg-black/40 border-green-700/30 text-green-100 min-h-[120px] rounded-xl focus:border-green-500 transition-colors"
+                  />
                 </div>
-                <div className="mt-4">
-                  <Label>Price (USD)</Label>
-                  <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="20" />
+                <div className="mt-6 space-y-2">
+                  <Label className="text-green-300 ml-1">Price (USD)</Label>
+                  <Input 
+                    type="number" 
+                    value={price} 
+                    onChange={(e) => setPrice(e.target.value)} 
+                    placeholder="20" 
+                    className="bg-black/40 border-green-700/30 text-green-100 h-12 rounded-xl focus:border-green-500 transition-colors"
+                  />
                 </div>
               </div>
             )}
 
             {/* Step 2: Weekly calendar (Mon - Sun) */}
             {step === 2 && (
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-4">Weekly availability</h3>
-                <p className="text-green-200 mb-4">Select the days you can offer this service (Mon - Sun).</p>
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500 mb-2">
+                    Weekly Availability
+                  </h3>
+                  <p className="text-green-200/80">Select the days you can offer this service</p>
+                </div>
+                
+                <div className="bg-black/40 p-6 rounded-xl border border-green-700/30">
                   <WeeklyCalendar
                     selected={selectedWeekDates}
                     onToggle={(iso) => {
@@ -336,96 +407,232 @@ export default function CreateServicePage() {
                     }}
                     onOpenDay={(iso) => setOpenDayIso(iso)}
                   />
+                  
+                  <div className="mt-6 flex items-center justify-center gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="text-green-200">Selected days</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-gray-800/40"></div>
+                      <span className="text-green-200">Available to select</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
             {/* Day details dialog */}
             <Dialog open={!!openDayIso} onOpenChange={(isOpen) => { if (!isOpen) setOpenDayIso(null) }}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>{openDayIso ? isoToLocalDate(openDayIso)!.toLocaleDateString('en-US', { weekday: 'long' }) : 'Day details'}</DialogTitle>
-                  <DialogDescription>{openDayIso ? `Manage slots for ${isoToLocalDate(openDayIso)!.toLocaleDateString('en-US', { weekday: 'long' })}` : ''}</DialogDescription>
+              <DialogContent className="bg-gradient-to-br from-gray-900 to-black border border-green-700/30 shadow-2xl">
+                <DialogHeader className="space-y-2">
+                  <DialogTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">
+                    {openDayIso ? isoToLocalDate(openDayIso)!.toLocaleDateString('en-US', { weekday: 'long' }) : 'Day details'}
+                  </DialogTitle>
+                  <DialogDescription className="text-green-200/80">
+                    {openDayIso ? `Manage slots for ${isoToLocalDate(openDayIso)!.toLocaleDateString('en-US', { weekday: 'long' })}` : ''}
+                  </DialogDescription>
                 </DialogHeader>
-                <div className="mt-4 space-y-3">
-                  <p className="text-green-100">Selected: {openDayIso ? (selectedWeekDates.includes(openDayIso) ? 'Yes' : 'No') : '—'}</p>
-
-                  {/* Explicit toggle control so opening the dialog doesn't flip selection unexpectedly */}
-                  {openDayIso && (
-                    <div className="mt-2">
-                      {selectedWeekDates.includes(openDayIso) ? (
-                        <button type="button" onClick={() => setSelectedWeekDates((prev) => prev.filter((d) => d !== openDayIso!))} className="px-3 py-1 bg-red-600 text-white rounded">Mark day inactive</button>
-                      ) : (
-                        <div>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedWeekDates((prev) => (prev.includes(openDayIso!) ? prev : [...prev, openDayIso!]))}
-                            className={`px-3 py-1 rounded ${((slotsMap[openDayIso!] && slotsMap[openDayIso!].length > 0) ? 'bg-green-500 text-black' : 'bg-gray-700 text-green-200 cursor-not-allowed')}`}
-                            disabled={!(slotsMap[openDayIso!] && slotsMap[openDayIso!].length > 0)}
-                          >
-                            Mark day active
-                          </button>
-                          {!(slotsMap[openDayIso!] && slotsMap[openDayIso!].length > 0) && (
-                            <div className="text-sm text-yellow-300 mt-2">Please add at least one slot to activate the day.</div>
-                          )}
-                        </div>
-                      )}
+                
+                <div className="mt-6 space-y-6">
+                  <div className="bg-black/40 p-4 rounded-xl border border-green-700/20">
+                    <div className="flex items-center justify-between">
+                      <span className="text-green-300">Day Status</span>
+                      <span className={`px-3 py-1 rounded-full text-sm ${
+                        openDayIso && selectedWeekDates.includes(openDayIso) 
+                          ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                          : 'bg-gray-800/40 text-gray-400 border border-gray-700/30'
+                      }`}>
+                        {openDayIso ? (selectedWeekDates.includes(openDayIso) ? 'Active' : 'Inactive') : '—'}
+                      </span>
                     </div>
-                  )}
 
-                  <div>
-                    <div className="text-sm text-green-200 mb-2">Slots</div>
+                    {openDayIso && (
+                      <div className="mt-4">
+                        {selectedWeekDates.includes(openDayIso) ? (
+                          <button 
+                            type="button" 
+                            onClick={() => setSelectedWeekDates((prev) => prev.filter((d) => d !== openDayIso!))}
+                            className="w-full py-2 px-4 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg transition-colors"
+                          >
+                            Mark Day as Inactive
+                          </button>
+                        ) : (
+                          <div className="space-y-2">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedWeekDates((prev) => (prev.includes(openDayIso!) ? prev : [...prev, openDayIso!]))}
+                              className={`w-full py-2 px-4 rounded-lg transition-colors ${
+                                (slotsMap[openDayIso!] && slotsMap[openDayIso!].length > 0)
+                                  ? 'bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 text-green-400'
+                                  : 'bg-gray-800/40 border border-gray-700/30 text-gray-400 cursor-not-allowed'
+                              }`}
+                              disabled={!(slotsMap[openDayIso!] && slotsMap[openDayIso!].length > 0)}
+                            >
+                              Mark Day as Active
+                            </button>
+                            {!(slotsMap[openDayIso!] && slotsMap[openDayIso!].length > 0) && (
+                              <div className="text-sm text-yellow-300/90 bg-yellow-400/10 border border-yellow-400/20 rounded-lg p-2">
+                                Add at least one time slot to activate this day
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-lg font-semibold text-green-400">Time Slots</h4>
+                      <span className="text-sm text-green-200/60">
+                        {openDayIso && slotsMap[openDayIso] ? `${slotsMap[openDayIso].length} slots` : 'No slots'}
+                      </span>
+                    </div>
+                    
                     <div className="space-y-2">
                       {(openDayIso && slotsMap[openDayIso]) ? (
                         slotsMap[openDayIso].map((s) => (
-                          <div key={s.id} className="flex items-center justify-between bg-gray-900/40 px-3 py-2 rounded">
-                            <div className="text-green-100">{s.time} • {s.capacity}p</div>
-                            <button type="button" onClick={() => removeSlot(openDayIso, s.id)} className="text-xs text-red-400">Remove</button>
+                          <div key={s.id} className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-green-700/20">
+                            <div className="text-green-100 flex items-center gap-2">
+                              <span className="text-green-400">{s.time}</span>
+                              <span className="text-green-200/60">•</span>
+                              <span className="text-green-200">{s.capacity} players</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button 
+                                type="button"
+                                onClick={() => {
+                                  setEditingSlot(s);
+                                  removeSlot(openDayIso, s.id);
+                                }}
+                                className="text-sm px-3 py-1 text-green-400 hover:text-green-300 hover:bg-green-500/10 rounded-lg transition-colors"
+                              >
+                                Edit
+                              </button>
+                              <button 
+                                type="button" 
+                                onClick={() => removeSlot(openDayIso, s.id)}
+                                className="text-sm px-3 py-1 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                              >
+                                Remove
+                              </button>
+                            </div>
                           </div>
                         ))
                       ) : (
-                        <div className="text-green-300 text-sm">No slots yet.</div>
+                        <div className="text-center py-6 bg-black/20 rounded-xl border border-green-700/10">
+                          <p className="text-green-200/60">No time slots added yet</p>
+                        </div>
                       )}
                     </div>
-                    <div className="mt-3">
-                      <SlotAdder onAdd={(time, cap) => { if (openDayIso) addSlot(openDayIso, time, cap) }} />
+
+                    <div className="mt-4 pt-4 border-t border-green-700/20">
+                      <SlotAdder 
+                        onAdd={(time, cap) => { 
+                          if (openDayIso) {
+                            addSlot(openDayIso, time, cap);
+                            setEditingSlot(null);
+                          }
+                        }} 
+                        editSlot={editingSlot}
+                      />
                     </div>
                   </div>
                 </div>
+
                 <div className="mt-6 flex justify-end">
-                  <DialogClose className="bg-gray-800/40 px-4 py-2 rounded text-green-100">Close</DialogClose>
+                  <DialogClose className="px-6 py-2 bg-gray-800/40 hover:bg-gray-800 text-green-200 rounded-xl border border-green-700/30 transition-colors">
+                    Close
+                  </DialogClose>
                 </div>
               </DialogContent>
             </Dialog>
 
             {/* Step 3: Review */}
             {step === 3 && (
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white">Review your service</h3>
-                <div className="bg-gray-800/40 p-4 rounded-lg border border-green-600/20">
-                  <p className="text-green-100"><strong>Title:</strong> {title}</p>
-                  <p className="text-green-100"><strong>Game:</strong> {userGames.find(g => String(g.id) === String(gameId))?.name ?? '—'}</p>
-                  <p className="text-green-100"><strong>Platform:</strong> {platform || '—'}</p>
-                  <p className="text-green-100"><strong>Price:</strong> ${price}</p>
-                  <p className="text-green-100 mt-2"><strong>Description:</strong> {description || '—'}</p>
-                    <div className="mt-3 text-green-100">
-                      <p><strong>Total sessions (slots) added:</strong> {totalSlotsCount}</p>
-                      <p><strong>Slots in selected week:</strong> {slotsThisWeekCount} {selectedWeekDates.length > 0 ? `(across ${selectedWeekDates.length} selected day(s))` : ''}</p>
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">Review your service</h3>
+                <div className="bg-black/40 p-6 rounded-xl border border-green-700/30 space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-green-400 text-sm font-medium mb-1">Service Title</div>
+                      <div className="text-green-100">{title}</div>
                     </div>
+                    <div>
+                      <div className="text-green-400 text-sm font-medium mb-1">Game</div>
+                      <div className="text-green-100">{userGames.find(g => String(g.id) === String(gameId))?.name ?? '—'}</div>
+                    </div>
+                    <div>
+                      <div className="text-green-400 text-sm font-medium mb-1">Platform</div>
+                      <div className="text-green-100">{platform || '—'}</div>
+                    </div>
+                    <div>
+                      <div className="text-green-400 text-sm font-medium mb-1">Price</div>
+                      <div className="text-green-100">${price}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-2">
+                    <div className="text-green-400 text-sm font-medium mb-2">Description</div>
+                    <div className="text-green-100/90 bg-black/20 p-4 rounded-lg">
+                      {description || '—'}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-green-700/20">
+                    <div className="text-green-400 text-sm font-medium mb-3">Availability Overview</div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center bg-black/20 p-3 rounded-lg">
+                        <span className="text-green-300">Total sessions:</span>
+                        <span className="text-green-100 font-medium">{totalSlotsCount}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-black/20 p-3 rounded-lg">
+                        <span className="text-green-300">Weekly slots:</span>
+                        <span className="text-green-100 font-medium">
+                          {slotsThisWeekCount} {selectedWeekDates.length > 0 ? `(${selectedWeekDates.length} days)` : ''}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
-            {error && <div className="text-red-400">{error}</div>}
-
-            <div className="flex justify-between items-center">
-              <div>
-                <Button type="button" variant="ghost" onClick={() => router.push('/profile/my-services')} className="mr-3">Cancel</Button>
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-red-400">
+                {error}
               </div>
-              <div className="flex items-center space-x-3">
+            )}
+
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4">
+              <div>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={() => router.push('/profile/my-services')} 
+                  className="bg-gray-800/40 border border-green-700/30 text-green-200 hover:bg-gray-800 hover:text-green-100 rounded-xl px-6 py-2 w-full sm:w-auto"
+                >
+                  Cancel
+                </Button>
+              </div>
+              <div className="flex items-center gap-4 w-full sm:w-auto">
                 {step > 1 && (
-                  <Button type="button" variant="outline" onClick={handleBack}>Back</Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handleBack}
+                    className="bg-gray-800/40 border border-green-700/30 text-green-200 hover:bg-gray-800 hover:text-green-100 rounded-xl px-6 py-2 flex-1 sm:flex-none"
+                  >
+                    Back
+                  </Button>
                 )}
-                <Button type="submit" variant="default" className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-black font-semibold px-6 py-2 rounded-xl shadow-lg" disabled={loading}>
+                <Button 
+                  type="submit" 
+                  variant="default" 
+                  className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-400 hover:to-emerald-400 text-black font-semibold px-8 py-2 rounded-xl shadow-lg transition-colors flex-1 sm:flex-none" 
+                  disabled={loading}
+                >
                   {loading ? 'Processing...' : (step < 3 ? 'Continue' : 'Finish')}
                 </Button>
               </div>
