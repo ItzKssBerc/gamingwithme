@@ -36,6 +36,14 @@ export async function GET(request: Request, { params }: { params: { username: st
         duration: true,
         isActive: true,
         createdAt: true,
+        serviceSlots: {
+          select: {
+            id: true,
+            date: true,
+            time: true,
+            capacity: true,
+          }
+        }
       }
     });
 

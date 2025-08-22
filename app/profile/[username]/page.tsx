@@ -614,42 +614,42 @@ export default function UserProfilePage() {
                         {reviewsData.reviews.map((review) => (
                           <Card key={review.id} className="bg-white/5 border-white/20">
                             <CardContent className="p-4">
-                                                              <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center">
-                                        {review.reviewer.avatar ? (
-                                          <img 
-                                            src={review.reviewer.avatar} 
-                                            alt={`${review.reviewer.username}'s profile`} 
-                                            className="w-full h-full object-cover"
-                                          />
-                                        ) : (
-                                          <User className="h-4 w-4 text-white" />
-                                        )}
+                                                                  <div className="flex items-start">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center">
+                                          {review.reviewer.avatar ? (
+                                            <img 
+                                              src={review.reviewer.avatar} 
+                                              alt={`${review.reviewer.username}'s profile`} 
+                                              className="w-full h-full object-cover"
+                                            />
+                                          ) : (
+                                            <User className="h-4 w-4 text-white" />
+                                          )}
+                                        </div>
+                                        <span className="text-white font-medium">{review.reviewer.username}</span>
+                                        <div className="flex gap-1">
+                                          {[1, 2, 3, 4, 5].map((star) => (
+                                            <Star
+                                              key={star}
+                                              className={`h-4 w-4 ${
+                                                star <= review.rating 
+                                                  ? 'text-yellow-400 fill-current' 
+                                                  : 'text-gray-400'
+                                              }`}
+                                            />
+                                          ))}
+                                        </div>
                                       </div>
-                                    <span className="text-white font-medium">{review.reviewer.username}</span>
-                                    <div className="flex gap-1">
-                                      {[1, 2, 3, 4, 5].map((star) => (
-                                        <Star
-                                          key={star}
-                                          className={`h-4 w-4 ${
-                                            star <= review.rating 
-                                              ? 'text-yellow-400 fill-current' 
-                                              : 'text-gray-400'
-                                          }`}
-                                        />
-                                      ))}
+                                      {review.comment && (
+                                        <p className="text-gray-300 text-sm pl-10">{review.comment}</p>
+                                      )}
                                     </div>
+                                    <p className="text-gray-500 text-xs mt-1 flex-shrink-0">
+                                      {new Date(review.createdAt).toLocaleDateString()}
+                                    </p>
                                   </div>
-                                  {review.comment && (
-                                    <p className="text-gray-300 text-sm">{review.comment}</p>
-                                  )}
-                                  <p className="text-gray-500 text-xs mt-2">
-                                    {new Date(review.createdAt).toLocaleDateString()}
-                                  </p>
-                                </div>
-                              </div>
                             </CardContent>
                           </Card>
                         ))}

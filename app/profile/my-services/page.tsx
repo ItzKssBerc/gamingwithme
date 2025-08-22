@@ -162,6 +162,7 @@ export default function MyServicesPage() {
                           />
                         <div className="mt-4 p-3 bg-green-900/20 rounded-lg border border-green-500/20 flex items-center justify-start space-x-3">
                           <button onClick={() => window.location.href = `/profile/my-services/plan?id=${service.id}`} className="text-sm text-green-200 hover:text-green-100">Plan</button>
+                          <button onClick={() => window.location.href = `/profile/my-services/requests?id=${service.id}`} className="text-sm text-green-200 hover:text-green-100">Requests</button>
                           <button onClick={() => handleDelete(service.id)} className="text-sm text-red-400 hover:text-red-500">Delete</button>
                         </div>
                       </div>

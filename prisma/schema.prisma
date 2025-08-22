@@ -39,6 +39,7 @@ model User {
   gameEasterEggs    GameEasterEgg[]
   reviewsGiven      Review[] @relation("ReviewGiver")
   reviewsReceived   Review[] @relation("ReviewReceiver")
+  requests          ServiceRequest[]
 
 
   @@map("users")
@@ -188,6 +189,7 @@ model FixedService {
   platform    Platform?@relation(fields: [platformId], references: [id], onDelete: SetNull)
   serviceSlots ServiceSlot[]
   orders      ServiceOrder[]
+  requests    ServiceRequest[]
 
   @@map("fixed_services")
 }
@@ -321,4 +323,19 @@ model Review {
 
   @@unique([reviewerId, reviewedId]) // One review per user pair
   @@map("reviews")
+}
+
+model ServiceRequest {
+  id        String   @id @default(cuid())
+  serviceId String
+  userId    String
+  status    String   @default("pending") // pending, accepted, rejected
+  message   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  service   FixedService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("service_requests")
 }
