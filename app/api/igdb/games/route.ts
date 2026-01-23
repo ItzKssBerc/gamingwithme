@@ -60,7 +60,12 @@ export async function GET(request: NextRequest) {
       offset ${offset};
     `;
 
+    console.log('Is IGDB configured:', igdbService.isConfigured());
+    console.log('Sending IGDB query:', igdbQuery);
+
     const games = await igdbService.makeCustomRequest('games', igdbQuery);
+    console.log('IGDB response:', games);
+    console.log('Number of games received:', games.length);
 
     // For pagination, we need a total count. This is tricky with IGDB's API without a separate count endpoint.
     // We will estimate the total count to provide a functional pagination experience.
@@ -108,6 +113,10 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Error fetching games from IGDB:', error);
+    // Add a specific log for configuration issues.
+    if (!igdbService.isConfigured()) {
+      console.error('IGDB Service is not configured. Please check your .env file for IGDB_CLIENT_ID and IGDB_CLIENT_SECRET.');
+    }
     return NextResponse.json(
       { 
         error: error.message || 'Failed to fetch games from IGDB',

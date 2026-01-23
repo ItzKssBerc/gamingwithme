@@ -19,7 +19,7 @@ export default function ContactUsPage() {
                 </div>
                 <div className="space-y-0.5">
                   <div className="text-sm font-medium text-green-300">Email</div>
-                  <a href="mailto:info@gamingwithyou.com" className="text-sm text-green-100/80 hover:text-green-100">info@gamingwithyou.com</a>
+                  <a href="mailto:info@gamingwithyou.com" className="text-sm text-green-100/80 hover:text-green-100">support@gamingwithme.com</a>
                 </div>
               </div>
               <div className="group flex items-center gap-4 p-3 rounded-lg transition-colors hover:bg-green-500/5">

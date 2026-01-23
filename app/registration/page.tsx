@@ -90,7 +90,9 @@ export default function RegistrationPage() {
       {/* Left Column - Registration Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <Card className="w-full max-w-md gaming-card border-0 bg-gradient-to-br from-green-600/10 to-green-800/10 backdrop-blur-sm">
-          
+          <CardHeader>
+            <CardTitle className="text-3xl font-bold text-center text-white">Registration</CardTitle>
+          </CardHeader>
           <CardContent className="pt-8">
             {error && (
               <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
