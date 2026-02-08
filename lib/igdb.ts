@@ -96,7 +96,7 @@ class IGDBService {
   constructor() {
     this.clientId = process.env.IGDB_CLIENT_ID || '';
     this.clientSecret = process.env.IGDB_CLIENT_SECRET || '';
-    
+
     if (!this.clientId || !this.clientSecret) {
       console.warn('IGDB_CLIENT_ID or IGDB_CLIENT_SECRET not configured. IGDB features will be disabled.');
     }
@@ -157,13 +157,13 @@ class IGDBService {
   private async makeRequest(endpoint: string, query: string): Promise<any[]> {
     const cacheKey = this.getCacheKey(endpoint, query);
     const cachedData = this.getCachedData(cacheKey);
-    
+
     if (cachedData) {
       return cachedData;
     }
 
     const token = await this.getAccessToken();
-    
+
     try {
       const response = await axios.post(
         `https://api.igdb.com/v4/${endpoint}`,
@@ -211,7 +211,7 @@ class IGDBService {
     // Use name search instead of the search endpoint - only main games, no DLCs, expansions, or seasons
     const searchQuery = `
       fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;
-      where version_parent = null & category = 0 & name ~ *"${query}"*;
+      where version_parent = null & name ~ *"${query}"*;
       limit ${Math.min(limit, 50)};
       sort rating desc;
     `;
@@ -222,7 +222,7 @@ class IGDBService {
   async getPopularGames(limit: number = 20): Promise<IGDBGame[]> {
     const query = `
       fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
-      where rating_count > 100 & version_parent = null & category = 0;
+      where rating_count > 100 & version_parent = null;
       sort rating desc;
       limit ${Math.min(limit, 50)};
     `;

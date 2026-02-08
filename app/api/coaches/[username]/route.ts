@@ -4,8 +4,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 export const runtime = 'nodejs';
 
-export async function GET(request: Request, { params }: { params: { username: string } }) {
-  const { username } = params;
+export async function GET(request: Request, { params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params;
   try {
     // Find coach by username
     const coach = await prisma.user.findUnique({

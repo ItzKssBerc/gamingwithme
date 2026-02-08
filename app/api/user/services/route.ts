@@ -65,15 +65,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
-  const { title, description, gameId, platform, price, slots, weeklySlots } = body || {}
+    const { title, description, gameId, platform, price, slots, weeklySlots } = body || {}
 
     const errors: string[] = []
     if (!title || typeof title !== 'string') errors.push('title is required and must be a string')
     if (price === undefined || typeof price !== 'number' || Number.isNaN(price)) errors.push('price is required and must be a number')
 
     // validate slots if provided
-  const validatedSlots: Array<{ date: string; time: string; capacity: number }> = []
-  const validatedWeekly: Array<{ dayOfWeek: number; time: string; capacity: number }> = []
+    const validatedSlots: Array<{ date: string; time: string; capacity: number }> = []
+    const validatedWeekly: Array<{ dayOfWeek: number; time: string; capacity: number }> = []
     if (slots !== undefined) {
       if (!Array.isArray(slots)) {
         errors.push('slots must be an array')
@@ -84,8 +84,8 @@ export async function POST(req: NextRequest) {
             return
           }
           const { date, time, capacity } = s
-          if (!date || typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) errors.push(`slots[${idx}].date must be YYYY-MM-DD`) 
-          if (!time || typeof time !== 'string' || !/^\d{2}:\d{2}$/.test(time)) errors.push(`slots[${idx}].time must be HH:mm`) 
+          if (!date || typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) errors.push(`slots[${idx}].date must be YYYY-MM-DD`)
+          if (!time || typeof time !== 'string' || !/^\d{2}:\d{2}$/.test(time)) errors.push(`slots[${idx}].time must be HH:mm`)
           const capNum = Number(capacity ?? 1)
           if (!Number.isFinite(capNum) || capNum <= 0) errors.push(`slots[${idx}].capacity must be a positive number`)
           validatedSlots.push({ date, time, capacity: capNum })
@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
     // create service with validated slots
     let service
     try {
-          service = await prisma.fixedService.create({
+      service = await prisma.fixedService.create({
         data: {
           providerId: user.id,
           title: String(title),
@@ -175,16 +175,16 @@ export async function POST(req: NextRequest) {
       })
     } catch (dbErr) {
       console.error('DB error creating FixedService', dbErr)
-  const devDetail = process.env.NODE_ENV !== 'production' ? ((dbErr as any)?.message || String(dbErr)) : undefined
+      const devDetail = process.env.NODE_ENV !== 'production' ? ((dbErr as any)?.message || String(dbErr)) : undefined
       return NextResponse.json({ error: 'Database error', detail: devDetail }, { status: 500 })
     }
 
     console.log('Created FixedService', { id: service.id, providerId: user.id, slotsCreated: service.serviceSlots.length })
     return NextResponse.json({ service }, { status: 201 })
   } catch (err) {
-  console.error('POST /api/user/services error', err)
-  const devDetail = process.env.NODE_ENV !== 'production' ? ((err as any)?.message || String(err)) : undefined
-  return NextResponse.json({ error: 'Failed to create', detail: devDetail }, { status: 500 })
+    console.error('POST /api/user/services error', err)
+    const devDetail = process.env.NODE_ENV !== 'production' ? ((err as any)?.message || String(err)) : undefined
+    return NextResponse.json({ error: 'Failed to create', detail: devDetail }, { status: 500 })
   }
 }
 
@@ -235,7 +235,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
-    const { id, isActive, slots } = body || {}
+    const { id, isActive, slots, weeklySlots } = body || {}
     if (!id || typeof id !== 'string') return NextResponse.json({ error: 'id is required' }, { status: 400 })
 
     const svc = await prisma.fixedService.findUnique({ where: { id }, include: { serviceSlots: true } })
@@ -246,26 +246,55 @@ export async function PATCH(req: NextRequest) {
     const data: any = {}
     if (typeof isActive === 'boolean') data.isActive = isActive
 
+    // Validate slots/weeklySlots if provided
+    const validatedSlots: Array<{ date: string; time: string; capacity: number }> = []
+    const validatedWeekly: Array<{ dayOfWeek: number; time: string; capacity: number }> = []
+
+    if (slots !== undefined && Array.isArray(slots)) {
+      slots.forEach((s: any) => {
+        if (s && typeof s === 'object') {
+          const capNum = Number(s.capacity ?? 1)
+          if (s.date && s.time && Number.isFinite(capNum)) {
+            validatedSlots.push({ date: s.date, time: s.time, capacity: capNum })
+          }
+        }
+      })
+    }
+
+    if (weeklySlots !== undefined && Array.isArray(weeklySlots)) {
+      weeklySlots.forEach((s: any) => {
+        if (s && typeof s === 'object') {
+          const dow = Number(s.dayOfWeek)
+          const capNum = Number(s.capacity ?? 1)
+          if (Number.isFinite(dow) && s.time && Number.isFinite(capNum)) {
+            validatedWeekly.push({ dayOfWeek: dow, time: s.time, capacity: capNum })
+          }
+        }
+      })
+    }
+
     // If slots provided, we'll replace existing slots with provided list (simple approach)
     try {
       let result
-  if (Array.isArray(slots) || Array.isArray(weeklySlots)) {
-        // normalize slots: [{date,time,capacity}]
-        // perform transaction: delete old slots, create new
+      const hasSlotsUpdate = (Array.isArray(slots) || Array.isArray(weeklySlots))
+
+      if (hasSlotsUpdate) {
+        // performs transaction: delete old slots, create new
         result = await prisma.$transaction(async (tx) => {
-          await tx.serviceSlot.deleteMany({ where: { serviceId: id } })
-          if (slots.length > 0) {
-            const createMany = slots.map((s: any) => ({ serviceId: id, date: s.date, time: s.time, capacity: Number(s.capacity || 1) }))
-            await tx.serviceSlot.createMany({ data: createMany })
+          if (Array.isArray(slots)) {
+            await tx.serviceSlot.deleteMany({ where: { serviceId: id } })
+            if (validatedSlots.length > 0) {
+              await tx.serviceSlot.createMany({ data: validatedSlots.map(s => ({ ...s, serviceId: id })) })
+            }
           }
-          // replace weekly slots if provided
+
           if (Array.isArray(weeklySlots)) {
             await tx.weeklyServiceSlot.deleteMany({ where: { serviceId: id } })
             if (validatedWeekly.length > 0) {
-              const createManyWeekly = validatedWeekly.map(w => ({ serviceId: id, dayOfWeek: w.dayOfWeek, time: w.time, capacity: Number(w.capacity || 1) }))
-              await tx.weeklyServiceSlot.createMany({ data: createManyWeekly })
+              await tx.weeklyServiceSlot.createMany({ data: validatedWeekly.map(w => ({ ...w, serviceId: id })) })
             }
           }
+
           if (Object.keys(data).length > 0) {
             return tx.fixedService.update({ where: { id }, data: data, include: { serviceSlots: true } })
           }

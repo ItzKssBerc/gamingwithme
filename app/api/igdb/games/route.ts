@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const currentYear = now.getFullYear();
     const genre = searchParams.get('genre');
     const platform = searchParams.get('platform');
-    
+
     // Trending: popularity szerint rendezünk, ha nincs orderBy megadva
     let orderByParam = searchParams.get('orderBy');
     if (!orderByParam || orderByParam === '-rating') {
@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
 
     // Build the WHERE clause for the IGDB query
     const nowInSeconds = Math.floor(Date.now() / 1000);
-  // Trending: minden idők legmagasabb értékelésű játékok
-    let whereClauses = ['version_parent = null', 'category = 0', `first_release_date <= ${nowInSeconds}`, 'rating != null'];
+    // Trending: minden idők legmagasabb értékelésű játékok
+    let whereClauses = ['version_parent = null', `first_release_date <= ${nowInSeconds}`, 'rating != null'];
     // Ha keresés van, ne legyen rating_count szűrés
     if (!query.trim() && (!orderByParam || orderByParam === '-rating' || orderByParam === '-rating_count' || orderByParam === '-popularity')) {
       whereClauses.push('rating_count >= 1000');
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
       console.error('IGDB Service is not configured. Please check your .env file for IGDB_CLIENT_ID and IGDB_CLIENT_SECRET.');
     }
     return NextResponse.json(
-      { 
+      {
         error: error.message || 'Failed to fetch games from IGDB',
         games: [],
         pagination: { page: 1, limit: 12, total: 0, totalPages: 0, hasNext: false, hasPrev: false, nextPage: null, prevPage: null }

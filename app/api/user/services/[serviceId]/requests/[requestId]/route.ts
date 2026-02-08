@@ -3,13 +3,13 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function PATCH(req: NextRequest, { params }: { params: { serviceId: string, requestId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ serviceId: string, requestId: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { serviceId, requestId } = params;
+  const { serviceId, requestId } = await params;
   const { action } = await req.json();
 
   if (!['accept', 'reject'].includes(action)) {

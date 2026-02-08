@@ -3,14 +3,14 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params
+    const { slug } = await params
 
     // Find the game in the database
     let game = await prisma.game.findFirst({
-      where: { 
+      where: {
         OR: [
           { slug: slug },
           { igdbSlug: slug }
@@ -22,11 +22,11 @@ export async function GET(
     if (!game) {
       const gameName = slug.replace(/-/g, ' ')
       game = await prisma.game.findFirst({
-        where: { 
-          name: { 
-            contains: gameName, 
-            mode: 'insensitive' 
-          } 
+        where: {
+          name: {
+            contains: gameName,
+            mode: 'insensitive'
+          }
         }
       })
     }
@@ -72,7 +72,7 @@ export async function GET(
 
     // Group by user and calculate stats
     const userMap = new Map()
-    
+
     userGames.forEach(userGame => {
       const userId = userGame.user.id
       if (userMap.has(userId)) {

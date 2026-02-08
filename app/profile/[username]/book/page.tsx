@@ -100,7 +100,7 @@ export default function BookSessionPage() {
         userAvailability: data.availability || [],
       }
       // build a slotsByDate map from services' serviceSlots if present
-      const slotsByDate: Record<string, Array<{ time: string; capacity?: number }>> = {}
+      const slotsByDate: Record<string, Array<{ time: string; capacity?: number; serviceId?: string }>> = {}
       if (Array.isArray(data.services)) {
         for (const svc of data.services) {
           if (!Array.isArray(svc.serviceSlots)) continue
@@ -112,7 +112,7 @@ export default function BookSessionPage() {
         }
       }
       // attach to profile for client usage
-      ;(mergedProfile as any).slotsByDate = slotsByDate
+      ; (mergedProfile as any).slotsByDate = slotsByDate
       setProfile(mergedProfile as unknown as UserProfile);
 
       // If there's no selected date yet, set it to the next available day
@@ -161,17 +161,17 @@ export default function BookSessionPage() {
   }, [fetchProfileData]);
 
   useEffect(() => {
-  if (profile && selectedDate) {
+    if (profile && selectedDate) {
       const dayOfWeek = getDay(selectedDate)
 
       const availabilities = Array.isArray(profile.userAvailability)
         ? profile.userAvailability.filter(a => {
-            const raw = Number(a.dayOfWeek)
-            if (Number.isNaN(raw)) return false
-            // Normalize incoming dayOfWeek to 0-6 (API might use 0-6 or 1-7 where 1=Mon..7=Sun)
-            const normalized = raw % 7 // 7 -> 0 (Sunday), 1->1 (Monday), 0->0 (Sunday)
-            return a.isActive && normalized === dayOfWeek
-          })
+          const raw = Number(a.dayOfWeek)
+          if (Number.isNaN(raw)) return false
+          // Normalize incoming dayOfWeek to 0-6 (API might use 0-6 or 1-7 where 1=Mon..7=Sun)
+          const normalized = raw % 7 // 7 -> 0 (Sunday), 1->1 (Monday), 0->0 (Sunday)
+          return a.isActive && normalized === dayOfWeek
+        })
         : []
 
       // debug: log availability count for selected day
@@ -179,9 +179,9 @@ export default function BookSessionPage() {
         console.debug('Booking page: selectedDate', selectedDate, 'dayOfWeek', dayOfWeek, 'availabilitiesForDay', availabilities)
       }
 
-  const slots: TimeSlot[] = []
+      const slots: TimeSlot[] = []
 
-  for (const a of availabilities) {
+      for (const a of availabilities) {
         // parse times robustly by splitting to avoid format mismatches like "9:00" vs "09:00"
         const [sh, sm] = (a.startTime || '').split(':').map((v: string) => Number(v))
         const [eh, em] = (a.endTime || '').split(':').map((v: string) => Number(v))
@@ -197,7 +197,7 @@ export default function BookSessionPage() {
         if (endTime.getTime() <= startTime.getTime()) continue
 
         // generate 60-minute slots (base slot duration)
-          while (startTime.getTime() < endTime.getTime()) {
+        while (startTime.getTime() < endTime.getTime()) {
           const slotEnd = add(startTime, { minutes: 60 })
           // don't push a slot that exceeds endTime
           if (slotEnd.getTime() > endTime.getTime()) break
@@ -209,15 +209,15 @@ export default function BookSessionPage() {
       if (slots.length > 0) {
         setAvailableTimes(slots)
       } else {
-            // fallback to per-service slots by exact date (YYYY-MM-DD)
+        // fallback to per-service slots by exact date (YYYY-MM-DD)
         if (selectedDate) {
           const iso = localIso(selectedDate)
           const slotsMap = (profile as any).slotsByDate || {}
           const daySlots = slotsMap[iso] || []
           if (daySlots.length > 0) {
             const parsed: TimeSlot[] = daySlots.map((s: any) => {
-              const [h, m] = (s.time || '').split(':').map((v:string) => Number(v))
-              const st = new Date(selectedDate!.getTime()); st.setHours(h||0, m||0, 0, 0)
+              const [h, m] = (s.time || '').split(':').map((v: string) => Number(v))
+              const st = new Date(selectedDate!.getTime()); st.setHours(h || 0, m || 0, 0, 0)
               return { start: st, end: add(st, { minutes: 60 }), price: 0, capacity: s.capacity, serviceId: s.serviceId }
             })
             setAvailableTimes(parsed)
@@ -235,8 +235,8 @@ export default function BookSessionPage() {
             }
             if (weeklyTimes.length > 0) {
               const parsed: TimeSlot[] = weeklyTimes.map((s: any) => {
-                const [h, m] = (s.time || '').split(':').map((v:string) => Number(v))
-                const st = new Date(selectedDate!.getTime()); st.setHours(h||0, m||0, 0, 0)
+                const [h, m] = (s.time || '').split(':').map((v: string) => Number(v))
+                const st = new Date(selectedDate!.getTime()); st.setHours(h || 0, m || 0, 0, 0)
                 return { start: st, end: add(st, { minutes: 60 }), price: 0, capacity: s.capacity, serviceId: s.serviceId }
               })
               setAvailableTimes(parsed)
@@ -252,14 +252,14 @@ export default function BookSessionPage() {
     else {
       // No profile or no availability for selected date
       // try fallback: per-service slots by exact date (YYYY-MM-DD)
-  if (!selectedDate) { setAvailableTimes([]); return }
-  const iso = localIso(selectedDate)
+      if (!selectedDate) { setAvailableTimes([]); return }
+      const iso = localIso(selectedDate)
       const slotsMap = (profile as any).slotsByDate || {}
       const daySlots = slotsMap[iso] || []
       if (daySlots.length > 0) {
         const parsed: TimeSlot[] = daySlots.map((s: any) => {
-          const [h, m] = (s.time || '').split(':').map((v:string) => Number(v))
-          const st = new Date(selectedDate!.getTime()); st.setHours(h||0, m||0, 0, 0)
+          const [h, m] = (s.time || '').split(':').map((v: string) => Number(v))
+          const st = new Date(selectedDate!.getTime()); st.setHours(h || 0, m || 0, 0, 0)
           return { start: st, end: add(st, { minutes: 30 }), price: 0 }
         })
         setAvailableTimes(parsed)
@@ -300,7 +300,7 @@ export default function BookSessionPage() {
         const matching = (bookings || []).filter((b: any) => {
           const bDate = new Date(b.date)
           const bIso = localIso(bDate)
-          return bIso === iso && (b.startTime || b.start_time || b.start) === (slotObj ? slotObj.start.toTimeString().slice(0,5) : '')
+          return bIso === iso && (b.startTime || b.start_time || b.start) === (slotObj ? slotObj.start.toTimeString().slice(0, 5) : '')
         })
         setSlotSignupCount(matching.length)
       } catch (e) {
@@ -319,7 +319,7 @@ export default function BookSessionPage() {
 
   const handleBooking = async () => {
     if (!selectedDate || !selectedTime) return;
-    
+
     setIsBookingLoading(true);
     try {
       // selectedTime is an ISO string representing the slot start
@@ -335,8 +335,8 @@ export default function BookSessionPage() {
         body: JSON.stringify({
           coachUsername: username,
           date: selectedDate.toISOString(),
-          startTime: start.toTimeString().slice(0,5),
-          endTime: end.toTimeString().slice(0,5),
+          startTime: start.toTimeString().slice(0, 5),
+          endTime: end.toTimeString().slice(0, 5),
           duration,
           price: slot?.price ?? 0,
           userId: sessionData?.user?.id // Use the actual logged-in user ID
@@ -352,7 +352,7 @@ export default function BookSessionPage() {
         title: "Booking Successful!",
         description: `Your session with ${profile?.username} on ${format(selectedDate, "PPP")} at ${selectedTime} is confirmed.`,
       });
-      
+
       // Refresh profile data to get the latest availability
       await fetchProfileData();
       setSelectedTime(null);
@@ -378,22 +378,22 @@ export default function BookSessionPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {/* Left Column: Coach Profile */}
             <div className="md:col-span-1">
-              
-                <div className="space-y-4 text-center md:text-left pt-8">
-                    <Avatar className="h-28 w-28 mb-4 border-2 border-primary/20 mx-auto md:mx-0">
-                      <AvatarImage src={profile.avatarUrl || undefined} alt={`@${profile.username}`} />
-                      <AvatarFallback>
-                        <User className="h-12 w-12" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <h1 className="text-3xl font-bold tracking-tight">{profile.username}</h1>
-                    <p className="text-muted-foreground">{profile.bio}</p>
-                    <Separator className="my-6" />
-                    <p className="text-sm text-muted-foreground">
-                      {profile.longDescription}
-                    </p>
-                </div>
-              
+
+              <div className="space-y-4 text-center md:text-left pt-8">
+                <Avatar className="h-28 w-28 mb-4 border-2 border-primary/20 mx-auto md:mx-0">
+                  <AvatarImage src={profile.avatarUrl || undefined} alt={`@${profile.username}`} />
+                  <AvatarFallback>
+                    <User className="h-12 w-12" />
+                  </AvatarFallback>
+                </Avatar>
+                <h1 className="text-3xl font-bold tracking-tight">{profile.username}</h1>
+                <p className="text-muted-foreground">{profile.bio}</p>
+                <Separator className="my-6" />
+                <p className="text-sm text-muted-foreground">
+                  {profile.longDescription}
+                </p>
+              </div>
+
             </div>
 
             {/* Right Column: Booking Form */}
@@ -422,39 +422,39 @@ export default function BookSessionPage() {
                       <Separator />
 
                       <div className="space-y-4">
-                          <h3 className="text-base font-semibold text-muted-foreground">2. Pick a Time</h3>
-                          <Select
-                    value={selectedTime || undefined}
-                    onValueChange={setSelectedTime}
-                    disabled={availableTimes.length === 0}
-                          >
-                              <SelectTrigger className="w-full h-12 text-base">
-                                  <SelectValue placeholder="Select a time..." />
-                              </SelectTrigger>
-                              <SelectContent>
-                      {availableTimes.map(timeSlot => (
-                      <SelectItem key={timeSlot.start.toISOString()} value={timeSlot.start.toISOString()}>
-                        {format(timeSlot.start, 'HH:mm')}
-                      </SelectItem>
-                      ))}
-                              </SelectContent>
-                          </Select>
-                          {availableTimes.length === 0 && !isLoading && (
-                              <p className="text-sm text-muted-foreground pt-2">No available times for this date.</p>
-                          )}
-                          {/* Capacity info */}
-                          {selectedTime && (
-                            <div className="mt-2 text-sm text-green-200/80">
-                              <div>{selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''} — booked: {slotSignupCount ?? '–'} / capacity: {slotCapacity ?? '–'}</div>
-                            </div>
-                          )}
-                           {/* Debug info for availability */}
-                           <div className="mt-2 text-xs text-slate-400">
-                             <div>Debug: selectedDate: {selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '—'}</div>
-                             <div>availableTimes: {availableTimes.length}</div>
-                             <div>fallbackSlots: {(profile && (profile as any).slotsByDate && selectedDate) ? (((profile as any).slotsByDate[localIso(selectedDate)]||[]).length) : 0}</div>
-                             <div>slotsByDate keys: {(profile && (profile as any).slotsByDate) ? Object.keys((profile as any).slotsByDate).join(', ') : '—'}</div>
-                           </div>
+                        <h3 className="text-base font-semibold text-muted-foreground">2. Pick a Time</h3>
+                        <Select
+                          value={selectedTime || undefined}
+                          onValueChange={setSelectedTime}
+                          disabled={availableTimes.length === 0}
+                        >
+                          <SelectTrigger className="w-full h-12 text-base">
+                            <SelectValue placeholder="Select a time..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableTimes.map(timeSlot => (
+                              <SelectItem key={timeSlot.start.toISOString()} value={timeSlot.start.toISOString()}>
+                                {format(timeSlot.start, 'HH:mm')}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {availableTimes.length === 0 && !isLoading && (
+                          <p className="text-sm text-muted-foreground pt-2">No available times for this date.</p>
+                        )}
+                        {/* Capacity info */}
+                        {selectedTime && (
+                          <div className="mt-2 text-sm text-green-200/80">
+                            <div>{selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''} — booked: {slotSignupCount ?? '–'} / capacity: {slotCapacity ?? '–'}</div>
+                          </div>
+                        )}
+                        {/* Debug info for availability */}
+                        <div className="mt-2 text-xs text-slate-400">
+                          <div>Debug: selectedDate: {selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '—'}</div>
+                          <div>availableTimes: {availableTimes.length}</div>
+                          <div>fallbackSlots: {(profile && (profile as any).slotsByDate && selectedDate) ? (((profile as any).slotsByDate[localIso(selectedDate)] || []).length) : 0}</div>
+                          <div>slotsByDate keys: {(profile && (profile as any).slotsByDate) ? Object.keys((profile as any).slotsByDate).join(', ') : '—'}</div>
+                        </div>
                       </div>
 
                       <Button onClick={handleBooking} disabled={isBookingLoading || !selectedDate || !selectedTime} size="lg" className="w-full text-base py-6">

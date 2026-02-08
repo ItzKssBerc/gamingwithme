@@ -5,22 +5,22 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
-    const username = params.username;
+    const { username } = await params;
 
     if (!username) {
       return NextResponse.json({ error: 'Username is required' }, { status: 400 });
     }
 
     const user = await prisma.user.findFirst({
-      where: { 
+      where: {
         username: {
           equals: username,
           mode: 'insensitive',
         },
-       },
+      },
       include: {
         userGames: {
           include: {

@@ -11,7 +11,7 @@ declare module "next-auth" {
     username: string
     isAdmin: boolean
   }
-  
+
   interface Session {
     user: {
       id: string
@@ -115,9 +115,7 @@ export const authOptions: NextAuthOptions = {
     async updateUser(message) { /* user updated - e.g. their email was verified */ },
     async linkAccount(message) { /* account linked to a user */ },
     async session(message) { /* session is active */ },
-    async error(message) {
-      console.error("NextAuth error:", message)
-    }
+
   },
   debug: process.env.NODE_ENV === 'development',
 }

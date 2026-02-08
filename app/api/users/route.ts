@@ -12,11 +12,11 @@ export async function GET(req: NextRequest) {
 
     const where = q
       ? {
-          username: {
-            contains: q,
-            mode: "insensitive",
-          },
-        }
+        username: {
+          contains: q,
+          mode: "insensitive" as const,
+        },
+      }
       : {};
 
     const [users, total] = await prisma.$transaction([

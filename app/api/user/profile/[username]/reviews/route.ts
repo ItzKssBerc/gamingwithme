@@ -8,10 +8,10 @@ export const dynamic = 'force-dynamic';
 // GET - Fetch reviews for a user
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
-    const username = params.username;
+    const { username } = await params;
 
     if (!username) {
       return NextResponse.json({ error: 'Username is required' }, { status: 400 });
@@ -19,12 +19,12 @@ export async function GET(
 
     // Get the user being reviewed
     const reviewedUser = await prisma.user.findFirst({
-      where: { 
+      where: {
         username: {
           equals: username,
           mode: 'insensitive',
         },
-       },
+      },
       select: { id: true }
     });
 
@@ -69,7 +69,7 @@ export async function GET(
 // POST - Create a new review
 export async function POST(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -78,7 +78,7 @@ export async function POST(
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const username = params.username;
+    const { username } = await params;
     const { rating, comment } = await request.json();
 
     if (!username) {
@@ -91,7 +91,7 @@ export async function POST(
 
     // Get the user being reviewed
     const reviewedUser = await prisma.user.findFirst({
-      where: { 
+      where: {
         username: {
           equals: username,
           mode: 'insensitive',
@@ -142,9 +142,9 @@ export async function POST(
       }
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       review,
-      message: 'Review submitted successfully' 
+      message: 'Review submitted successfully'
     });
 
   } catch (error) {

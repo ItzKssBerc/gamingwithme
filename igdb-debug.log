@@ -1,0 +1,120 @@
+{
+  "timestamp": "2026-02-08T22:41:00.473Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;\n      where rating_count > 100 & version_parent = null & category = 0;\n      sort rating desc;\n      limit 20;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:41:39.283Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;\n      where version_parent = null & category = 0 & first_release_date <= 1770590497 & rating != null & rating_count >= 1000;\n      sort rating_count desc;\n      limit 12;\n      offset 0;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:44:46.361Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;\n      where version_parent = null & category = 0 & first_release_date <= 1770590686 & rating != null & rating_count >= 1000;\n      sort rating_count desc;\n      limit 12;\n      offset 0;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:44:47.333Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;\n      where version_parent = null & category = 0 & first_release_date <= 1770590687 & rating != null & rating_count >= 1000;\n      sort rating_count desc;\n      limit 12;\n      offset 0;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:45:30.309Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;\n      where slug = \"league-of-legends\";\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:46:22.009Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;\n      where slug = \"honkai-star-rail\";\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:46:34.569Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;\n      where slug = \"warframe\";\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:46:56.448Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;\n      where slug = \"the-forest\";\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:50:02.562Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;\n      where version_parent = null & category = 0 & first_release_date <= 1770591002 & rating != null & rating_count >= 1000;\n      sort rating_count desc;\n      limit 12;\n      offset 0;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:50:03.649Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;\n      where version_parent = null & category = 0 & first_release_date <= 1770591003 & rating != null & rating_count >= 1000;\n      sort rating_count desc;\n      limit 12;\n      offset 0;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:50:54.437Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;\n      where version_parent = null & category = 0 & first_release_date <= 1770591054 & rating != null & rating_count >= 1000;\n      sort rating_count desc;\n      limit 12;\n      offset 0;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:52:15.621Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;\n      where rating_count > 100 & version_parent = null;\n      sort rating desc;\n      limit 20;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:52:20.437Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;\n      where version_parent = null & first_release_date <= 1770591140 & rating != null & rating_count >= 1000;\n      sort rating_count desc;\n      limit 12;\n      offset 0;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:52:25.291Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;\n      where version_parent = null & first_release_date <= 1770591145 & rating != null & rating_count >= 1000;\n      sort rating_count desc;\n      limit 12;\n      offset 12;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---
+{
+  "timestamp": "2026-02-08T22:52:29.680Z",
+  "endpoint": "games",
+  "query": "\n      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;\n      where version_parent = null & first_release_date <= 1770591149 & rating != null & rating_count >= 1000;\n      sort rating_count desc;\n      limit 12;\n      offset 0;\n    ",
+  "clientId": "69s30...",
+  "hasToken": true
+}
+---

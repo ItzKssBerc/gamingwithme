@@ -3,10 +3,10 @@ import { igdbService } from '@/lib/igdb';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
 
     if (!slug) {
       return NextResponse.json(
@@ -16,7 +16,7 @@ export async function GET(
     }
 
     const game = await igdbService.getGameBySlug(slug);
-    
+
     if (!game) {
       return NextResponse.json(
         { error: 'Game not found' },

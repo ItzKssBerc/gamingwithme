@@ -3,13 +3,13 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(req: NextRequest, { params }: { params: { serviceId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ serviceId: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { serviceId } = params;
+  const { serviceId } = await params;
 
   try {
     const service = await prisma.fixedService.findUnique({

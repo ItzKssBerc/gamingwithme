@@ -7,13 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  User, 
-  Mail, 
-  Calendar, 
-  Gamepad2, 
-  Languages, 
-  Tags, 
+import {
+  User,
+  Mail,
+  Calendar,
+  Gamepad2,
+  Languages,
+  Tags,
   Star,
   Clock,
   MessageCircle,
@@ -132,7 +132,7 @@ export default function UserProfilePage() {
     try {
       setLoading(true)
       setError(null)
-      
+
       const response = await fetch(`/api/user/profile/${username}`, { cache: 'no-store' })
       if (response.ok) {
         const data = await response.json()
@@ -174,10 +174,10 @@ export default function UserProfilePage() {
     if (!profile?.userAvailability || profile.userAvailability.length === 0) {
       return "No availability set"
     }
-    
+
     const activeAvailability = profile.userAvailability.filter(av => av.isActive)
     if (activeAvailability.length === 0) return "No availability set"
-    
+
     return `${activeAvailability.length} time slots available`
   }
 
@@ -185,7 +185,7 @@ export default function UserProfilePage() {
     try {
       setSubmittingReview(true)
       setReviewError(null)
-      
+
       const response = await fetch(`/api/user/profile/${username}/reviews`, {
         method: 'POST',
         headers: {
@@ -273,13 +273,13 @@ export default function UserProfilePage() {
               </div>
             </div>
           )}
-          
+
           <div className="flex items-center gap-4 mb-6">
             <div className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center">
               {profile.avatar ? (
-                <img 
-                  src={profile.avatar} 
-                  alt={`${profile.username}'s profile`} 
+                <img
+                  src={profile.avatar}
+                  alt={`${profile.username}'s profile`}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -297,13 +297,12 @@ export default function UserProfilePage() {
                   <Clock className="h-4 w-4 text-gray-400" />
                   <span className="text-gray-400 text-sm">{formatAvailability()}</span>
                 </div>
-                
+
                 {/* Account Status Badge */}
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                  profile.isActive 
-                    ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${profile.isActive
+                    ? 'bg-green-500/20 text-green-300 border border-green-500/30'
                     : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                }`}>
+                  }`}>
                   {profile.isActive ? (
                     <>
                       <CheckCircle className="h-3 w-3" />
@@ -411,11 +410,10 @@ export default function UserProfilePage() {
                           Account Status
                         </h3>
                         <div className="flex items-center gap-3">
-                          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
-                            profile.isActive 
-                              ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
+                          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${profile.isActive
+                              ? 'bg-green-500/20 text-green-300 border border-green-500/30'
                               : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                          }`}>
+                            }`}>
                             {profile.isActive ? (
                               <>
                                 <CheckCircle className="h-4 w-4" />
@@ -429,7 +427,7 @@ export default function UserProfilePage() {
                             )}
                           </div>
                           <p className="text-gray-400 text-sm">
-                            {profile.isActive 
+                            {profile.isActive
                               ? 'This user is currently active and available for gaming sessions.'
                               : 'This user is currently inactive and may not be available for gaming sessions.'
                             }
@@ -449,73 +447,73 @@ export default function UserProfilePage() {
                       Games
                     </CardTitle>
                   </CardHeader>
-                                     <CardContent>
-                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                       {profile.userGames.length > 0 ? (
-                         (() => {
-                           // Group games by name to avoid duplicates
-                           const gameGroups = profile.userGames.reduce((groups, userGame) => {
-                             const gameName = userGame.game.name
-                             if (!groups[gameName]) {
-                               groups[gameName] = []
-                             }
-                             groups[gameName].push(userGame)
-                             return groups
-                           }, {} as Record<string, typeof profile.userGames>)
-                           
-                           return Object.entries(gameGroups).map(([gameName, userGames]) => {
-                             const firstGame = userGames[0]
-                             const platforms = userGames.map(ug => ug.platform).filter(Boolean)
-                             const levels = userGames.map(ug => ug.level)
-                             const uniqueLevels = [...new Set(levels)]
-                             
-                             return (
-                                                               <Card key={firstGame.id} className="bg-white/5 border-white/20 hover:bg-white/10 transition-colors">
-                                  <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                      <div className="flex-1 min-w-0">
-                                        <h4 className="text-white font-semibold text-lg truncate">{gameName}</h4>
-                                        {platforms.length > 0 && (
-                                          <p className="text-gray-400 text-sm mt-1 truncate">
-                                            {platforms.join(', ')}
-                                          </p>
-                                        )}
-                                        {uniqueLevels.length > 0 && (
-                                          <p className="text-gray-500 text-xs mt-1">
-                                            Levels: {uniqueLevels.join(', ')}
-                                          </p>
-                                        )}
-                                      </div>
-                                      <Button 
-                                        variant="outline" 
-                                        size="sm"
-                                        className="border-green-500/30 text-green-300 hover:bg-green-500/20 ml-3 flex-shrink-0"
-                                        onClick={() => {
-                                          setSelectedGame({ 
-                                            game: firstGame.game, 
-                                            userGames: userGames,
-                                            platforms: platforms,
-                                            levels: uniqueLevels
-                                          })
-                                          setShowGameDialog(true)
-                                        }}
-                                      >
-                                        View
-                                      </Button>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                      {profile.userGames.length > 0 ? (
+                        (() => {
+                          // Group games by name to avoid duplicates
+                          const gameGroups = profile.userGames.reduce((groups, userGame) => {
+                            const gameName = userGame.game.name
+                            if (!groups[gameName]) {
+                              groups[gameName] = []
+                            }
+                            groups[gameName].push(userGame)
+                            return groups
+                          }, {} as Record<string, typeof profile.userGames>)
+
+                          return Object.entries(gameGroups).map(([gameName, userGames]) => {
+                            const firstGame = userGames[0]
+                            const platforms = userGames.map(ug => ug.platform).filter(Boolean)
+                            const levels = userGames.map(ug => ug.level)
+                            const uniqueLevels = [...new Set(levels)]
+
+                            return (
+                              <Card key={firstGame.id} className="bg-white/5 border-white/20 hover:bg-white/10 transition-colors">
+                                <CardContent className="p-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="text-white font-semibold text-lg truncate">{gameName}</h4>
+                                      {platforms.length > 0 && (
+                                        <p className="text-gray-400 text-sm mt-1 truncate">
+                                          {platforms.join(', ')}
+                                        </p>
+                                      )}
+                                      {uniqueLevels.length > 0 && (
+                                        <p className="text-gray-500 text-xs mt-1">
+                                          Levels: {uniqueLevels.join(', ')}
+                                        </p>
+                                      )}
                                     </div>
-                                  </CardContent>
-                                </Card>
-                             )
-                           })
-                         })()
-                       ) : (
-                         <div className="col-span-full text-center py-8">
-                           <Gamepad2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                           <p className="text-gray-400">No games listed</p>
-                         </div>
-                       )}
-                     </div>
-                   </CardContent>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="border-green-500/30 text-green-300 hover:bg-green-500/20 ml-3 flex-shrink-0"
+                                      onClick={() => {
+                                        setSelectedGame({
+                                          game: firstGame.game,
+                                          userGames: userGames,
+                                          platforms: platforms,
+                                          levels: uniqueLevels
+                                        })
+                                        setShowGameDialog(true)
+                                      }}
+                                    >
+                                      View
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )
+                          })
+                        })()
+                      ) : (
+                        <div className="col-span-full text-center py-8">
+                          <Gamepad2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                          <p className="text-gray-400">No games listed</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
                 </Card>
               </TabsContent>
 
@@ -552,11 +550,10 @@ export default function UserProfilePage() {
                                     <button
                                       key={star}
                                       onClick={() => setReviewForm(prev => ({ ...prev, rating: star }))}
-                                      className={`text-2xl ${
-                                        star <= reviewForm.rating 
-                                          ? 'text-yellow-400' 
+                                      className={`text-2xl ${star <= reviewForm.rating
+                                          ? 'text-yellow-400'
                                           : 'text-gray-400'
-                                      } hover:text-yellow-400 transition-colors`}
+                                        } hover:text-yellow-400 transition-colors`}
                                     >
                                       ★
                                     </button>
@@ -614,42 +611,41 @@ export default function UserProfilePage() {
                         {reviewsData.reviews.map((review) => (
                           <Card key={review.id} className="bg-white/5 border-white/20">
                             <CardContent className="p-4">
-                                                                  <div className="flex items-start">
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center">
-                                          {review.reviewer.avatar ? (
-                                            <img 
-                                              src={review.reviewer.avatar} 
-                                              alt={`${review.reviewer.username}'s profile`} 
-                                              className="w-full h-full object-cover"
-                                            />
-                                          ) : (
-                                            <User className="h-4 w-4 text-white" />
-                                          )}
-                                        </div>
-                                        <span className="text-white font-medium">{review.reviewer.username}</span>
-                                        <div className="flex gap-1">
-                                          {[1, 2, 3, 4, 5].map((star) => (
-                                            <Star
-                                              key={star}
-                                              className={`h-4 w-4 ${
-                                                star <= review.rating 
-                                                  ? 'text-yellow-400 fill-current' 
-                                                  : 'text-gray-400'
-                                              }`}
-                                            />
-                                          ))}
-                                        </div>
-                                      </div>
-                                      {review.comment && (
-                                        <p className="text-gray-300 text-sm pl-10">{review.comment}</p>
+                              <div className="flex items-start">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center">
+                                      {review.reviewer.avatar ? (
+                                        <img
+                                          src={review.reviewer.avatar}
+                                          alt={`${review.reviewer.username}'s profile`}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      ) : (
+                                        <User className="h-4 w-4 text-white" />
                                       )}
                                     </div>
-                                    <p className="text-gray-500 text-xs mt-1 flex-shrink-0">
-                                      {new Date(review.createdAt).toLocaleDateString()}
-                                    </p>
+                                    <span className="text-white font-medium">{review.reviewer.username}</span>
+                                    <div className="flex gap-1">
+                                      {[1, 2, 3, 4, 5].map((star) => (
+                                        <Star
+                                          key={star}
+                                          className={`h-4 w-4 ${star <= review.rating
+                                              ? 'text-yellow-400 fill-current'
+                                              : 'text-gray-400'
+                                            }`}
+                                        />
+                                      ))}
+                                    </div>
                                   </div>
+                                  {review.comment && (
+                                    <p className="text-gray-300 text-sm pl-10">{review.comment}</p>
+                                  )}
+                                </div>
+                                <p className="text-gray-500 text-xs mt-1 flex-shrink-0">
+                                  {new Date(review.createdAt).toLocaleDateString()}
+                                </p>
+                              </div>
                             </CardContent>
                           </Card>
                         ))}
@@ -677,8 +673,8 @@ export default function UserProfilePage() {
                 <CardTitle className="text-white">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button 
-                  asChild 
+                <Button
+                  asChild
                   className={`w-full ${profile.isActive ? 'gaming-button' : 'bg-gray-600/20 text-gray-400 border-gray-500/30 cursor-not-allowed'}`}
                   disabled={!profile.isActive}
                 >
@@ -730,114 +726,114 @@ export default function UserProfilePage() {
                     {profile.userAvailability?.filter(av => av.isActive).length || 0}
                   </span>
                 </div>
-                                 <div className="flex items-center justify-between">
-                   <span className="text-gray-400">Member Since</span>
-                   <span className="text-white font-semibold">
-                     {new Date(profile.createdAt).getFullYear()}
-                   </span>
-                 </div>
-                 <div className="flex items-center justify-between">
-                   <span className="text-gray-400">Reviews</span>
-                   <span className="text-white font-semibold">
-                     {reviewsData?.totalReviews || 0}
-                   </span>
-                 </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Member Since</span>
+                  <span className="text-white font-semibold">
+                    {new Date(profile.createdAt).getFullYear()}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Reviews</span>
+                  <span className="text-white font-semibold">
+                    {reviewsData?.totalReviews || 0}
+                  </span>
+                </div>
               </CardContent>
             </Card>
-                     </div>
-         </div>
-       </div>
+          </div>
+        </div>
+      </div>
 
-       {/* Game Details Modal */}
-       <Dialog open={showGameDialog} onOpenChange={setShowGameDialog}>
-         <DialogContent className="bg-gray-900 border-gray-700">
-           <DialogHeader>
-             <DialogTitle className="text-white flex items-center gap-2">
-               <Gamepad2 className="h-5 w-5" />
-               {selectedGame?.game.name}
-             </DialogTitle>
-             <DialogDescription className="text-gray-400">
-               Game details and player information
-             </DialogDescription>
-           </DialogHeader>
-                       {selectedGame && (
-              <div className="space-y-4">
-                {/* Player Levels */}
+      {/* Game Details Modal */}
+      <Dialog open={showGameDialog} onOpenChange={setShowGameDialog}>
+        <DialogContent className="bg-gray-900 border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Gamepad2 className="h-5 w-5" />
+              {selectedGame?.game.name}
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Game details and player information
+            </DialogDescription>
+          </DialogHeader>
+          {selectedGame && (
+            <div className="space-y-4">
+              {/* Player Levels */}
+              <div>
+                <h4 className="text-white font-semibold mb-2">Player Levels</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedGame.levels?.map((level: string, index: number) => (
+                    <Badge key={index} variant="secondary" className="bg-green-600/20 text-green-300 border-green-500/30">
+                      {level}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Platforms */}
+              {selectedGame.platforms && selectedGame.platforms.length > 0 && (
                 <div>
-                  <h4 className="text-white font-semibold mb-2">Player Levels</h4>
+                  <h4 className="text-white font-semibold mb-2">Platforms</h4>
                   <div className="flex flex-wrap gap-2">
-                    {selectedGame.levels?.map((level, index) => (
-                      <Badge key={index} variant="secondary" className="bg-green-600/20 text-green-300 border-green-500/30">
-                        {level}
+                    {selectedGame.platforms.map((platform: string, index: number) => (
+                      <Badge key={index} variant="outline" className="border-blue-500/30 text-blue-300">
+                        {platform}
                       </Badge>
                     ))}
                   </div>
                 </div>
+              )}
 
-                {/* Platforms */}
-                {selectedGame.platforms && selectedGame.platforms.length > 0 && (
-                  <div>
-                    <h4 className="text-white font-semibold mb-2">Platforms</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedGame.platforms.map((platform, index) => (
-                        <Badge key={index} variant="outline" className="border-blue-500/30 text-blue-300">
-                          {platform}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              {/* Game Genre */}
+              {selectedGame.game.genre && (
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Genre</h4>
+                  <Badge variant="outline" className="border-purple-500/30 text-purple-300">
+                    {selectedGame.game.genre}
+                  </Badge>
+                </div>
+              )}
 
-                {/* Game Genre */}
-                {selectedGame.game.genre && (
-                  <div>
-                    <h4 className="text-white font-semibold mb-2">Genre</h4>
-                    <Badge variant="outline" className="border-purple-500/30 text-purple-300">
-                      {selectedGame.game.genre}
-                    </Badge>
-                  </div>
-                )}
-                
-                {/* Game Platform */}
-                {selectedGame.game.platform && (
-                  <div>
-                    <h4 className="text-white font-semibold mb-2">Game Platform</h4>
-                    <Badge variant="outline" className="border-orange-500/30 text-orange-300">
-                      {selectedGame.game.platform}
-                    </Badge>
-                  </div>
-                )}
+              {/* Game Platform */}
+              {selectedGame.game.platform && (
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Game Platform</h4>
+                  <Badge variant="outline" className="border-orange-500/30 text-orange-300">
+                    {selectedGame.game.platform}
+                  </Badge>
+                </div>
+              )}
 
-                {/* Detailed Breakdown */}
-                {selectedGame.userGames && selectedGame.userGames.length > 1 && (
-                  <div>
-                    <h4 className="text-white font-semibold mb-2">Detailed Breakdown</h4>
-                    <div className="space-y-2">
-                      {selectedGame.userGames.map((userGame, index) => (
-                        <div key={index} className="bg-white/5 p-3 rounded-lg">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-300">
-                              {userGame.platform || 'No platform'} - {userGame.level}
-                            </span>
-                          </div>
+              {/* Detailed Breakdown */}
+              {selectedGame.userGames && selectedGame.userGames.length > 1 && (
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Detailed Breakdown</h4>
+                  <div className="space-y-2">
+                    {selectedGame.userGames.map((userGame: any, index: number) => (
+                      <div key={index} className="bg-white/5 p-3 rounded-lg">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-300">
+                            {userGame.platform || 'No platform'} - {userGame.level}
+                          </span>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </div>
-            )}
-           <DialogFooter>
-             <Button
-               variant="outline"
-               onClick={() => setShowGameDialog(false)}
-               className="border-gray-600 text-gray-300 hover:bg-gray-800"
-             >
-               Close
-             </Button>
-           </DialogFooter>
-         </DialogContent>
-       </Dialog>
-     </div>
-   )
- }
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowGameDialog(false)}
+              className="border-gray-600 text-gray-300 hover:bg-gray-800"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
