@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import ServiceCard from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
+import { Plus, LayoutGrid, Settings, Calendar, Inbox, Trash2, Edit2, ArrowLeft, Layers } from "lucide-react";
+import Link from "next/link";
 
 interface Service {
   id: string;
@@ -24,7 +26,6 @@ export default function MyServicesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch user's services from API
     fetch("/api/user/services")
       .then((res) => res.json())
       .then((data) => {
@@ -42,137 +43,143 @@ export default function MyServicesPage() {
   }, []);
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this service?")) return;
     try {
       const res = await fetch('/api/user/services', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
       if (!res.ok) throw new Error('Delete failed')
       setServices(prev => prev.filter(s => s.id !== id))
     } catch (e) {
       console.error('Failed to delete service', e)
-      alert('Could not delete service')
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-green-900 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
-      <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-teal-500/5 rounded-full blur-2xl -translate-x-1/2 -translate-y-1/2"></div>
-      
-      <div className="relative z-10 py-12 px-4">
-        <div className="container mx-auto max-w-6xl">
-          {/* Header Section */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full mb-6 shadow-lg">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h1 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-emerald-400 to-teal-500 drop-shadow-2xl mb-4">
-              My Services
-            </h1>
-            <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto mb-8">
-              Manage and showcase your gaming coaching services with professional tools
-            </p>
-            <Button
-              variant="default"
-              className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 text-black font-bold px-8 py-4 text-lg rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-green-400/50 hover:border-green-300"
-              onClick={() => window.location.href = '/profile/my-services/create'}
-            >
-              <span className="inline-block align-middle mr-3 text-2xl">✨</span> 
-              Create New Service
-            </Button>
-          </div>
-          
-          {/* Content Section */}
-          <div className="mt-16">
-            {loading ? (
-              <div className="flex flex-col justify-center items-center h-64 bg-gradient-to-br from-gray-800/50 to-green-900/30 backdrop-blur-sm rounded-3xl border border-green-500/20 shadow-2xl">
-                <div className="relative">
-                  <span className="animate-spin rounded-full h-16 w-16 border-4 border-green-500/20 border-t-green-400 shadow-lg"></span>
-                  <div className="absolute inset-0 animate-pulse rounded-full bg-green-400/10"></div>
-                </div>
-                <span className="text-green-100 text-xl font-medium mt-6 animate-pulse">Loading your services...</span>
+    <div className="min-h-screen bg-[#050505] text-white selection:bg-green-500/30">
+      {/* Dynamic Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-green-900/10 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-900/10 rounded-full blur-[120px] animate-pulse delay-700"></div>
+      </div>
+
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 py-12">
+        {/* Breadcrumbs / Back */}
+        <Link href="/profile" className="inline-flex items-center text-sm text-gray-500 hover:text-green-400 transition-colors mb-8 group">
+          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+          Back to Profile
+        </Link>
+
+        {/* Dashboard Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-green-500/10 rounded-lg border border-green-500/20">
+                <Layers className="w-6 h-6 text-green-400" />
               </div>
-            ) : services.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-96 bg-gradient-to-br from-gray-800/40 via-green-900/20 to-emerald-900/30 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-green-500/30 p-12 relative overflow-hidden">
-                {/* Decorative background pattern */}
-                <div className="absolute inset-0 bg-green-500/5 opacity-30">
-                  <div className="absolute top-4 left-4 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <div className="absolute top-8 right-8 w-1 h-1 bg-emerald-400 rounded-full animate-pulse delay-100"></div>
-                  <div className="absolute bottom-6 left-8 w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse delay-200"></div>
-                  <div className="absolute bottom-4 right-4 w-2 h-2 bg-green-300 rounded-full animate-pulse delay-300"></div>
+              <span className="text-sm font-bold uppercase tracking-[0.2em] text-green-500/80">Creator Studio</span>
+            </div>
+            <h1 className="text-5xl md:text-6xl font-black tracking-tighter mb-4">
+              Manage <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">Services</span>
+            </h1>
+            <p className="text-gray-400 max-w-xl text-lg leading-relaxed">
+              Create and manage your professional coaching sessions. Set your own prices, schedule availability, and track your bookings.
+            </p>
+          </div>
+
+          <Link href="/profile/my-services/create">
+            <Button className="h-14 px-8 bg-green-500 hover:bg-green-400 text-black font-bold rounded-2xl shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              New Coaching Service
+            </Button>
+          </Link>
+        </div>
+
+        {/* Stats / Filter Bar (Placeholder for future) */}
+        {!loading && services.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+            {[
+              { label: 'Total Services', value: services.length, icon: LayoutGrid },
+              { label: 'Active Status', value: services.filter(s => s.isActive).length, icon: Settings },
+              { label: 'Upcoming Slots', value: '–', icon: Calendar },
+              { label: 'New Requests', value: '0', icon: Inbox },
+            ].map((stat, i) => (
+              <div key={i} className="bg-white/5 border border-white/5 rounded-2xl p-6 backdrop-blur-md">
+                <div className="flex items-center gap-3 mb-2">
+                  <stat.icon className="w-4 h-4 text-green-400" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{stat.label}</span>
                 </div>
-                
-                <div className="relative z-10 text-center">
-                  <div className="flex items-center justify-center mb-8">
-                    <div className="relative">
-                      <span className="inline-block text-7xl text-green-400 drop-shadow-lg animate-bounce">🎮</span>
-                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                        <span className="text-white text-lg font-bold">+</span>
-                      </div>
-                    </div>
-                  </div>
-                  <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400 mb-4">
-                    Ready to Start Coaching?
-                  </h2>
-                  <p className="text-green-200 text-lg mb-8 max-w-md mx-auto leading-relaxed">
-                    Create your first coaching service and start helping gamers improve their skills!
-                  </p>
+                <div className="text-2xl font-black">{stat.value}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Main Content Area */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-32 space-y-4">
+            <div className="w-12 h-12 border-4 border-green-500/20 border-t-green-500 rounded-full animate-spin"></div>
+            <p className="text-gray-500 font-medium animate-pulse">Syncing your studio data...</p>
+          </div>
+        ) : services.length === 0 ? (
+          <div className="bg-white/[0.02] border border-white/5 rounded-[40px] p-16 text-center backdrop-blur-sm border-dashed">
+            <div className="w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-8 animate-float">
+              <Plus className="w-12 h-12 text-green-500" />
+            </div>
+            <h2 className="text-3xl font-bold mb-4">No services built yet</h2>
+            <p className="text-gray-400 max-w-md mx-auto mb-10 text-lg">
+              You haven't created any coaching services yet. Start your journey by offering your first session to the community.
+            </p>
+            <Link href="/profile/my-services/create">
+              <Button variant="outline" className="border-green-500/50 text-green-400 hover:bg-green-500/10 h-14 px-10 rounded-2xl">
+                Launch Your First Service
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, index) => (
+              <div key={service.id} className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                <ServiceCard
+                  service={service}
+                  memberCount={service.sessionsPerWeek || 0}
+                  onDelete={handleDelete}
+                  gameName={service.gameName}
+                  gamePlatform={service.gamePlatform}
+                  platformName={service.platformName}
+                />
+
+                {/* Management Actions */}
+                <div className="grid grid-cols-2 gap-3">
+                  <Link href={`/profile/my-services/plan?id=${service.id}`} className="flex-1">
+                    <Button variant="secondary" className="w-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5 rounded-xl text-xs font-bold uppercase tracking-wider py-5 flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5" />
+                      Schedule
+                    </Button>
+                  </Link>
+                  <Link href={`/profile/my-services/requests?id=${service.id}`} className="flex-1">
+                    <Button variant="secondary" className="w-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5 rounded-xl text-xs font-bold uppercase tracking-wider py-5 flex items-center gap-2">
+                      <Inbox className="w-3.5 h-3.5" />
+                      Orders
+                    </Button>
+                  </Link>
+                  <Link href={`/profile/my-services/create?id=${service.id}`} className="flex-1">
+                    <Button variant="secondary" className="w-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5 rounded-xl text-xs font-bold uppercase tracking-wider py-5 flex items-center gap-2">
+                      <Edit2 className="w-3.5 h-3.5" />
+                      Edit
+                    </Button>
+                  </Link>
                   <Button
-                    variant="default"
-                    className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 text-black font-bold px-10 py-4 text-lg rounded-2xl shadow-2xl hover:scale-110 transition-all duration-300 border-2 border-green-400/50 hover:border-green-300 group"
-                    onClick={() => window.location.href = '/profile/my-services/create'}
+                    onClick={() => handleDelete(service.id)}
+                    variant="secondary"
+                    className="flex-1 bg-red-500/5 hover:bg-red-500/10 text-red-400/80 border border-red-500/10 rounded-xl text-xs font-bold uppercase tracking-wider py-5 flex items-center gap-2"
                   >
-                    <span className="inline-block align-middle mr-3 text-xl group-hover:animate-bounce">🚀</span> 
-                    Create Your First Service
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Delete
                   </Button>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-8">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                      <span className="text-white font-bold text-lg">{services.length}</span>
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-green-100">Active Services</h2>
-                      <p className="text-green-300">Manage your coaching offerings</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {services.map((service, index) => (
-                    <div 
-                      key={service.id} 
-                      className="group bg-gradient-to-br from-gray-800/60 to-green-900/30 backdrop-blur-sm rounded-2xl shadow-2xl p-6 hover:scale-[1.02] transition-all duration-300 border border-green-500/20 hover:border-green-400/50 relative overflow-hidden"
-                      style={{ animationDelay: `${index * 100}ms` }}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <div className="relative z-10">
-                          <ServiceCard
-                            service={service}
-                            memberCount={service.sessionsPerWeek || 0}
-                            onDelete={handleDelete}
-                            gameName={service.gameName}
-                            gamePlatform={service.gamePlatform}
-                            platformName={service.platformName}
-                          />
-                        <div className="mt-4 p-3 bg-green-900/20 rounded-lg border border-green-500/20 flex items-center justify-start space-x-3">
-                          <button onClick={() => window.location.href = `/profile/my-services/plan?id=${service.id}`} className="text-sm text-green-200 hover:text-green-100">Plan</button>
-                          <button onClick={() => window.location.href = `/profile/my-services/requests?id=${service.id}`} className="text-sm text-green-200 hover:text-green-100">Requests</button>
-                          <button onClick={() => handleDelete(service.id)} className="text-sm text-red-400 hover:text-red-500">Delete</button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            ))}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

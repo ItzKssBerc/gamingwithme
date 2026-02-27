@@ -3,7 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
+import LoadingSync from "@/components/LoadingSync"
+
+import {
   Trophy,
   Star,
   Users,
@@ -51,7 +53,7 @@ export default function LeaderboardPage() {
       try {
         setLoading(true)
         setError(null)
-        
+
         const response = await fetch('/api/leaderboard')
         if (response.ok) {
           const data = await response.json()
@@ -78,10 +80,10 @@ export default function LeaderboardPage() {
   const filteredAndSortedUsers = users
     .filter(user => {
       // Search filter
-      const matchesSearch = 
+      const matchesSearch =
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.bio?.toLowerCase().includes(searchTerm.toLowerCase())
-      
+
       // Category filter
       let matchesCategory = true
       switch (selectedCategory) {
@@ -100,7 +102,7 @@ export default function LeaderboardPage() {
         default:
           matchesCategory = true
       }
-      
+
       return matchesSearch && matchesCategory
     })
     .sort((a, b) => {
@@ -141,21 +143,12 @@ export default function LeaderboardPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-green-400" />
-            <span className="ml-3 text-white">Loading leaderboard...</span>
-          </div>
-        </div>
-      </div>
-    )
+    return <LoadingSync message="SYNC / RANKINGS" subtext="Analyzing Combat Data" />
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900">
+      <div className="min-h-screen bg-transparent">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col items-center justify-center py-12">
             <AlertCircle className="h-12 w-12 text-red-400 mb-4" />
@@ -174,9 +167,9 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900">
+    <div className="min-h-screen bg-transparent">
       {/* Header */}
-      <section className="py-8 bg-black/20">
+      <section className="py-8 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-4 mb-6">
             <Button asChild variant="outline" className="border-white/20 text-white hover:bg-white/10">
@@ -186,7 +179,7 @@ export default function LeaderboardPage() {
               </Link>
             </Button>
           </div>
-          
+
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-4">
               <Trophy className="h-12 w-12 text-yellow-400" />
@@ -269,11 +262,11 @@ export default function LeaderboardPage() {
               >
                 {getCategoryIcon(category)}
                 <span className="ml-2 capitalize">
-                  {category === 'all' ? 'All Players' : 
-                   category === 'top-rated' ? 'Top Rated' :
-                   category === 'most-games' ? 'Most Games' :
-                   category === 'multi-platform' ? 'Multi Platform' :
-                   'Most Reviewed'}
+                  {category === 'all' ? 'All Players' :
+                    category === 'top-rated' ? 'Top Rated' :
+                      category === 'most-games' ? 'Most Games' :
+                        category === 'multi-platform' ? 'Multi Platform' :
+                          'Most Reviewed'}
                 </span>
               </Button>
             ))}
@@ -300,8 +293,8 @@ export default function LeaderboardPage() {
                         <div className="flex items-center gap-4 mb-3">
                           <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center">
                             {user.avatar ? (
-                              <img 
-                                src={user.avatar} 
+                              <img
+                                src={user.avatar}
                                 alt={user.username}
                                 className="w-12 h-12 rounded-full object-cover"
                               />
@@ -370,7 +363,7 @@ export default function LeaderboardPage() {
                               </div>
                             </div>
                           )}
-                          
+
                           {user.games && user.games.length > 0 && (
                             <div className="flex items-center gap-2">
                               <span className="text-gray-400 text-sm">Top Games:</span>
@@ -415,8 +408,8 @@ export default function LeaderboardPage() {
                 <Trophy className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-white mb-2">No Players Found</h3>
                 <p className="text-gray-400 mb-6">
-                  {searchTerm || selectedCategory !== 'all' 
-                    ? `No players match your search criteria${searchTerm ? ' and' : ''}${selectedCategory !== 'all' ? ` category filter (${selectedCategory})` : ''}.` 
+                  {searchTerm || selectedCategory !== 'all'
+                    ? `No players match your search criteria${searchTerm ? ' and' : ''}${selectedCategory !== 'all' ? ` category filter (${selectedCategory})` : ''}.`
                     : 'No players available in the leaderboard.'}
                 </p>
                 <Button asChild className="gaming-button">

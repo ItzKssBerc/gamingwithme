@@ -55,8 +55,9 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} antialiased`}
       >
         <SessionProvider session={session}>
+          <div className="app-grid-pattern" />
           <Navigation />
-          <main className="min-h-screen">
+          <main className="min-h-screen relative z-0">
             {children}
           </main>
           <Footer />

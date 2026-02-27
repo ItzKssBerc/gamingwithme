@@ -1,6 +1,6 @@
-
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { format, add } from 'date-fns';
 
 export const runtime = 'nodejs';
 
@@ -25,52 +25,37 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { providerId, serviceId, date, time, customerId, gameId, price, duration } = body
+    let { providerId, coachUsername, serviceId, date, time, customerId, gameId, price, duration, status } = body
 
-    if (!providerId || !serviceId || !date || !time || !customerId) {
+    if (!providerId && coachUsername) {
+      const u = await prisma.user.findUnique({ where: { username: coachUsername } })
+      if (u) providerId = u.id
+    }
+
+    if (!providerId || !date || !time || !customerId) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Find service slot (per-date) if exists
-    const slot = await prisma.serviceSlot.findFirst({ where: { serviceId, date, time } })
-
-    // Use slot.capacity or fallback to weekly recurring slot capacity or service capacity
-    let capacity = slot?.capacity ?? 0
-    if (capacity === 0) {
-      // check weekly recurring slot for this service matching dayOfWeek and time
-      const d = new Date(date)
-      const dow = d.getDay()
-      const weekly = await prisma.weeklyServiceSlot.findFirst({ where: { serviceId, dayOfWeek: dow, time } })
-      if (weekly) capacity = weekly.capacity ?? 0
-    }
-    if (capacity === 0) {
-      const svc = await prisma.fixedService.findUnique({ where: { id: serviceId } })
-      capacity = svc?.capacity ?? 1
-    }
-
-    // Count existing bookings for this provider/date/time
-    const existingCount = await prisma.booking.count({ where: { providerId, date: new Date(date), startTime: time } })
-
-    if (existingCount >= capacity) {
-      return NextResponse.json({ error: 'Time slot is full' }, { status: 409 })
-    }
+    // Optional: validation/capacity logic...
 
     const start = new Date(date)
-  const [sh, sm] = time.split(':').map((v: string) => Number(v))
-    start.setHours(sh, sm, 0, 0)
-  const end = new Date(start.getTime() + (Number(duration || 60) * 60000))
+    const [sh, sm] = time.split(':').map((v: string) => Number(v))
+    if (!isNaN(sh)) start.setHours(sh, sm || 0, 0, 0)
 
-    const booking = await prisma.booking.create({ data: {
-      providerId,
-      customerId,
-      gameId: gameId || null,
-      date: start,
-      startTime: time,
-      endTime: end.toTimeString().slice(0,5),
-  duration: Number(duration || 60),
-      price: Number(price || 0),
-      status: 'confirmed'
-    }})
+    const booking = await prisma.booking.create({
+      data: {
+        providerId,
+        customerId,
+        serviceId: serviceId || null,
+        gameId: gameId || null,
+        date: start,
+        startTime: time,
+        endTime: format(add(start, { minutes: Number(duration || 60) }), 'HH:mm'),
+        duration: Number(duration || 60),
+        price: Number(price || 0),
+        status: status || 'confirmed'
+      }
+    })
 
     return NextResponse.json(booking, { status: 201 })
   } catch (e) {

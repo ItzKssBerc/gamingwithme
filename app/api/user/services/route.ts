@@ -235,16 +235,46 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
-    const { id, isActive, slots, weeklySlots } = body || {}
-    if (!id || typeof id !== 'string') return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    const { id, title, description, gameId, platform, price, duration, capacity, isActive, slots, weeklySlots } = body || {}
+    if (!id || typeof id !== 'string') return NextResponse.json({ id, title, description, gameId, platform, price, duration, capacity, isActive, slots, weeklySlots })
 
-    const svc = await prisma.fixedService.findUnique({ where: { id }, include: { serviceSlots: true } })
+    const svc = await prisma.fixedService.findUnique({ where: { id }, include: { serviceSlots: true, weeklyServiceSlots: true } })
     if (!svc) return NextResponse.json({ error: 'Service not found' }, { status: 404 })
     if (svc.providerId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     // Build update data
     const data: any = {}
+    if (title !== undefined) data.title = String(title)
+    if (description !== undefined) data.description = String(description)
+    if (gameId !== undefined) data.gameId = gameId || null
+    if (price !== undefined) data.price = Number(price)
+    if (duration !== undefined) data.duration = Number(duration)
+    if (capacity !== undefined) data.capacity = Number(capacity)
     if (typeof isActive === 'boolean') data.isActive = isActive
+
+    // Resolve platform -> platformId
+    if (platform !== undefined) {
+      let platformId: string | null = null
+      if (platform) {
+        try {
+          const byId = await prisma.platform.findUnique({ where: { id: String(platform) } })
+          if (byId) platformId = byId.id
+          else {
+            const byName = await prisma.platform.findFirst({ where: { name: { equals: String(platform), mode: 'insensitive' } } })
+            if (byName) platformId = byName.id
+            else {
+              const slug = String(platform).toLowerCase().replace(/[^a-z0-9]+/g, '-')
+              const placeholderIgdbId = -Math.floor(Date.now() / 1000)
+              const createdPlat = await prisma.platform.create({ data: { name: String(platform), slug, igdbId: placeholderIgdbId } })
+              platformId = createdPlat.id
+            }
+          }
+        } catch (e) {
+          console.warn('Error resolving platform in PATCH', e)
+        }
+      }
+      data.platformId = platformId
+    }
 
     // Validate slots/weeklySlots if provided
     const validatedSlots: Array<{ date: string; time: string; capacity: number }> = []

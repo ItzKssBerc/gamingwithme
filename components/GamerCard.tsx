@@ -16,8 +16,8 @@ interface GamerCardProps {
 
 const GamerCard: React.FC<GamerCardProps> = ({ gamer }) => {
     return (
-        <Link href={`/profile/${gamer.id}`} className="group flex-shrink-0 w-52 transition-transform duration-300 hover:scale-105">
-            <div className="relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900 shadow-lg p-4">
+        <Link href={`/profile/${gamer.username}`} className="group flex-shrink-0 w-52 transition-transform duration-300 hover:scale-105">
+            <div className="relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900 p-4">
                 <div className="flex items-center gap-4">
                     <div className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-primary/50 group-hover:border-primary transition-colors">
                         {gamer.avatar ? (
@@ -25,6 +25,7 @@ const GamerCard: React.FC<GamerCardProps> = ({ gamer }) => {
                                 src={gamer.avatar}
                                 alt={gamer.username}
                                 fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 className="object-cover"
                             />
                         ) : (

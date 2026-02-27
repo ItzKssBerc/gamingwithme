@@ -3,67 +3,76 @@ import Image from "next/image";
 
 const links = [
     {
+        title: "Platform",
+        links: [
+            { label: "Gamers", href: "/gamers" },
+            { label: "Games", href: "/games" },
+            { label: "Leaderboard", href: "/leaderboard" },
+        ],
+    },
+    {
         title: "Support",
         links: [
-            {
-                label: "FAQ",
-                href: "/support/faq",
-            },
-            {
-                label: "Contact Us",
-                href: "/support/contactus",
-            },
+            { label: "FAQ", href: "/support/faq" },
+            { label: "Contact Us", href: "/support/contactus" },
         ],
     },
     {
         title: "Legal",
         links: [
-            {
-                label: "Privacy Policy",
-                href: "#",
-            },
-            {
-                label: "Cookie Policy",
-                href: "#",
-            },
+            { label: "Privacy Policy", href: "#" },
+            { label: "Terms of Service", href: "#" },
         ],
     },
 ];
 
 const Footer = () => {
     return (
-        <footer className="bg-black text-white border-t border-green-700">
-            <div className="container mx-auto py-8 px-4 md:px-6">
-                {/* Upper section with brand info and links */}
-                <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 text-center md:text-left">
-                    {/* Left side: Brand and social */}
-                    <div className="flex flex-col items-center md:items-start gap-4 md:w-1/3">
-                        <div className="flex items-center gap-3">
-                            <Image
-                                src="/logo/logo.png"
-                                alt="GamingWithMe Logo"
-                                width={48}
-                                height={48}
-                                className="h-12 w-auto"
-                            />
-                            <h2 className="text-2xl font-bold font-orbitron tracking-wider text-gaming-green">GamingWithMe</h2>
+        <footer className="relative mt-20 border-t border-white/[0.05] bg-[#050505] selection:bg-gaming-green selection:text-black">
+
+            <div className="container mx-auto py-16 px-6 md:px-10 max-w-7xl">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">
+                    {/* Brand Section */}
+                    <div className="lg:col-span-5 space-y-8">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 rounded-2xl bg-white/[0.01] border border-white/[0.05]">
+                                <Image
+                                    src="/logo/logo.png"
+                                    alt="GamingWithMe Logo"
+                                    width={48}
+                                    height={48}
+                                    className="h-10 w-auto"
+                                />
+                            </div>
+                            <h2 className="text-2xl font-black font-orbitron tracking-tighter text-white uppercase italic">
+                                Gaming<span className="text-gaming-green italic">WithMe</span>
+                            </h2>
                         </div>
-                        <div className="max-w-xs">
-                            <p className="text-gray-300 text-justify">
-                                GamingWithMe is a platform for gamers to connect and play together.
-                            </p>
-                        </div>
+
+                        <p className="text-gray-500 text-sm md:text-base max-w-sm leading-relaxed font-medium">
+                            The ultimate tactical communication layer for elite operatives. Coordinate, compete, and dominate across every theater of play.
+                        </p>
+
+
                     </div>
 
-                    {/* Right side: Links */}
-                    <div className="grid grid-cols-2 md:w-2/3 md:border-l border-green-700 divide-x divide-green-700">
+                    {/* Links Section */}
+                    <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
                         {links.map((column) => (
-                            <div key={column.title} className="flex flex-col gap-4 px-6 md:px-12">
-                                <h3 className="font-bold text-lg text-white font-orbitron uppercase tracking-widest text-sm">{column.title}</h3>
-                                <ul className="flex flex-col gap-2">
+                            <div key={column.title} className="space-y-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-[1px] w-4 bg-white/[0.1]"></div>
+                                    <h3 className="text-[10px] font-black font-orbitron text-gray-600 uppercase tracking-[0.3em]">
+                                        {column.title}
+                                    </h3>
+                                </div>
+                                <ul className="space-y-3">
                                     {column.links.map((link) => (
                                         <li key={link.label}>
-                                            <Link href={link.href} className="text-gray-300 hover:text-gaming-green text-sm transition-colors">
+                                            <Link
+                                                href={link.href}
+                                                className="text-gray-500 hover:text-white text-sm font-medium transition-all duration-300 hover:translate-x-1 block"
+                                            >
                                                 {link.label}
                                             </Link>
                                         </li>
@@ -75,11 +84,23 @@ const Footer = () => {
                 </div>
             </div>
 
-            {/* Bottom section with copyright */}
-            <div className="border-t border-green-700">
-                <div className="container mx-auto py-8 text-center text-gray-400 text-xs tracking-widest uppercase">
-                    <p>© {new Date().getFullYear()} GamingWithMe. All rights reserved.</p>
+            {/* Bottom Section */}
+            <div className="border-t border-white/[0.05] relative py-10">
+                <div className="container mx-auto px-6 md:px-10 max-w-7xl flex flex-col md:flex-row justify-between items-center gap-6">
+
+
+                    <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">
+                        © {new Date().getFullYear()} <span className="text-white italic">GamingWithMe</span>. All rights reserved.
+                    </p>
+
+                    <div className="flex items-center gap-6">
+                        <div className="h-[1px] w-12 bg-white/[0.05] hidden md:block"></div>
+                        <p className="text-gray-600 text-[9px] font-medium uppercase tracking-[0.2em]">
+                            Stealth v2.0.42
+                        </p>
+                    </div>
                 </div>
+
             </div>
         </footer>
     );

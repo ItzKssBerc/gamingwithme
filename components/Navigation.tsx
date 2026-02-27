@@ -58,9 +58,9 @@ export default function Navigation() {
   }
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
-      ? 'bg-black/20 backdrop-blur-sm border-b border-green-500/30'
-      : 'bg-black border-b border-green-700'
+    <nav className={`sticky top-0 z-50 transition-colors duration-500 ${isScrolled
+      ? 'bg-black/80 backdrop-blur-md border-b border-white/[0.02]'
+      : 'bg-black border-b border-white/[0.05]'
       }`}>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-3 items-center h-16">
@@ -72,10 +72,10 @@ export default function Navigation() {
                 alt="GamingWithMe Logo"
                 width={32}
                 height={32}
-                className="h-8 w-auto"
+                className="h-8 w-auto opacity-80"
                 priority
               />
-              <span className="text-xl font-bold text-gaming-green font-orbitron tracking-wider">GamingWithMe</span>
+              <span className="text-xl font-black text-gray-200 font-orbitron tracking-wider">GamingWithMe</span>
             </Link>
           </div>
 
@@ -87,27 +87,27 @@ export default function Navigation() {
           {/* Desktop Navigation - col - középre igazítva */}
           <div className="col-span-1 hidden md:flex items-center justify-center">
             <div className="flex items-center space-x-8">
-              <Link href="/games" className="text-green-200 hover:text-white transition-colors">
+              <Link href="/games" className="text-[11px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
                 Games
               </Link>
-              <Link href="/gamers" className="text-green-200 hover:text-white transition-colors">
+              <Link href="/gamers" className="text-[11px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
                 Gamers
               </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="text-green-200 hover:text-white transition-colors flex items-center gap-1 px-2 py-1 rounded-md">
-                    Support <ChevronDown className="h-4 w-4" />
+                  <button className="text-[11px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors flex items-center gap-1 px-2 py-1 rounded-md">
+                    Support <ChevronDown className="h-3 w-3" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/50 text-white rounded-lg shadow-xl min-w-[140px]" align="start">
-                  <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                    <Link href="/support/contactus" className="flex items-center space-x-2 cursor-pointer py-2">
-                      <span>Contact us</span>
+                <DropdownMenuContent className="bg-black/90 border border-white/[0.05] text-white rounded-xl shadow-2xl min-w-[140px] backdrop-blur-xl" align="start">
+                  <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                    <Link href="/support/contactus" className="flex items-center space-x-2 cursor-pointer py-2 px-3">
+                      <span className="text-[10px] font-black uppercase tracking-widest">Contact us</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                    <Link href="/support/faq" className="flex items-center space-x-2 cursor-pointer py-2">
-                      <span>FAQ</span>
+                  <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                    <Link href="/support/faq" className="flex items-center space-x-2 cursor-pointer py-2 px-3">
+                      <span className="text-[10px] font-black uppercase tracking-widest">FAQ</span>
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -122,68 +122,68 @@ export default function Navigation() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="p-0 h-auto bg-transparent border-none hover:bg-transparent">
-                      <div className="p-1 rounded-full hover:bg-emerald-600/20 transition-colors">
+                      <div className="p-1 rounded-full hover:bg-white/5 transition-colors">
                         {userProfile?.avatar ? (
                           <Image
                             src={userProfile.avatar}
                             alt="Profile"
                             width={32}
                             height={32}
-                            className="w-8 h-8 rounded-full object-cover border-2 border-emerald-400/50 hover:border-emerald-300/70 transition-colors"
+                            className="w-8 h-8 rounded-full object-cover border border-white/10 hover:border-white/20 transition-colors"
                           />
                         ) : (
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center border-2 border-emerald-400/50 hover:border-emerald-300/70 transition-colors">
-                            <User className="h-4 w-4 text-white" />
+                          <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center border border-white/10 hover:border-white/20 transition-colors">
+                            <User className="h-4 w-4 text-gray-400" />
                           </div>
                         )}
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/50 text-white rounded-lg shadow-xl" sideOffset={0} align="end">
-                    <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                      <Link href="/profile" className="flex items-center space-x-2 cursor-pointer py-2">
-                        <User className="h-4 w-4" />
-                        <span>Profile</span>
+                  <DropdownMenuContent className="w-56 bg-black/90 border border-white/[0.05] text-white rounded-xl shadow-2xl backdrop-blur-xl" sideOffset={10} align="end">
+                    <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                      <Link href="/profile" className="flex items-center space-x-2 cursor-pointer py-2 px-3">
+                        <User className="h-4 w-4 text-gray-500" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Profile</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                      <Link href={`/profile/${session.user?.username}/my-bookings`} className="flex items-center space-x-2 cursor-pointer py-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>My Bookings</span>
+                    <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                      <Link href={`/profile/${session.user?.username}/my-bookings`} className="flex items-center space-x-2 cursor-pointer py-2 px-3">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">My Bookings</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                      <Link href="/profile/my-services" className="flex items-center space-x-2 cursor-pointer py-2">
-                        <Settings className="h-4 w-4" />
-                        <span>My Services</span>
+                    <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                      <Link href="/profile/my-services" className="flex items-center space-x-2 cursor-pointer py-2 px-3">
+                        <Settings className="h-4 w-4 text-gray-500" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">My Services</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                      <Link href="/profile" className="flex items-center space-x-2 cursor-pointer py-2">
-                        <Settings className="h-4 w-4" />
-                        <span>Settings</span>
+                    <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                      <Link href="/profile" className="flex items-center space-x-2 cursor-pointer py-2 px-3">
+                        <Settings className="h-4 w-4 text-gray-500" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Settings</span>
                       </Link>
                     </DropdownMenuItem>
 
-                    <DropdownMenuSeparator className="bg-emerald-400/50 mx-1" />
+                    <DropdownMenuSeparator className="bg-white/[0.05] mx-2" />
                     <DropdownMenuItem
                       onClick={() => signOut({ callbackUrl: "/" })}
-                      className="flex items-center space-x-2 cursor-pointer text-red-400 hover:text-red-300 hover:bg-red-600/20 focus:bg-red-600/20 rounded-md mx-1 my-0.5 py-2"
+                      className="flex items-center space-x-2 cursor-pointer text-red-500/70 hover:text-red-400 hover:bg-red-500/5 focus:bg-red-500/5 rounded-lg mx-1 my-0.5 py-2 px-3"
                     >
                       <LogOut className="h-4 w-4" />
-                      <span>Sign Out</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             ) : (
               <>
-                <Button asChild className="min-w-[120px] justify-center bg-green-300/30 backdrop-blur-md border border-green-300/50 text-white shadow-lg hover:bg-green-300/50 hover:border-green-400/70 transition-all duration-300 font-orbitron tracking-wider">
+                <Button asChild className="h-9 min-w-[100px] justify-center bg-white/[0.08] border border-white/[0.1] text-gray-300 hover:text-white hover:bg-white/[0.15] transition-all duration-300 font-orbitron tracking-widest text-[10px] uppercase font-black rounded-lg">
                   <Link href="/login">
                     Login
                   </Link>
                 </Button>
-                <Button asChild className="min-w-[120px] justify-center bg-green-700/40 backdrop-blur-md border border-green-700/70 text-white shadow-lg hover:bg-green-700/60 hover:border-green-500/80 transition-all duration-300 font-orbitron tracking-wider">
+                <Button asChild className="h-9 min-w-[100px] justify-center bg-green-600/80 border border-green-500/50 text-black shadow-lg hover:bg-green-500 transition-all duration-300 font-orbitron tracking-widest text-[10px] uppercase font-black rounded-lg">
                   <Link href="/registration">
                     Sign up
                   </Link>
@@ -196,7 +196,7 @@ export default function Navigation() {
           <div className="col-span-1 md:hidden flex items-center justify-end">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-green-200 p-2"
+              className="text-gray-400 p-2"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -205,128 +205,128 @@ export default function Navigation() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-green-700">
+          <div className="md:hidden py-4 border-t border-white/[0.05]">
             <div className="flex flex-col space-y-4">
               <Link
                 href="/games"
-                className="text-green-200 hover:text-white transition-colors flex items-center space-x-2"
+                className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <Gamepad2 className="h-5 w-5" />
+                <Gamepad2 className="h-4 w-4" />
                 <span>Games</span>
               </Link>
               <Link
                 href="/gamers"
-                className="text-green-200 hover:text-white transition-colors flex items-center space-x-2"
+                className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <Users className="h-5 w-5" />
+                <Users className="h-4 w-4" />
                 <span>Gamers</span>
               </Link>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="text-green-200 hover:text-white transition-colors flex items-center justify-between w-full space-x-2">
+                  <button className="text-gray-400 hover:text-white transition-colors flex items-center justify-between w-full space-x-2 text-[10px] font-black uppercase tracking-widest">
                     <div className="flex items-center space-x-2">
-                      <Settings className="h-5 w-5" />
+                      <Settings className="h-4 w-4" />
                       <span>Support</span>
                     </div>
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown className="h-3 w-3" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-[calc(100vw-2rem)] bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/50 text-white rounded-lg shadow-xl" side="bottom" align="start" sideOffset={10}>
-                  <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                    <Link href="/support/contactus" className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
-                      <span>Contact us</span>
+                <DropdownMenuContent className="w-[calc(100vw-2rem)] bg-black/90 border border-white/[0.05] text-white rounded-xl shadow-2xl backdrop-blur-xl" side="bottom" align="start" sideOffset={10}>
+                  <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                    <Link href="/support/contactus" className="flex items-center space-x-2 cursor-pointer py-2 px-3" onClick={() => setIsMenuOpen(false)}>
+                      <span className="text-[10px] font-black uppercase tracking-widest">Contact us</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                    <Link href="/support/faq" className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
-                      <span>FAQ</span>
+                  <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                    <Link href="/support/faq" className="flex items-center space-x-2 cursor-pointer py-2 px-3" onClick={() => setIsMenuOpen(false)}>
+                      <span className="text-[10px] font-black uppercase tracking-widest">FAQ</span>
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <div className="pt-4 border-t border-green-700">
+              <div className="pt-4 border-t border-white/[0.05]">
                 {session ? (
                   <div className="flex flex-col space-y-2">
                     {/* Mobile Profile Dropdown */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="p-0 h-auto bg-transparent border-none hover:bg-transparent w-full justify-start">
-                          <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg w-full hover:bg-green-600/20 transition-colors">
+                          <div className="flex items-center space-x-3 p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl w-full hover:bg-white/5 transition-colors">
                             {userProfile?.avatar ? (
                               <Image
                                 src={userProfile.avatar}
                                 alt="Profile"
                                 width={40}
                                 height={40}
-                                className="w-10 h-10 rounded-full object-cover border-2 border-green-500/30"
+                                className="w-10 h-10 rounded-full object-cover border border-white/10"
                               />
                             ) : (
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center border-2 border-green-500/30">
-                                <User className="h-5 w-5 text-white" />
+                              <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center border border-white/10">
+                                <User className="h-5 w-5 text-gray-500" />
                               </div>
                             )}
                             <div className="flex-1 text-left">
-                              <p className="text-white font-medium text-sm">
+                              <p className="text-gray-200 font-black text-[10px] uppercase tracking-widest">
                                 {session.user?.username || session.user?.email}
                               </p>
-                              <p className="text-gray-400 text-xs">Tap to open menu</p>
+                              <p className="text-gray-600 text-[9px] uppercase font-black">Tap to open menu</p>
                             </div>
-                            <ChevronDown className="h-4 w-4 text-green-400" />
+                            <ChevronDown className="h-4 w-4 text-gray-700" />
                           </div>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-full bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/50 text-white rounded-lg shadow-xl" side="bottom" align="start" sideOffset={0}>
-                        <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                          <Link href="/profile" className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
-                            <User className="h-4 w-4" />
-                            <span>Profile</span>
+                      <DropdownMenuContent className="w-full bg-black/90 border border-white/[0.05] text-white rounded-xl backdrop-blur-xl" side="bottom" align="start" sideOffset={10}>
+                        <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                          <Link href="/profile" className="flex items-center space-x-2 cursor-pointer py-2 px-3" onClick={() => setIsMenuOpen(false)}>
+                            <User className="h-4 w-4 text-gray-500" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Profile</span>
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                          <Link href={`/profile/${session.user?.username}/my-bookings`} className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
-                            <Calendar className="h-4 w-4" />
-                            <span>My Bookings</span>
+                        <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                          <Link href={`/profile/${session.user?.username}/my-bookings`} className="flex items-center space-x-2 cursor-pointer py-2 px-3" onClick={() => setIsMenuOpen(false)}>
+                            <Calendar className="h-4 w-4 text-gray-500" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">My Bookings</span>
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                          <Link href="/profile/my-services" className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
-                            <Settings className="h-4 w-4" />
-                            <span>My Services</span>
+                        <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                          <Link href="/profile/my-services" className="flex items-center space-x-2 cursor-pointer py-2 px-3" onClick={() => setIsMenuOpen(false)}>
+                            <Settings className="h-4 w-4 text-gray-500" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">My Services</span>
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="hover:bg-emerald-600/30 focus:bg-emerald-600/30 rounded-md mx-1 my-0.5">
-                          <Link href="/profile" className="flex items-center space-x-2 cursor-pointer py-2" onClick={() => setIsMenuOpen(false)}>
-                            <Settings className="h-4 w-4" />
-                            <span>Settings</span>
+                        <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                          <Link href="/profile" className="flex items-center space-x-2 cursor-pointer py-2 px-3" onClick={() => setIsMenuOpen(false)}>
+                            <Settings className="h-4 w-4 text-gray-500" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Settings</span>
                           </Link>
                         </DropdownMenuItem>
 
-                        <DropdownMenuSeparator className="bg-emerald-400/50 mx-1" />
+                        <DropdownMenuSeparator className="bg-white/[0.05] mx-2" />
                         <DropdownMenuItem
                           onClick={() => {
                             signOut({ callbackUrl: "/" })
                             setIsMenuOpen(false)
                           }}
-                          className="flex items-center space-x-2 cursor-pointer text-red-400 hover:text-red-300 hover:bg-red-600/20 focus:bg-red-600/20 rounded-md mx-1 my-0.5 py-2"
+                          className="flex items-center space-x-2 cursor-pointer text-red-500/70 hover:text-red-400 hover:bg-red-500/5 focus:bg-red-500/5 rounded-lg mx-1 my-0.5 py-2 px-3"
                         >
                           <LogOut className="h-4 w-4" />
-                          <span>Sign Out</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
                 ) : (
                   <div className="flex flex-col space-y-2">
-                    <Button asChild className="w-full justify-center bg-green-600/20 backdrop-blur-sm border border-green-500/30 text-white hover:bg-green-600/30 hover:border-green-400/50 transition-all duration-300 font-orbitron tracking-wider">
+                    <Button asChild className="w-full justify-center bg-white/[0.08] border border-white/[0.1] text-gray-300 hover:bg-white/[0.15] hover:text-white transition-all duration-300 font-orbitron tracking-widest text-[10px] uppercase font-black rounded-lg">
                       <Link href="/login" onClick={() => setIsMenuOpen(false)}>
                         Login
                       </Link>
                     </Button>
-                    <Button asChild className="w-full justify-center bg-green-700/40 backdrop-blur-md border border-green-700/70 text-white shadow-lg hover:bg-green-700/60 hover:border-green-500/80 transition-all duration-300 font-orbitron tracking-wider">
+                    <Button asChild className="w-full justify-center bg-green-600/80 border border-green-500/50 text-black shadow-lg hover:bg-green-500 transition-all duration-300 font-orbitron tracking-widest text-[10px] uppercase font-black rounded-lg">
                       <Link href="/registration" onClick={() => setIsMenuOpen(false)}>
                         Sign up
                       </Link>

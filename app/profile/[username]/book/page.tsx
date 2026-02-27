@@ -1,36 +1,20 @@
 "use client"
 
-import { useState, useEffect, useMemo, useCallback } from "react"
-import { useParams } from "next/navigation"
+import { useState, useEffect, useCallback } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { add, format, getDay, parse, startOfDay } from 'date-fns'
-import { User, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { format, getDay, add } from 'date-fns'
+import {
+  User, Loader2, AlertCircle, ArrowLeft, Calendar as CalendarIcon,
+  Clock, CheckCircle2, ShieldCheck, Zap, Info, CreditCard,
+  Target, Award, Users, Star, ChevronRight
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { useToast } from "@/hooks/use-toast"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface UserProfile {
   id: string
@@ -39,10 +23,11 @@ interface UserProfile {
   bio?: string | null
   longDescription?: string | null
   userGames: Array<{
-    game: {
-      id: string
-      name: string
-    }
+    id: string
+    title?: string
+    price: number
+    game: { id: string; name: string }
+    weeklyServiceSlots?: Array<{ dayOfWeek: number; time: string; capacity: number }>
   }>
   userAvailability: Array<{
     dayOfWeek: number
@@ -59,10 +44,23 @@ interface TimeSlot {
   price: number
   capacity?: number
   serviceId?: string
+  serviceTitle?: string
 }
 
 export default function BookSessionPage() {
-  // helper: produce local YYYY-MM-DD (avoid toISOString timezone shifts)
+  const params = useParams();
+  const router = useRouter();
+  const { toast } = useToast();
+  const username = params.username as string;
+  const { data: sessionData } = useSession();
+
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [availableTimes, setAvailableTimes] = useState<TimeSlot[]>([]);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true);
+  const [isBookingLoading, setIsBookingLoading] = useState(false)
+
   const localIso = (d?: Date) => {
     if (!d) return ''
     const y = d.getFullYear()
@@ -70,423 +68,409 @@ export default function BookSessionPage() {
     const dd = String(d.getDate()).padStart(2, '0')
     return `${y}-${m}-${dd}`
   }
-  const params = useParams();
-  const { toast } = useToast();
-  const username = params.username as string;
-  const { data: sessionData } = useSession();
-
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [availableTimes, setAvailableTimes] = useState<TimeSlot[]>([]);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null)
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [isBookingLoading, setIsBookingLoading] = useState(false)
 
   const fetchProfileData = useCallback(async () => {
     if (!username) return;
     setIsLoading(true);
     try {
       const response = await fetch(`/api/coaches/${username}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch coach data');
-      }
+      if (!response.ok) throw new Error('Coach not found');
       const data = await response.json();
-      // API returns { coach, services, availability }
+
       const mergedProfile = {
         ...data.coach,
         userGames: data.services || [],
         userAvailability: data.availability || [],
+        slotsByDate: {} as Record<string, any[]>
       }
-      // build a slotsByDate map from services' serviceSlots if present
-      const slotsByDate: Record<string, Array<{ time: string; capacity?: number; serviceId?: string }>> = {}
+
       if (Array.isArray(data.services)) {
         for (const svc of data.services) {
-          if (!Array.isArray(svc.serviceSlots)) continue
+          if (!svc.serviceSlots) continue
           for (const ss of svc.serviceSlots) {
-            const date = String(ss.date)
-            if (!slotsByDate[date]) slotsByDate[date] = []
-            slotsByDate[date].push({ time: ss.time, capacity: ss.capacity, serviceId: svc.id })
+            const dateStr = String(ss.date)
+            if (!mergedProfile.slotsByDate[dateStr]) mergedProfile.slotsByDate[dateStr] = []
+            mergedProfile.slotsByDate[dateStr].push({ ...ss, serviceId: svc.id, serviceTitle: svc.title, price: svc.price })
           }
         }
       }
-      // attach to profile for client usage
-      ; (mergedProfile as any).slotsByDate = slotsByDate
-      setProfile(mergedProfile as unknown as UserProfile);
 
-      // If there's no selected date yet, set it to the next available day
-      if ((!selectedDate || selectedDate === undefined) && Array.isArray(data.availability) && data.availability.length > 0) {
-        // find the next availability day starting from today
-        const today = new Date()
-        // sort availability by dayOfWeek (0-6)
-        const days = data.availability.map((a: any) => a.dayOfWeek)
-        // find the nearest upcoming date that matches any available dayOfWeek
-        for (let i = 0; i < 14; i++) {
-          const check = new Date()
-          check.setDate(today.getDate() + i)
-          const dow = getDay(check)
-          if (days.includes(dow)) {
-            setSelectedDate(check)
-            break
-          }
-        }
-      }
-      // If no weekly availability, try to set selectedDate from per-service slots (slotsByDate)
-      if ((!selectedDate || selectedDate === undefined) && (mergedProfile as any).slotsByDate) {
-        const slotsMap = (mergedProfile as any).slotsByDate as Record<string, any[]>
-        const keys = Object.keys(slotsMap)
-        if (keys.length > 0) {
-          // pick the earliest date key
-          keys.sort()
-          const firstIso = keys[0]
-          const parts = firstIso.split('-').map((p: string) => Number(p))
-          if (parts.length === 3) {
-            const d = new Date(parts[0], parts[1] - 1, parts[2])
-            setSelectedDate(d)
-          }
-        }
-      }
+      setProfile(mergedProfile);
     } catch (error) {
       console.error(error);
-      toast({ variant: "destructive", title: "Error", description: "Could not load coach details." });
+      toast({ variant: "destructive", title: "Error", description: "Coach profile not available." });
     } finally {
       setIsLoading(false);
     }
   }, [username, toast]);
 
-  // Fetch initial data on component mount
-  useEffect(() => {
-    fetchProfileData();
-  }, [fetchProfileData]);
+  useEffect(() => { fetchProfileData() }, [fetchProfileData]);
 
   useEffect(() => {
-    if (profile && selectedDate) {
-      const dayOfWeek = getDay(selectedDate)
+    if (!profile || !selectedDate) {
+      setAvailableTimes([]);
+      return;
+    }
 
-      const availabilities = Array.isArray(profile.userAvailability)
-        ? profile.userAvailability.filter(a => {
-          const raw = Number(a.dayOfWeek)
-          if (Number.isNaN(raw)) return false
-          // Normalize incoming dayOfWeek to 0-6 (API might use 0-6 or 1-7 where 1=Mon..7=Sun)
-          const normalized = raw % 7 // 7 -> 0 (Sunday), 1->1 (Monday), 0->0 (Sunday)
-          return a.isActive && normalized === dayOfWeek
+    const iso = localIso(selectedDate)
+    const dow = getDay(selectedDate)
+    const slots: TimeSlot[] = []
+
+    const dateSlots = (profile as any).slotsByDate[iso] || []
+    if (dateSlots.length > 0) {
+      for (const ds of dateSlots) {
+        const [h, m] = ds.time.split(':').map(Number)
+        const st = new Date(selectedDate); st.setHours(h, m, 0, 0)
+        slots.push({
+          start: st,
+          end: add(st, { minutes: 60 }),
+          price: ds.price || 0,
+          capacity: ds.capacity,
+          serviceId: ds.serviceId,
+          serviceTitle: ds.serviceTitle
         })
-        : []
-
-      // debug: log availability count for selected day
-      if (process.env.NODE_ENV !== 'production') {
-        console.debug('Booking page: selectedDate', selectedDate, 'dayOfWeek', dayOfWeek, 'availabilitiesForDay', availabilities)
       }
+    }
 
-      const slots: TimeSlot[] = []
-
-      for (const a of availabilities) {
-        // parse times robustly by splitting to avoid format mismatches like "9:00" vs "09:00"
-        const [sh, sm] = (a.startTime || '').split(':').map((v: string) => Number(v))
-        const [eh, em] = (a.endTime || '').split(':').map((v: string) => Number(v))
-
-        if (Number.isNaN(sh) || Number.isNaN(sm) || Number.isNaN(eh) || Number.isNaN(em)) continue
-
-        let startTime = new Date(selectedDate)
-        startTime.setHours(sh, sm, 0, 0)
-        const endTime = new Date(selectedDate)
-        endTime.setHours(eh, em, 0, 0)
-
-        // guard: if end is before or equal to start, skip
-        if (endTime.getTime() <= startTime.getTime()) continue
-
-        // generate 60-minute slots (base slot duration)
-        while (startTime.getTime() < endTime.getTime()) {
-          const slotEnd = add(startTime, { minutes: 60 })
-          // don't push a slot that exceeds endTime
-          if (slotEnd.getTime() > endTime.getTime()) break
-          // userAvailability slots are not tied to a service; leave serviceId undefined and capacity default
-          slots.push({ start: new Date(startTime), end: slotEnd, price: a.price, capacity: a.isActive ? (a.price ? 1 : 1) : 1 })
-          startTime = add(startTime, { minutes: 60 })
-        }
-      }
-      if (slots.length > 0) {
-        setAvailableTimes(slots)
-      } else {
-        // fallback to per-service slots by exact date (YYYY-MM-DD)
-        if (selectedDate) {
-          const iso = localIso(selectedDate)
-          const slotsMap = (profile as any).slotsByDate || {}
-          const daySlots = slotsMap[iso] || []
-          if (daySlots.length > 0) {
-            const parsed: TimeSlot[] = daySlots.map((s: any) => {
-              const [h, m] = (s.time || '').split(':').map((v: string) => Number(v))
-              const st = new Date(selectedDate!.getTime()); st.setHours(h || 0, m || 0, 0, 0)
-              return { start: st, end: add(st, { minutes: 60 }), price: 0, capacity: s.capacity, serviceId: s.serviceId }
-            })
-            setAvailableTimes(parsed)
-          } else {
-            // No per-date slots: check weekly recurring slots from services
-            const dow = getDay(selectedDate)
-            const weeklyTimes: Array<{ time: string; capacity?: number; serviceId?: string }> = []
-            if (Array.isArray((profile as any).userGames)) {
-              for (const svc of (profile as any).userGames) {
-                if (!Array.isArray(svc.weeklyServiceSlots)) continue
-                for (const ws of svc.weeklyServiceSlots) {
-                  if (Number(ws.dayOfWeek) === dow) weeklyTimes.push({ time: ws.time, capacity: ws.capacity, serviceId: svc.id })
-                }
-              }
-            }
-            if (weeklyTimes.length > 0) {
-              const parsed: TimeSlot[] = weeklyTimes.map((s: any) => {
-                const [h, m] = (s.time || '').split(':').map((v: string) => Number(v))
-                const st = new Date(selectedDate!.getTime()); st.setHours(h || 0, m || 0, 0, 0)
-                return { start: st, end: add(st, { minutes: 60 }), price: 0, capacity: s.capacity, serviceId: s.serviceId }
+    if (Array.isArray(profile.userGames)) {
+      for (const svc of (profile as any).userGames) {
+        if (!svc.weeklyServiceSlots) continue
+        for (const ws of svc.weeklyServiceSlots) {
+          if (ws.dayOfWeek === dow) {
+            const [h, m] = ws.time.split(':').map(Number)
+            const st = new Date(selectedDate); st.setHours(h, m, 0, 0)
+            if (!slots.some(s => s.start.getTime() === st.getTime())) {
+              slots.push({
+                start: st,
+                end: add(st, { minutes: 60 }),
+                price: svc.price,
+                capacity: ws.capacity,
+                serviceId: svc.id,
+                serviceTitle: svc.title
               })
-              setAvailableTimes(parsed)
-            } else {
-              setAvailableTimes([])
             }
           }
-        } else {
-          setAvailableTimes([])
         }
       }
     }
-    else {
-      // No profile or no availability for selected date
-      // try fallback: per-service slots by exact date (YYYY-MM-DD)
-      if (!selectedDate) { setAvailableTimes([]); return }
-      const iso = localIso(selectedDate)
-      const slotsMap = (profile as any).slotsByDate || {}
-      const daySlots = slotsMap[iso] || []
-      if (daySlots.length > 0) {
-        const parsed: TimeSlot[] = daySlots.map((s: any) => {
-          const [h, m] = (s.time || '').split(':').map((v: string) => Number(v))
-          const st = new Date(selectedDate!.getTime()); st.setHours(h || 0, m || 0, 0, 0)
-          return { start: st, end: add(st, { minutes: 30 }), price: 0 }
-        })
-        setAvailableTimes(parsed)
-      } else {
-        setAvailableTimes([])
+
+    const generalAvail = profile.userAvailability.filter(a => a.isActive && a.dayOfWeek === dow)
+    for (const a of generalAvail) {
+      const [sh, sm] = a.startTime.split(':').map(Number)
+      const [eh, em] = a.endTime.split(':').map(Number)
+      let curr = new Date(selectedDate); curr.setHours(sh, sm, 0, 0)
+      const end = new Date(selectedDate); end.setHours(eh, em, 0, 0)
+      while (curr.getTime() < end.getTime()) {
+        if (!slots.some(s => s.start.getTime() === curr.getTime())) {
+          slots.push({ start: new Date(curr), end: add(curr, { minutes: 60 }), price: a.price, capacity: 1 })
+        }
+        curr = add(curr, { minutes: 60 })
       }
     }
-  }, [profile, selectedDate])
 
-  // auto-select first available time when slots change
-  useEffect(() => {
-    if (availableTimes.length > 0) {
-      setSelectedTime(availableTimes[0].start.toISOString())
-    } else {
-      setSelectedTime(null)
-    }
-  }, [availableTimes])
-
-  // Fetch bookings count for the selected slot and compute capacity info
-  const [slotSignupCount, setSlotSignupCount] = useState<number | null>(null)
-  const [slotCapacity, setSlotCapacity] = useState<number | null>(null)
-
-  useEffect(() => {
-    const loadCounts = async () => {
-      if (!profile || !selectedDate || !selectedTime) { setSlotSignupCount(null); setSlotCapacity(null); return }
-      // find the slot object
-      const slotObj = availableTimes.find(s => s.start.toISOString() === selectedTime)
-      const capacity = slotObj?.capacity ?? null
-      setSlotCapacity(capacity)
-
-      try {
-        const username = profile.username
-        const resp = await fetch(`/api/bookings?username=${encodeURIComponent(username)}`)
-        if (!resp.ok) { setSlotSignupCount(null); return }
-        const bookings = await resp.json()
-        const iso = localIso(selectedDate)
-        // bookings store date as ISO DateTime; compare by date and startTime
-        const matching = (bookings || []).filter((b: any) => {
-          const bDate = new Date(b.date)
-          const bIso = localIso(bDate)
-          return bIso === iso && (b.startTime || b.start_time || b.start) === (slotObj ? slotObj.start.toTimeString().slice(0, 5) : '')
-        })
-        setSlotSignupCount(matching.length)
-      } catch (e) {
-        setSlotSignupCount(null)
-      }
-    }
-    loadCounts()
-  }, [profile, selectedDate, selectedTime, availableTimes])
-
-  const handleDateSelect = (date: Date | undefined) => {
-    if (!date) return
-    setSelectedDate(date)
-    setSelectedTime(null)
-    setIsCalendarOpen(false)
-  }
+    setAvailableTimes(slots.sort((a, b) => a.start.getTime() - b.start.getTime()))
+  }, [profile, selectedDate]);
 
   const handleBooking = async () => {
-    if (!selectedDate || !selectedTime) return;
-
+    if (!selectedDate || !selectedTime || !profile) return;
     setIsBookingLoading(true);
     try {
-      // selectedTime is an ISO string representing the slot start
-      const start = new Date(selectedTime)
-      // find the matching slot to get price and end
       const slot = availableTimes.find(s => s.start.toISOString() === selectedTime)
-      const end = slot ? slot.end : add(start, { minutes: 30 })
-      const duration = Math.round((end.getTime() - start.getTime()) / (1000 * 60))
+      if (!slot) throw new Error("Invalid time slot selected")
 
-      const response = await fetch('/api/bookings', {
+      const bookingRes = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           coachUsername: username,
-          date: selectedDate.toISOString(),
-          startTime: start.toTimeString().slice(0, 5),
-          endTime: end.toTimeString().slice(0, 5),
-          duration,
-          price: slot?.price ?? 0,
-          userId: sessionData?.user?.id // Use the actual logged-in user ID
+          serviceId: slot.serviceId,
+          date: slot.start.toISOString(),
+          time: format(slot.start, 'HH:mm'),
+          duration: 60,
+          price: slot.price,
+          status: slot.price > 0 ? 'pending_payment' : 'confirmed',
+          customerId: sessionData?.user?.id
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Booking failed');
+      if (!bookingRes.ok) throw new Error(await bookingRes.text());
+      const booking = await bookingRes.json();
+
+      if (slot.price > 0) {
+        const checkoutRes = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            coachUsername: username,
+            bookingId: booking.id,
+            price: slot.price,
+            serviceTitle: slot.serviceTitle || "Coaching Session"
+          })
+        })
+
+        if (!checkoutRes.ok) throw new Error("Failed to initialize payment");
+        const { url } = await checkoutRes.json();
+        window.location.href = url;
+        return;
       }
 
-      toast({
-        title: "Booking Successful!",
-        description: `Your session with ${profile?.username} on ${format(selectedDate, "PPP")} at ${selectedTime} is confirmed.`,
-      });
-
-      // Refresh profile data to get the latest availability
-      await fetchProfileData();
-      setSelectedTime(null);
-
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error)
-      toast({
-        variant: "destructive",
-        title: "Booking Failed",
-        description: msg || "Could not book the session. Please try again.",
-      })
+      toast({ title: "Booking Confirmed!", description: `Success! See you on ${format(slot.start, 'PPP')} at ${format(slot.start, 'HH:mm')}.` });
+      router.push('/profile/bookings')
+    } catch (e) {
+      toast({ variant: "destructive", title: "Booking Failed", description: (e as any).message });
     } finally {
       setIsBookingLoading(false);
     }
   };
 
+  const currentSlot = availableTimes.find(s => s.start.toISOString() === selectedTime)
+
+  if (isLoading) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex flex-col items-center gap-4"
+      >
+        <div className="w-10 h-10 border-2 border-green-500/20 border-t-green-500 rounded-full animate-spin"></div>
+        <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em]">Syncing</p>
+      </motion.div>
+    </div>
+  )
+
+  if (!profile) return (
+    <div className="min-h-screen bg-black flex items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-sm w-full p-6 bg-white/[0.02] border border-white/5 rounded-3xl text-center backdrop-blur-xl"
+      >
+        <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-4" />
+        <h2 className="text-xl font-black mb-2 tracking-tight">Profile Offline</h2>
+        <p className="text-xs text-gray-500 mb-6 font-medium">This coach is currently not reachable.</p>
+        <Button onClick={() => router.back()} className="w-full h-10 bg-white/5 hover:bg-white/10 text-xs font-bold rounded-xl">Back</Button>
+      </motion.div>
+    </div>
+  )
+
   return (
-    <div className="bg-muted/40 min-h-screen w-full flex items-center justify-center">
-      {isLoading ? (
-        <Loader2 className="mx-auto h-12 w-12 animate-spin" />
-      ) : profile ? (
-        <div className="container mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Left Column: Coach Profile */}
-            <div className="md:col-span-1">
+    <div className="min-h-screen bg-[#020205] text-white selection:bg-green-500/30 overflow-x-hidden">
+      {/* Darkened Background Effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(34,197,94,0.02),transparent_70%)]"></div>
+        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.02]"></div>
+      </div>
 
-              <div className="space-y-4 text-center md:text-left pt-8">
-                <Avatar className="h-28 w-28 mb-4 border-2 border-primary/20 mx-auto md:mx-0">
-                  <AvatarImage src={profile.avatarUrl || undefined} alt={`@${profile.username}`} />
-                  <AvatarFallback>
-                    <User className="h-12 w-12" />
-                  </AvatarFallback>
-                </Avatar>
-                <h1 className="text-3xl font-bold tracking-tight">{profile.username}</h1>
-                <p className="text-muted-foreground">{profile.bio}</p>
-                <Separator className="my-6" />
-                <p className="text-sm text-muted-foreground">
-                  {profile.longDescription}
-                </p>
+      <div className="relative z-10 max-w-5xl mx-auto px-6">
+        {/* Compact Header */}
+        <div className="py-6 flex items-center justify-between border-b border-white/[0.02] mb-8">
+          <button onClick={() => router.back()} className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-white transition-all">
+            <ArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" />
+            Back
+          </button>
+          <div className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
+            Coaching <span className="text-green-500/30">Interface</span> v2.2
+          </div>
+        </div>
+
+        {/* COMPACT HERO */}
+        <div className="py-2 mb-10">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative">
+              <Avatar className="h-28 w-28 border border-white/[0.05] p-1 bg-black">
+                <AvatarImage src={profile.avatarUrl || undefined} className="rounded-full object-cover" />
+                <AvatarFallback className="bg-slate-900 text-2xl font-black text-green-500">
+                  {profile.username.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -bottom-1 -right-1 bg-[#020205] p-1.5 rounded-full border border-white/[0.05]">
+                <CheckCircle2 className="w-4 h-4 text-green-500/50" />
               </div>
+            </motion.div>
 
-            </div>
-
-            {/* Right Column: Booking Form */}
-            <div className="md:col-span-2">
-              <Card className="border-none shadow-lg">
-                <CardHeader>
-                  <CardTitle className="tracking-tight">Schedule Your Session</CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    Complete the steps below to book your time.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-8">
-                  {isLoading ? <Loader2 className="mx-auto h-8 w-8 animate-spin" /> : (
-                    <>
-                      <div className="space-y-4">
-                        <h3 className="text-base font-semibold text-muted-foreground">1. Select a Date</h3>
-                        <div>
-                          <Calendar
-                            value={selectedDate}
-                            onChange={handleDateSelect}
-                            className="rounded-md border border-white/20 bg-white/5"
-                          />
-                        </div>
-                      </div>
-
-                      <Separator />
-
-                      <div className="space-y-4">
-                        <h3 className="text-base font-semibold text-muted-foreground">2. Pick a Time</h3>
-                        <Select
-                          value={selectedTime || undefined}
-                          onValueChange={setSelectedTime}
-                          disabled={availableTimes.length === 0}
-                        >
-                          <SelectTrigger className="w-full h-12 text-base">
-                            <SelectValue placeholder="Select a time..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {availableTimes.map(timeSlot => (
-                              <SelectItem key={timeSlot.start.toISOString()} value={timeSlot.start.toISOString()}>
-                                {format(timeSlot.start, 'HH:mm')}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {availableTimes.length === 0 && !isLoading && (
-                          <p className="text-sm text-muted-foreground pt-2">No available times for this date.</p>
-                        )}
-                        {/* Capacity info */}
-                        {selectedTime && (
-                          <div className="mt-2 text-sm text-green-200/80">
-                            <div>{selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''} — booked: {slotSignupCount ?? '–'} / capacity: {slotCapacity ?? '–'}</div>
-                          </div>
-                        )}
-                        {/* Debug info for availability */}
-                        <div className="mt-2 text-xs text-slate-400">
-                          <div>Debug: selectedDate: {selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '—'}</div>
-                          <div>availableTimes: {availableTimes.length}</div>
-                          <div>fallbackSlots: {(profile && (profile as any).slotsByDate && selectedDate) ? (((profile as any).slotsByDate[localIso(selectedDate)] || []).length) : 0}</div>
-                          <div>slotsByDate keys: {(profile && (profile as any).slotsByDate) ? Object.keys((profile as any).slotsByDate).join(', ') : '—'}</div>
-                        </div>
-                      </div>
-
-                      <Button onClick={handleBooking} disabled={isBookingLoading || !selectedDate || !selectedTime} size="lg" className="w-full text-base py-6">
-                        {isBookingLoading ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          "Book Session"
-                        )}
-                      </Button>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-2">
+                <h1 className="text-3xl md:text-5xl font-black tracking-tight underline transition-all hover:decoration-green-500/30 decoration-transparent underline-offset-8">
+                  {profile.username}
+                </h1>
+              </div>
+              <p className="text-sm text-gray-400 max-w-xl font-medium leading-relaxed italic">
+                {profile.bio || "No profile description provided."}
+              </p>
             </div>
           </div>
         </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center w-full p-4">
-          <Card className="max-w-md w-full mx-auto border-red-500/20 bg-red-500/5">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><AlertCircle className="h-5 w-5 text-red-400" />Coach Not Found</CardTitle>
-              <CardDescription>We could not find the coach you are looking for. Please check the username or try again later.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex justify-end">
-              <Button variant="outline" onClick={() => window.history.back()}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Go Back
-              </Button>
-            </CardContent>
-          </Card>
+
+        {/* MAIN INTERFACE - DENSE GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+
+          {/* LEFT: MINIMAL CARDS */}
+          <div className="lg:col-span-4 space-y-4">
+            <div className="bg-[#070707]/90 border border-white/[0.05] rounded-3xl p-6 backdrop-blur-sm">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-6">Expertise</h3>
+              <div className="space-y-4">
+                {[
+                  { icon: Target, text: "Match Analysis" },
+                  { icon: Award, text: "Pro Tactics" },
+                  { icon: Users, text: "Teamwork" }
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <item.icon className="w-4 h-4 text-gray-400" />
+                    <span className="text-xs font-bold text-gray-300">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* NEW: WEEKLY SCHEDULE SUMMARY */}
+            <div className="bg-[#070707]/90 border border-white/[0.05] rounded-3xl p-6 backdrop-blur-sm">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Weekly Schedule</h3>
+                <CalendarIcon className="w-3 h-3 text-gray-700" />
+              </div>
+              <div className="space-y-3">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => {
+                  const dayIndex = i + 1 > 6 ? 0 : i + 1; // Convert to 0-indexed where 0 is Sunday
+                  const dayAvail = profile.userAvailability.filter(a => a.dayOfWeek === dayIndex && a.isActive);
+                  return (
+                    <div key={day} className="flex items-center justify-between">
+                      <span className="text-[10px] font-black text-gray-600 uppercase w-8">{day}</span>
+                      <div className="flex-1 flex flex-col items-end gap-1">
+                        {dayAvail.length > 0 ? (
+                          dayAvail.map((a, idx) => (
+                            <span key={idx} className="text-[10px] font-bold text-gray-400">
+                              {a.startTime} - {a.endTime}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-[10px] font-black text-gray-800 uppercase italic">Offline</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+          </div>
+
+          {/* RIGHT: COMPACT SCHEDULER */}
+          <div className="lg:col-span-8">
+            <div className="bg-[#070707]/90 border border-white/[0.05] rounded-[32px] overflow-hidden backdrop-blur-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2">
+                {/* Compact Calendar Side */}
+                <div className="p-8 border-b md:border-b-0 md:border-r border-white/[0.02]">
+                  <div className="flex items-center gap-3 mb-8">
+                    <CalendarIcon className="w-4 h-4 text-gray-500" />
+                    <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Section 01 / Date</h2>
+                  </div>
+
+                  <div className="flex justify-center">
+                    <Calendar
+                      value={selectedDate}
+                      onChange={(date: Date) => { setSelectedDate(date); setSelectedTime(null); }}
+                      className="scale-95 translate-y-[-10px]"
+                    />
+                  </div>
+                </div>
+
+                {/* Dense Slots Side */}
+                <div className="p-8 bg-black/10">
+                  <div className="flex items-center gap-3 mb-8">
+                    <Clock className="w-4 h-4 text-gray-500" />
+                    <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Section 02 / Time</h2>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                    <AnimatePresence mode="popLayout">
+                      {availableTimes.length > 0 ? (
+                        availableTimes.map((slot, i) => {
+                          const iso = slot.start.toISOString()
+                          const isActive = selectedTime === iso
+                          return (
+                            <motion.button
+                              key={iso}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: i * 0.02 }}
+                              onClick={() => setSelectedTime(iso)}
+                              className={`
+                                                        px-4 py-3 rounded-xl border text-[11px] font-bold tracking-tight text-center transition-all
+                                                        ${isActive
+                                  ? 'bg-green-600 border-green-500 text-black'
+                                  : 'bg-black/40 border-white/[0.05] text-gray-400 hover:border-white/20 hover:text-white'}
+                                                    `}
+                            >
+                              {format(slot.start, 'HH:mm')}
+                            </motion.button>
+                          )
+                        })
+                      ) : (
+                        <div className="col-span-full py-20 text-center opacity-40">
+                          <Info className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-300">No Windows Found</div>
+                        </div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </div>
+
+              {/* Integrated Footer Summary */}
+              <div className="px-8 py-6 border-t border-white/[0.05] bg-black">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+                  <div className="text-center sm:text-left">
+                    {selectedDate && selectedTime ? (
+                      <div className="flex flex-col gap-1">
+                        <div className="text-xs font-black text-gray-300 flex items-center gap-2">
+                          <CalendarIcon className="w-3 h-3 text-green-500/50" />
+                          {format(selectedDate, 'MMM do')} @ {format(new Date(selectedTime), 'HH:mm')}
+                        </div>
+                        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500">
+                          Session payload: {currentSlot?.serviceTitle || "Coaching"}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-600">
+                        Mission Parameters Pending
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-8">
+                    <div className="text-right">
+                      <div className="text-[8px] font-black uppercase tracking-widest text-gray-500 mb-0.5">Total Compensation</div>
+                      <div className="text-2xl font-black text-gray-200 leading-none flex items-baseline gap-0.5">
+                        <span className="text-green-500/50 text-base">$</span>
+                        {currentSlot?.price || 0}
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={handleBooking}
+                      disabled={isBookingLoading || !selectedTime}
+                      className="h-12 px-10 bg-green-600/80 hover:bg-green-500 text-black font-black text-[11px] uppercase tracking-widest rounded-xl transition-all active:scale-95 disabled:grayscale disabled:opacity-10"
+                    >
+                      {isBookingLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Initiate Booking"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-center gap-10 py-8 opacity-20 hover:opacity-100 transition-all duration-1000">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-3 h-3" />
+                <span className="text-[9px] font-black uppercase tracking-widest">Secure Node</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="w-3 h-3" />
+                <span className="text-[9px] font-black uppercase tracking-widest">Endorsed by community</span>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
     </div>
-  );
+  )
 }

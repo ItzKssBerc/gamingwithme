@@ -48,11 +48,13 @@ export async function GET(request: NextRequest) {
         where.releaseDate = {
           gte: twoYearsAgo.toISOString(),
         };
+        where.igdbRatingCount = { not: null };
         orderBy.push({ igdbRatingCount: 'desc' });
         orderBy.push({ igdbRating: 'desc' });
         break;
       default:
         // Default sort (can be the same as trending or something else)
+        where.igdbRatingCount = { not: null };
         orderBy.push({ igdbRating: 'desc' });
         orderBy.push({ igdbRatingCount: 'desc' });
         break;
@@ -124,7 +126,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching games:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to fetch games',
         details: error instanceof Error ? error.message : 'Unknown error'
       },

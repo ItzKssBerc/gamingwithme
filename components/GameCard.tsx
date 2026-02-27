@@ -18,12 +18,13 @@ interface GameCardProps {
 const GameCard: React.FC<GameCardProps> = ({ game }) => {
     return (
         <Link href={`/games/${game.slug}`} className="group flex-shrink-0 w-40 transition-transform duration-300 hover:scale-105">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-xl border border-white/10 bg-black shadow-lg">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-xl border border-white/10 bg-black">
                 {game.igdbCoverUrl ? (
                     <Image
                         src={game.igdbCoverUrl.replace('t_thumb', 't_cover_big')}
                         alt={game.name}
                         fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover transition-opacity duration-300 group-hover:opacity-80"
                     />
                 ) : (

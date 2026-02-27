@@ -1,7 +1,8 @@
 "use client"
 
-import { HelpCircle, ChevronDown } from "lucide-react";
+import { ChevronDown, MessageSquare, Disc as Discord } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 
 const faqs = [
   {
@@ -26,61 +27,103 @@ export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-gaming-green selection:text-black">
-      {/* Hero Background Effect */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-gaming-green/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
-      </div>
+    <div className="min-h-screen bg-transparent text-white selection:bg-gaming-green selection:text-black">
+      <div className="relative container mx-auto px-4 md:px-10 pt-4 pb-16 md:pt-6 md:pb-24 max-w-5xl">
 
-      <div className="relative container mx-auto px-4 pt-6 pb-16 md:pt-10 md:pb-24 max-w-4xl">
+        {/* Tactical Header */}
+        <div className="mb-12 md:mb-16">
+          <div className="flex items-center gap-3 mb-6 md:mb-8">
+            <div className="h-[1px] w-8 bg-white/[0.1]"></div>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 font-orbitron">
+              Support Center
+            </h2>
+            <div className="h-[1px] flex-1 bg-white/[0.1]"></div>
+          </div>
+
+          <div className="space-y-4 md:space-y-6">
+            <h1 className="text-3xl md:text-5xl font-black font-orbitron text-white tracking-tighter uppercase italic leading-[0.9]">
+              Frequently Asked <span className="text-white">Questions</span>
+            </h1>
+            <p className="text-gray-500 text-base md:text-xl font-medium max-w-2xl leading-relaxed">
+              Find answers to common questions about our platform and procedures.
+              If you can't find what you're looking for, our tactical team is ready for dispatch.
+            </p>
+          </div>
+        </div>
 
         {/* FAQ List */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 md:gap-6">
           {faqs.map((faq, idx) => (
             <div
               key={idx}
-              className="group overflow-hidden rounded-2xl bg-white/5 border border-white/10 hover:border-gaming-green/30 transition-all duration-500 hover:shadow-[0_0_30px_rgba(25,255,0,0.05)]"
+              className={`group overflow-hidden rounded-[24px] md:rounded-[32px] bg-[#070707]/90 border transition-all duration-500 backdrop-blur-sm ${openIndex === idx
+                ? 'border-gaming-green/40'
+                : 'border-white/[0.05] hover:border-white/[0.1]'
+                }`}
             >
               <button
                 onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-                className="w-full flex items-center justify-between p-6 text-left transition-colors"
+                className="w-full flex items-center justify-between p-6 md:p-8 text-left transition-colors"
               >
-                <span className={`text-lg md:text-xl font-bold font-orbitron transition-colors ${openIndex === idx ? 'text-gaming-green' : 'text-white/80 group-hover:text-white'}`}>
+                <span className={`text-lg md:text-2xl font-black font-orbitron tracking-tight transition-all duration-500 uppercase ${openIndex === idx ? 'text-gaming-green italic' : 'text-white group-hover:text-gaming-green/80'
+                  }`}>
                   {faq.question}
                 </span>
-                <ChevronDown className={`h-5 w-5 text-gaming-green transition-transform duration-500 ${openIndex === idx ? 'rotate-180' : ''}`} />
+                <div className={`p-2 rounded-xl bg-white/[0.05] border border-white/[0.05] text-gaming-green transition-all duration-500 ${openIndex === idx ? 'rotate-180 bg-gaming-green/10 border-gaming-green/20' : ''
+                  }`}>
+                  <ChevronDown className="h-5 w-5 md:h-6 md:w-6" />
+                </div>
               </button>
 
               <div
-                className={`transition-all duration-500 ease-in-out ${openIndex === idx ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+                className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${openIndex === idx ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
               >
-                <div className="p-6 pt-0 text-white/60 leading-relaxed border-t border-white/5 bg-black/20">
-                  {faq.answer}
+                <div className="p-6 md:p-8 pt-0 text-gray-400 text-sm md:text-lg leading-relaxed font-medium border-t border-white/[0.05]">
+                  <div className="max-w-3xl">
+                    {faq.answer}
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-16 text-center">
-          <p className="text-white/40 mb-6">Still have questions?</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="/support/contactus"
-              className="px-8 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-gaming-green hover:text-gaming-green font-bold font-orbitron text-sm uppercase tracking-widest transition-all"
-            >
-              Contact Support
-            </a>
-            <a
-              href="https://discord.gg/56FHDE6F77"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-3 rounded-xl bg-gaming-green text-black font-bold font-orbitron text-sm uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_30px_rgba(25,255,0,0.2)]"
-            >
-              Join Our Discord
-            </a>
+        {/* Tactical Footer CTA */}
+        <div className="mt-20 md:mt-32 relative">
+          <div className="relative z-10 p-8 md:p-16 rounded-[40px] bg-[#070707]/90 border border-white/[0.05] backdrop-blur-sm text-center space-y-8 md:space-y-12">
+            <div className="space-y-4">
+              <h3 className="text-2xl md:text-5xl font-black font-orbitron text-white tracking-tighter uppercase italic leading-tight">
+                Still have <span className="text-gaming-green">questions?</span>
+              </h3>
+              <p className="text-gray-500 text-base md:text-xl font-medium max-w-xl mx-auto leading-relaxed">
+                Our support operatives are standing by to assist you in all sectors.
+              </p>
+            </div>
+
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+              <Link
+                href="/support/contactus"
+                className="group relative flex items-center justify-center gap-4 w-full md:w-auto px-10 py-6 rounded-[24px] bg-white/[0.05] border border-white/[0.1] text-white font-black font-orbitron text-sm md:text-base uppercase tracking-widest transition-all duration-500 hover:bg-white/[0.1] hover:border-white/[0.2] overflow-hidden"
+              >
+                <MessageSquare className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                <span>Contact Support</span>
+              </Link>
+
+              <a
+                href="https://discord.gg/56FHDE6F77"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex items-center justify-center gap-4 w-full md:w-auto px-10 py-6 rounded-[24px] bg-white text-black font-black font-orbitron text-sm md:text-base uppercase tracking-widest transition-all duration-500 hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:-translate-y-1 overflow-hidden"
+              >
+                <Discord className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                <span>Join Discord</span>
+              </a>
+            </div>
+
+            <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.4em] italic pt-4">
+              Universal access protocol enabled • 24/7 Monitoring
+            </p>
           </div>
         </div>
       </div>

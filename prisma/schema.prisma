@@ -165,6 +165,8 @@ model Booking {
   provider User @relation("BookingProvider", fields: [providerId], references: [id])
   customer User @relation("BookingCustomer", fields: [customerId], references: [id])
   game     Game? @relation(fields: [gameId], references: [id])
+  service  FixedService? @relation(fields: [serviceId], references: [id])
+  serviceId String?
 
   @@map("bookings")
 }
@@ -191,6 +193,7 @@ model FixedService {
   weeklyServiceSlots WeeklyServiceSlot[]
   orders      ServiceOrder[]
   requests    ServiceRequest[]
+  bookings    Booking[]
 
   @@map("fixed_services")
 }

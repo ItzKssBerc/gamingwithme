@@ -50,15 +50,15 @@ export async function POST(request: NextRequest) {
     // Return the URL
     const fileUrl = `/uploads/profile-pictures/${fileName}`
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       url: fileUrl,
-      message: 'Profile picture uploaded successfully' 
+      message: 'Profile picture uploaded successfully'
     })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error uploading profile picture:', error)
     return NextResponse.json(
-      { error: 'Failed to upload profile picture' }, 
+      { error: 'Failed to upload profile picture', details: error.message, stack: error.stack },
       { status: 500 }
     )
   }

@@ -1,9 +1,8 @@
-
 "use client";
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
@@ -14,7 +13,6 @@ function getDaysInMonth(year: number, month: number) {
 }
 
 function getFirstDayOfMonth(year: number, month: number) {
-  // Adjust for Monday-first week (getDay() is 0 for Sunday)
   const day = new Date(year, month, 1).getDay();
   return day === 0 ? 6 : day - 1;
 }
@@ -27,19 +25,16 @@ export interface CalendarProps {
 
 export function Calendar({ value, onChange, className }: CalendarProps) {
   const today = new Date();
-  // Internal state for month/year navigation
   const [currentDate, setCurrentDate] = useState(value || today);
 
-  // Update internal state only if the external value changes
   useEffect(() => {
     if (value && value.getTime() !== currentDate.getTime()) {
       setCurrentDate(value);
     }
-  }, [value, currentDate]);
+  }, [value]);
 
   const month = currentDate.getMonth();
   const year = currentDate.getFullYear();
-
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfMonth(year, month);
 
@@ -48,39 +43,47 @@ export function Calendar({ value, onChange, className }: CalendarProps) {
     onChange?.(date);
   }
 
-  function setDisplayMonth(newDate: Date) {
-    setCurrentDate(newDate);
-  }
-
   function prevMonth() {
-    setDisplayMonth(new Date(year, month - 1, 1));
+    setCurrentDate(new Date(year, month - 1, 1));
   }
 
   function nextMonth() {
-    setDisplayMonth(new Date(year, month + 1, 1));
+    setCurrentDate(new Date(year, month + 1, 1));
   }
 
   return (
-  <div className={`rounded-xl border-2 border-green-500 shadow-green-500/20 shadow-lg bg-slate-900 p-4 w-full max-w-sm mx-auto ${className ?? ""}`}> 
-      <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="p-2 rounded-full hover:bg-primary/20 transition">
-          <ChevronLeft className="h-5 w-5 text-primary" />
-        </button>
-  <div className="text-lg font-bold text-green-400">
-          {MONTHS[month]} {year}
+    <div className={`w-full bg-transparent ${className ?? ""}`}>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-sm font-black uppercase tracking-widest text-gray-200">
+          {MONTHS[month]} <span className="text-gray-400">{year}</span>
+        </h3>
+        <div className="flex gap-1">
+          <button
+            onClick={prevMonth}
+            className="p-2 rounded-lg hover:bg-white/5 text-gray-300 hover:text-white transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            onClick={nextMonth}
+            className="p-2 rounded-lg hover:bg-white/5 text-gray-300 hover:text-white transition-colors"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
-        <button onClick={nextMonth} className="p-2 rounded-full hover:bg-primary/20 transition">
-          <ChevronRight className="h-5 w-5 text-primary" />
-        </button>
       </div>
-  <div className="grid grid-cols-7 gap-1 mb-2">
+
+      <div className="grid grid-cols-7 gap-1 mb-2">
         {WEEKDAYS.map((wd) => (
-          <div key={wd} className="text-center text-green-400 font-semibold">{wd}</div>
+          <div key={wd} className="text-center text-[10px] uppercase font-black text-gray-500 py-1">
+            {wd}
+          </div>
         ))}
       </div>
-  <div className="grid grid-cols-7 gap-1">
+
+      <div className="grid grid-cols-7 gap-1">
         {Array(firstDay).fill(null).map((_, i) => (
-          <div key={"empty-" + i}></div>
+          <div key={"empty-" + i} className="aspect-square"></div>
         ))}
         {Array.from({ length: daysInMonth }, (_, i) => {
           const day = i + 1;
@@ -94,13 +97,17 @@ export function Calendar({ value, onChange, className }: CalendarProps) {
             date.getDate() === value.getDate() &&
             date.getMonth() === value.getMonth() &&
             date.getFullYear() === value.getFullYear();
+
           return (
             <button
               key={day}
               onClick={() => handleSelect(day)}
-              className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-base transition-all duration-200 m-1
-                ${isSelected ? "bg-green-500 text-white shadow-lg scale-110 border-2 border-green-400" : "bg-slate-700 text-white hover:bg-green-700 hover:scale-105"}
-                ${isToday && !isSelected ? "border-2 border-green-400 font-extrabold" : ""}
+              className={`
+                aspect-square rounded-xl flex items-center justify-center text-sm font-bold transition-all relative group
+                ${isSelected
+                  ? "bg-green-500 text-black shadow-[0_0_20px_rgba(34,197,94,0.4)] z-10 scale-105"
+                  : "text-gray-300 hover:bg-white/5 hover:text-white hover:scale-105"}
+                ${isToday && !isSelected ? "after:content-[''] after:absolute after:bottom-1.5 after:w-1 after:h-1 after:bg-green-500 after:rounded-full" : ""}
               `}
             >
               {day}

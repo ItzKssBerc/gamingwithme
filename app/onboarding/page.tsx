@@ -390,8 +390,8 @@ export default function OnboardingPage() {
     setProfilePicturePreview(null)
   }
 
-  const uploadProfilePicture = async (): Promise<string | null> => {
-    if (!profilePicture) return null
+  const uploadProfilePicture = async (): Promise<string> => {
+    if (!profilePicture) throw new Error("No picture selected")
 
     setUploadingPicture(true)
     try {
@@ -407,12 +407,15 @@ export default function OnboardingPage() {
         const data = await response.json()
         return data.url
       } else {
-        console.error('Failed to upload profile picture')
-        return null
+        let errorMsg = 'Failed to upload profile picture'
+        try {
+          const resJson = await response.json()
+          errorMsg = resJson.error || errorMsg
+          if (resJson.details) errorMsg += `: ${resJson.details}`
+        } catch (e) { }
+        console.error(errorMsg)
+        throw new Error(errorMsg)
       }
-    } catch (error) {
-      console.error('Error uploading profile picture:', error)
-      return null
     } finally {
       setUploadingPicture(false)
     }
@@ -424,9 +427,10 @@ export default function OnboardingPage() {
       // Upload profile picture first if selected
       let profilePictureUrl: string | null = null
       if (profilePicture) {
-        profilePictureUrl = await uploadProfilePicture()
-        if (!profilePictureUrl) {
-          alert('Failed to upload profile picture. Please try again.')
+        try {
+          profilePictureUrl = await uploadProfilePicture()
+        } catch (error: any) {
+          alert(error.message || 'Failed to upload profile picture. Please try again.')
           setLoading(false)
           return
         }
@@ -545,8 +549,8 @@ export default function OnboardingPage() {
                           variant="outline"
                           size="sm"
                           className={`border-white/20 text-white hover:bg-white/10 text-sm sm:text-base py-2 px-4 sm:px-6 backdrop-blur-sm min-w-[120px] sm:min-w-[140px] ${selectedPlatforms.includes(platform)
-                              ? 'bg-green-600/80 border-green-500 backdrop-blur-md'
-                              : 'bg-white/10'
+                            ? 'bg-green-600/80 border-green-500 backdrop-blur-md'
+                            : 'bg-white/10'
                             }`}
                           onClick={() => handlePlatformToggle(platform)}
                         >
@@ -574,7 +578,7 @@ export default function OnboardingPage() {
                         <div className="mt-4 sm:mt-6">
                           <span className="text-white text-sm sm:text-base font-medium mb-3 sm:mb-4 block">Skill Level:</span>
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-                            {[1, 2, 3, 4].map((level) => {
+                            {[1, 2, 3].map((level) => {
                               const skillValue = level === 1 ? 'beginner' :
                                 level === 2 ? 'intermediate' :
                                   level === 3 ? 'advanced' : 'expert'
@@ -585,8 +589,8 @@ export default function OnboardingPage() {
                                   key={`skill-${platform}-${level}`}
                                   onClick={() => handleModalSkillLevelChange(platform, skillValue)}
                                   className={`py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium transition-all backdrop-blur-sm ${isSelected
-                                      ? 'bg-green-500 text-white shadow-lg'
-                                      : 'bg-white/20 text-white hover:bg-white/30'
+                                    ? 'bg-green-500 text-white shadow-lg'
+                                    : 'bg-white/20 text-white hover:bg-white/30'
                                     }`}
                                 >
                                   {skillValue}
@@ -640,11 +644,11 @@ export default function OnboardingPage() {
           {/* Progress Bar */}
           <div className="max-w-3xl mx-auto mb-4 sm:mb-8">
             <div className="flex items-center justify-center mb-3 sm:mb-4 px-2">
-              {[1, 2, 3, 4].map((step) => (
+              {[1, 2, 3].map((step) => (
                 <div key={step} className="flex items-center">
                   <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${currentStep >= step
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-600 text-gray-400'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-600 text-gray-400'
                     }`}>
                     {currentStep > step ? (
                       <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
@@ -652,7 +656,7 @@ export default function OnboardingPage() {
                       <span className="text-sm sm:text-base md:text-lg font-bold">{step}</span>
                     )}
                   </div>
-                  {step < 4 && (
+                  {step < 3 && (
                     <div className={`w-12 sm:w-16 md:w-24 h-1 sm:h-2 mx-2 sm:mx-3 md:mx-4 ${currentStep > step ? 'bg-green-600' : 'bg-gray-600'
                       }`} />
                   )}
@@ -660,7 +664,7 @@ export default function OnboardingPage() {
               ))}
             </div>
             <div className="text-center text-gray-400 text-sm sm:text-base">
-              Step {currentStep} of 4
+              Step {currentStep} of 3
             </div>
           </div>
 
@@ -757,8 +761,8 @@ export default function OnboardingPage() {
                           key={category.id}
                           onClick={() => handleCategoryToggle(category.id)}
                           className={`p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all backdrop-blur-sm ${selectedCategories.includes(category.id)
-                              ? 'border-green-500 bg-green-600/20 backdrop-blur-md'
-                              : 'border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/20'
+                            ? 'border-green-500 bg-green-600/20 backdrop-blur-md'
+                            : 'border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/20'
                             }`}
                         >
                           <div className="flex items-center gap-2 sm:gap-3">
@@ -953,140 +957,6 @@ export default function OnboardingPage() {
               <Card className="gaming-card bg-slate-800/60 backdrop-blur-xl border border-white/10 shadow-2xl">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <Languages className="h-6 w-6" />
-                    Languages & Skills
-                  </CardTitle>
-                  <CardDescription className="text-gray-300">
-                    What languages do you speak and at what level?
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Languages */}
-                  <div>
-                    <label className="block text-white font-medium mb-2">Languages</label>
-                    <div className="space-y-4">
-                      {languages.map((lang, index) => (
-                        <div key={index} className="flex items-center gap-4">
-                          <select
-                            value={lang.language}
-                            onChange={(e) => handleUpdateLanguage(index, 'language', e.target.value)}
-                            className="bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-md px-3 py-2 flex-1"
-                          >
-                            <option value="">Select language</option>
-                            {COMMON_LANGUAGES.map(language => (
-                              <option key={language} value={language}>
-                                {language}
-                              </option>
-                            ))}
-                          </select>
-                          <select
-                            value={lang.level}
-                            onChange={(e) => handleUpdateLanguage(index, 'level', e.target.value)}
-                            className="bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-md px-3 py-2"
-                          >
-                            {LANGUAGE_LEVELS.map(level => (
-                              <option key={level.value} value={level.value}>
-                                {level.label}
-                              </option>
-                            ))}
-                          </select>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="border-red-500/30 text-red-400 hover:bg-red-500/20"
-                            onClick={() => handleRemoveLanguage(index)}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      ))}
-                      <Button
-                        variant="outline"
-                        className="border-white/20 text-white hover:bg-white/10 backdrop-blur-sm"
-                        onClick={handleAddLanguage}
-                      >
-                        + Add Language
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Tags */}
-                  <div>
-                    <label className="block text-white font-medium mb-2">Tags</label>
-                    <p className="text-gray-400 mb-4">Add tags that describe your gaming style or interests</p>
-
-                    {/* Common Tags */}
-                    <div className="mb-4">
-                      <h4 className="text-white font-medium mb-2">Common Tags:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {COMMON_TAGS.map(tag => (
-                          <Button
-                            key={tag}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleAddTag(tag)}
-                            disabled={tags.includes(tag)}
-                            className="border-white/20 text-white hover:bg-white/10 disabled:opacity-50 backdrop-blur-sm"
-                          >
-                            {tag}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Selected Tags */}
-                    {tags.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="text-white font-medium mb-2">Your Tags:</h4>
-                        <div className="flex gap-2 flex-wrap">
-                          {tags.map((tag) => (
-                            <Badge
-                              key={tag}
-                              className="bg-green-600/20 text-green-300 border-green-500/30 cursor-pointer hover:bg-red-600/20 hover:text-red-300 hover:border-red-500/30"
-                              onClick={() => handleRemoveTag(tag)}
-                            >
-                              {tag} ×
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Custom Tag Input */}
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Add a custom tag..."
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            handleAddTag(e.currentTarget.value)
-                            e.currentTarget.value = ''
-                          }
-                        }}
-                        className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                      />
-                      <Button
-                        variant="outline"
-                        className="border-white/20 text-white hover:bg-white/10"
-                        onClick={() => {
-                          const input = document.querySelector('input[placeholder="Add a custom tag..."]') as HTMLInputElement
-                          if (input?.value) {
-                            handleAddTag(input.value)
-                            input.value = ''
-                          }
-                        }}
-                      >
-                        Add
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {currentStep === 4 && (
-              <Card className="gaming-card bg-slate-800/60 backdrop-blur-xl border border-white/10 shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
                     <CheckCircle className="h-6 w-6" />
                     Review Your Profile
                   </CardTitle>
@@ -1169,37 +1039,7 @@ export default function OnboardingPage() {
                     </div>
                   )}
 
-                  {/* Languages */}
-                  {languages.length > 0 && (
-                    <div>
-                      <h3 className="text-white font-medium mb-2">Languages</h3>
-                      <div className="space-y-2">
-                        {languages.map((lang, index) => (
-                          <div key={index} className="flex items-center justify-between p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
-                            <span className="text-white">{lang.language}</span>
-                            <Badge className="bg-blue-600/20 text-blue-300 border-blue-500/30">
-                              {lang.level}
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Tags */}
-                  {tags.length > 0 && (
-                    <div>
-                      <h3 className="text-white font-medium mb-2">Tags</h3>
-                      <div className="flex gap-2 flex-wrap">
-                        {tags.map((tag) => (
-                          <Badge key={tag} className="bg-purple-600/20 text-purple-300 border-purple-500/30">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
+                  </CardContent>
               </Card>
             )}
 
@@ -1219,10 +1059,10 @@ export default function OnboardingPage() {
               <Button
                 className="gaming-button text-sm sm:text-base"
                 onClick={() => {
-                  if (currentStep === 4) {
+                  if (currentStep === 3) {
                     handleSubmit()
                   } else {
-                    setCurrentStep(prev => Math.min(4, prev + 1))
+                    setCurrentStep(prev => Math.min(3, prev + 1))
                   }
                 }}
                 disabled={loading}
@@ -1233,7 +1073,7 @@ export default function OnboardingPage() {
                     <span className="hidden sm:inline">Saving...</span>
                     <span className="sm:hidden">Save</span>
                   </>
-                ) : currentStep === 4 ? (
+                ) : currentStep === 3 ? (
                   <>
                     <span className="hidden sm:inline">Complete Setup</span>
                     <span className="sm:hidden">Complete</span>

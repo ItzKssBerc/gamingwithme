@@ -94,11 +94,11 @@ const HorizontalLane: React.FC<HorizontalLaneProps> = ({ title, href, type, init
     };
 
     return (
-        <section className="py-4 bg-black/20 relative group/lane">
-            <div className="container mx-auto px-4">
+        <section className="py-4 relative group/lane">
+            <div className="w-full px-8 lg:px-12">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <span className="h-8 w-1 bg-primary rounded-full"></span>
+                        <span className="h-8 w-1 bg-white/[0.1] rounded-full"></span>
                         {href ? (
                             <Link href={href} className="flex items-center gap-2 group">
                                 <h2 className="text-2xl font-bold text-white group-hover:text-primary transition-colors">
@@ -117,8 +117,8 @@ const HorizontalLane: React.FC<HorizontalLaneProps> = ({ title, href, type, init
                 <div className="relative">
                     {/* Empty State */}
                     {items.length === 0 && !loading && emptyMessage && (
-                        <div className="py-16 flex flex-col items-center justify-center border border-white/5 rounded-2xl bg-gradient-to-b from-white/5 to-transparent backdrop-blur-sm shadow-2xl">
-                            <div className="p-4 rounded-full bg-primary/10 border border-primary/20 mb-6 group-hover/lane:scale-110 transition-transform duration-500">
+                        <div className="py-16 flex flex-col items-center justify-center border border-white/5 rounded-2xl bg-[#0a0a0a] backdrop-blur-sm">
+                            <div className="p-4 rounded-full bg-white/[0.02] border border-white/[0.05] mb-6 group-hover/lane:scale-110 transition-transform duration-500">
                                 {type === 'gamer' ? (
                                     <Users className="h-10 w-10 text-primary" />
                                 ) : (
@@ -145,7 +145,7 @@ const HorizontalLane: React.FC<HorizontalLaneProps> = ({ title, href, type, init
                         <div className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex items-center justify-center">
                             <Button
                                 variant="outline"
-                                className="h-10 w-10 p-0 flex items-center justify-center rounded-full border-white/10 bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 hover:scale-110 transition-all shadow-xl"
+                                className="h-10 w-10 p-0 flex items-center justify-center rounded-full border-white/10 bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 hover:scale-110 transition-all"
                                 onClick={() => scroll('left')}
                             >
                                 <ChevronLeft className="h-6 w-6" />
@@ -163,7 +163,7 @@ const HorizontalLane: React.FC<HorizontalLaneProps> = ({ title, href, type, init
                             ) : (
                                 <Button
                                     variant="outline"
-                                    className="h-10 w-10 p-0 flex items-center justify-center rounded-full border-white/10 bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 hover:scale-110 transition-all shadow-xl"
+                                    className="h-10 w-10 p-0 flex items-center justify-center rounded-full border-white/10 bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 hover:scale-110 transition-all"
                                     onClick={() => scroll('right')}
                                 >
                                     <ChevronRight className="h-6 w-6" />
@@ -174,7 +174,7 @@ const HorizontalLane: React.FC<HorizontalLaneProps> = ({ title, href, type, init
 
                     <div
                         ref={scrollRef}
-                        className={`flex gap-6 overflow-x-auto no-scrollbar pb-4 scroll-smooth ${items.length === 0 ? 'hidden' : ''}`}
+                        className={`flex gap-6 overflow-x-auto no-scrollbar pt-4 pb-4 px-4 -mx-4 scroll-smooth ${items.length === 0 ? 'hidden' : ''}`}
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                         {items.map((item) => (

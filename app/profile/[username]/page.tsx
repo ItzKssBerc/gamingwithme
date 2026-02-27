@@ -35,6 +35,8 @@ import {
 import Link from "next/link"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import LoadingSync from "@/components/LoadingSync"
+
 
 interface UserProfile {
   id: string
@@ -213,16 +215,7 @@ export default function UserProfilePage() {
   const canReview = session?.user && profile && session.user.id !== profile.id
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-green-400" />
-            <span className="ml-3 text-white">Loading profile...</span>
-          </div>
-        </div>
-      </div>
-    )
+    return <LoadingSync subtext="Loading Operative Data" />
   }
 
   if (error || !profile) {
@@ -248,590 +241,430 @@ export default function UserProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-transparent">
+      <div className="container mx-auto px-10 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <Button asChild variant="outline" className="mb-4 border-white/20 text-white hover:bg-white/10">
-            <Link href="/gamers">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Gamers
+        <div className="mb-12">
+          <Button asChild variant="ghost" className="mb-8 p-0 h-auto hover:bg-transparent text-gray-500 hover:text-white transition-colors">
+            <Link href="/gamers" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]">
+              <ArrowLeft className="h-3 w-3" />
+              Return to Operations
             </Link>
           </Button>
 
           {/* Inactive Account Warning */}
           {!profile.isActive && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-              <div className="flex items-center gap-3">
-                <XCircle className="h-5 w-5 text-red-400" />
+            <div className="mb-8 p-6 bg-red-500/5 border border-red-500/10 rounded-3xl backdrop-blur-md">
+              <div className="flex items-start gap-4">
+                <Ban className="h-5 w-5 text-red-500/50 mt-1" />
                 <div>
-                  <h3 className="text-red-300 font-medium">Inactive Account</h3>
-                  <p className="text-red-200 text-sm">
-                    This user's account is currently inactive. They may not be available for gaming sessions or respond to messages.
+                  <h3 className="text-red-400 font-black text-xs uppercase tracking-widest mb-1">Dormant Account</h3>
+                  <p className="text-red-300/60 text-[11px] font-medium leading-relaxed max-w-2xl">
+                    This operative is currently off the grid. Communication and session requests may remain unanswered until status is reactivated.
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center">
-              {profile.avatar ? (
-                <img
-                  src={profile.avatar}
-                  alt={`${profile.username}'s profile`}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User className="h-10 w-10 text-white" />
-              )}
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-white">{profile.username}</h1>
-              <div className="flex items-center gap-4 mt-2">
-                <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                  <span className="text-white text-sm">{calculateAverageRating()}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-400 text-sm">{formatAvailability()}</span>
-                </div>
-
-                {/* Account Status Badge */}
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${profile.isActive
-                    ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                    : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                  }`}>
-                  {profile.isActive ? (
-                    <>
-                      <CheckCircle className="h-3 w-3" />
-                      <span>Active</span>
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="h-3 w-3" />
-                      <span>Inactive</span>
-                    </>
-                  )}
+          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-green-500/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                <div className="w-28 h-28 rounded-full p-1 bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.05] relative z-10">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-slate-900 border border-white/[0.05]">
+                    {profile.avatar ? (
+                      <img
+                        src={profile.avatar}
+                        alt={`${profile.username}`}
+                        className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-slate-800">
+                        <User className="h-10 w-10 text-gray-600" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
+
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-none uppercase">{profile.username}</h1>
+                  <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${profile.isActive
+                    ? 'bg-green-500/5 text-green-500/70 border border-green-500/10'
+                    : 'bg-red-500/5 text-red-500/70 border border-red-500/10'
+                    }`}>
+                    <div className={`w-1.5 h-1.5 rounded-full ${profile.isActive ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                    {profile.isActive ? 'Active Status' : 'Signal Lost'}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-3.5 w-3.5 text-gray-600" />
+                    <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest">{calculateAverageRating()} Score</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-3.5 w-3.5 text-gray-600" />
+                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">{formatAvailability()}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-3.5 w-3.5 text-gray-600" />
+                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Global Sector</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 w-full md:w-auto">
+              <Button asChild className="h-11 flex-1 md:flex-none px-8 bg-green-600/80 hover:bg-green-500 text-black font-black text-[11px] uppercase tracking-widest rounded-xl transition-all">
+                <Link href={`/profile/${profile.username}/book`}>
+                  Initiate Booking
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-11 px-6 bg-white/[0.03] border-white/[0.05] text-gray-300 hover:text-white hover:bg-white/[0.08] font-black text-[11px] uppercase tracking-widest rounded-xl transition-all">
+                <Link href={`/profile/${profile.username}/message`}>
+                  Direct Comm
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
           {/* Left Column - Profile Info */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 gap-1 bg-white/10 border border-white/20 p-1 rounded-lg">
-                <TabsTrigger value="overview" className="text-white data-[state=active]:bg-green-600 px-2 py-1 text-sm">Overview</TabsTrigger>
-                <TabsTrigger value="games" className="text-white data-[state=active]:bg-green-600 px-2 py-1 text-sm">Games</TabsTrigger>
-                <TabsTrigger value="reviews" className="text-white data-[state=active]:bg-green-600 px-2 py-1 text-sm">Reviews</TabsTrigger>
+              <TabsList className="inline-flex w-auto bg-black/40 border border-white/[0.02] p-1 rounded-2xl mb-8">
+                <TabsTrigger value="overview" className="h-10 px-8 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 data-[state=active]:bg-white/[0.05] data-[state=active]:text-white transition-all">Overview</TabsTrigger>
+                <TabsTrigger value="games" className="h-10 px-8 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 data-[state=active]:bg-white/[0.05] data-[state=active]:text-white transition-all">Intelligence</TabsTrigger>
+                <TabsTrigger value="reviews" className="h-10 px-8 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 data-[state=active]:bg-white/[0.05] data-[state=active]:text-white transition-all">Reports</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview" className="mt-6">
-                <Card className="gaming-card">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <User className="h-5 w-5" />
-                      About {profile.username}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {/* Bio */}
-                      <div>
-                        <h3 className="text-white font-semibold mb-2">Bio</h3>
-                        <p className="text-gray-300">
-                          {profile.bio || "No bio available"}
-                        </p>
-                      </div>
+              <TabsContent value="overview" className="mt-0">
+                <div className="bg-[#070707]/90 border border-white/[0.05] rounded-[32px] p-8 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Operative Profile</h3>
+                    <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
+                  </div>
 
-                      {/* Languages */}
-                      <div>
-                        <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-                          <Languages className="h-4 w-4" />
-                          Languages
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {profile.userLanguages.length > 0 ? (
-                            profile.userLanguages.map((lang) => (
-                              <Badge key={lang.id} variant="secondary" className="bg-blue-600/20 text-blue-300 border-blue-500/30">
-                                {lang.language} ({lang.level})
-                              </Badge>
-                            ))
-                          ) : (
-                            <span className="text-gray-500 text-sm">No languages listed</span>
-                          )}
-                        </div>
-                      </div>
+                  <div className="space-y-12">
+                    {/* Bio */}
+                    <div>
+                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Background Intel</h3>
+                      <p className="text-xs font-bold text-gray-400 leading-relaxed max-w-3xl">
+                        {profile.bio || "No background information available on this operative."}
+                      </p>
+                    </div>
 
-                      {/* Tags */}
-                      <div>
-                        <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-                          <Tags className="h-4 w-4" />
-                          Tags
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {profile.userTags
-                            .filter(tag => !tag.tag.startsWith('category:'))
-                            .map((tag) => (
-                              <Badge key={tag.id} variant="outline" className="border-green-500/30 text-green-300">
-                                {tag.tag}
-                              </Badge>
-                            ))}
-                          {profile.userTags.filter(tag => !tag.tag.startsWith('category:')).length === 0 && (
-                            <span className="text-gray-500 text-sm">No tags listed</span>
-                          )}
-                        </div>
-                      </div>
-
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                       {/* Member Since */}
                       <div>
-                        <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          Member Since
-                        </h3>
-                        <p className="text-gray-300">
-                          {new Date(profile.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-
-                      {/* Account Status */}
-                      <div>
-                        <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-                          {profile.isActive ? (
-                            <CheckCircle className="h-4 w-4 text-green-400" />
-                          ) : (
-                            <XCircle className="h-4 w-4 text-red-400" />
-                          )}
-                          Account Status
-                        </h3>
+                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Activation Date</h3>
                         <div className="flex items-center gap-3">
-                          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${profile.isActive
-                              ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                              : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                            }`}>
-                            {profile.isActive ? (
-                              <>
-                                <CheckCircle className="h-4 w-4" />
-                                <span className="font-medium">Active Account</span>
-                              </>
-                            ) : (
-                              <>
-                                <XCircle className="h-4 w-4" />
-                                <span className="font-medium">Inactive Account</span>
-                              </>
-                            )}
-                          </div>
-                          <p className="text-gray-400 text-sm">
-                            {profile.isActive
-                              ? 'This user is currently active and available for gaming sessions.'
-                              : 'This user is currently inactive and may not be available for gaming sessions.'
-                            }
+                          <Calendar className="h-4 w-4 text-gray-700" />
+                          <p className="text-xs font-black text-gray-300 uppercase tracking-widest">
+                            {new Date(profile.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                           </p>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
 
-              <TabsContent value="games" className="mt-6">
-                <Card className="gaming-card">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Gamepad2 className="h-5 w-5" />
-                      Games
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                      {profile.userGames.length > 0 ? (
-                        (() => {
-                          // Group games by name to avoid duplicates
-                          const gameGroups = profile.userGames.reduce((groups, userGame) => {
-                            const gameName = userGame.game.name
-                            if (!groups[gameName]) {
-                              groups[gameName] = []
-                            }
-                            groups[gameName].push(userGame)
-                            return groups
-                          }, {} as Record<string, typeof profile.userGames>)
-
-                          return Object.entries(gameGroups).map(([gameName, userGames]) => {
-                            const firstGame = userGames[0]
-                            const platforms = userGames.map(ug => ug.platform).filter(Boolean)
-                            const levels = userGames.map(ug => ug.level)
-                            const uniqueLevels = [...new Set(levels)]
-
-                            return (
-                              <Card key={firstGame.id} className="bg-white/5 border-white/20 hover:bg-white/10 transition-colors">
-                                <CardContent className="p-4">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex-1 min-w-0">
-                                      <h4 className="text-white font-semibold text-lg truncate">{gameName}</h4>
-                                      {platforms.length > 0 && (
-                                        <p className="text-gray-400 text-sm mt-1 truncate">
-                                          {platforms.join(', ')}
-                                        </p>
-                                      )}
-                                      {uniqueLevels.length > 0 && (
-                                        <p className="text-gray-500 text-xs mt-1">
-                                          Levels: {uniqueLevels.join(', ')}
-                                        </p>
-                                      )}
-                                    </div>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="border-green-500/30 text-green-300 hover:bg-green-500/20 ml-3 flex-shrink-0"
-                                      onClick={() => {
-                                        setSelectedGame({
-                                          game: firstGame.game,
-                                          userGames: userGames,
-                                          platforms: platforms,
-                                          levels: uniqueLevels
-                                        })
-                                        setShowGameDialog(true)
-                                      }}
-                                    >
-                                      View
-                                    </Button>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            )
-                          })
-                        })()
-                      ) : (
-                        <div className="col-span-full text-center py-8">
-                          <Gamepad2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-gray-400">No games listed</p>
+                      {/* Languages / Skills */}
+                      <div>
+                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Core Competencies</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {profile.userLanguages.length > 0 ? profile.userLanguages.map(lang => (
+                            <Badge key={lang.id} variant="outline" className="bg-white/[0.02] border-white/[0.05] text-[9px] font-black uppercase text-gray-400 px-3 py-1">
+                              {lang.language} - {lang.level}
+                            </Badge>
+                          )) : <span className="text-xs italic text-gray-600 font-bold">Awaiting assessment...</span>}
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </TabsContent>
 
-              {/* ...existing code... (Services tab törölve) */}
+              <TabsContent value="games" className="mt-0">
+                <div className="bg-[#070707]/90 border border-white/[0.05] rounded-[32px] p-8 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Intelligence Brief</h3>
+                    <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
+                  </div>
 
-              <TabsContent value="reviews" className="mt-6">
-                <Card className="gaming-card">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-white flex items-center gap-2">
-                        <Star className="h-5 w-5" />
-                        Reviews
-                      </CardTitle>
-                      {canReview && (
-                        <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
-                          <DialogTrigger asChild>
-                            <Button className="gaming-button">
-                              <Plus className="h-4 w-4 mr-2" />
-                              Write Review
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="bg-gray-900 border-gray-700">
-                            <DialogHeader>
-                              <DialogTitle className="text-white">Write a Review</DialogTitle>
-                              <DialogDescription className="text-gray-400">
-                                Share your experience with {profile?.username}
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div>
-                                <label className="text-white text-sm font-medium mb-2 block">Rating</label>
-                                <div className="flex gap-2">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                      key={star}
-                                      onClick={() => setReviewForm(prev => ({ ...prev, rating: star }))}
-                                      className={`text-2xl ${star <= reviewForm.rating
-                                          ? 'text-yellow-400'
-                                          : 'text-gray-400'
-                                        } hover:text-yellow-400 transition-colors`}
-                                    >
-                                      ★
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                              <div>
-                                <label className="text-white text-sm font-medium mb-2 block">Comment (optional)</label>
-                                <Textarea
-                                  value={reviewForm.comment}
-                                  onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
-                                  placeholder="Share your experience..."
-                                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
-                                  rows={4}
-                                />
-                              </div>
-                              {reviewError && (
-                                <p className="text-red-400 text-sm">{reviewError}</p>
-                              )}
-                            </div>
-                            <DialogFooter>
-                              <Button
-                                variant="outline"
-                                onClick={() => setShowReviewDialog(false)}
-                                className="border-gray-600 text-gray-300 hover:bg-gray-800"
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                onClick={handleSubmitReview}
-                                disabled={submittingReview}
-                                className="gaming-button"
-                              >
-                                {submittingReview ? (
-                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                ) : (
-                                  <Send className="h-4 w-4 mr-2" />
-                                )}
-                                Submit Review
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {reviewsLoading ? (
-                      <div className="flex items-center justify-center py-8">
-                        <Loader2 className="h-6 w-6 animate-spin text-green-400" />
-                        <span className="ml-2 text-white">Loading reviews...</span>
-                      </div>
-                    ) : reviewsData?.reviews && reviewsData.reviews.length > 0 ? (
-                      <div className="space-y-4">
-                        {reviewsData.reviews.map((review) => (
-                          <Card key={review.id} className="bg-white/5 border-white/20">
-                            <CardContent className="p-4">
-                              <div className="flex items-start">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center">
-                                      {review.reviewer.avatar ? (
-                                        <img
-                                          src={review.reviewer.avatar}
-                                          alt={`${review.reviewer.username}'s profile`}
-                                          className="w-full h-full object-cover"
-                                        />
-                                      ) : (
-                                        <User className="h-4 w-4 text-white" />
-                                      )}
-                                    </div>
-                                    <span className="text-white font-medium">{review.reviewer.username}</span>
-                                    <div className="flex gap-1">
-                                      {[1, 2, 3, 4, 5].map((star) => (
-                                        <Star
-                                          key={star}
-                                          className={`h-4 w-4 ${star <= review.rating
-                                              ? 'text-yellow-400 fill-current'
-                                              : 'text-gray-400'
-                                            }`}
-                                        />
-                                      ))}
-                                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {profile.userGames.length > 0 ? (
+                      (() => {
+                        const gameGroups = profile.userGames.reduce((groups, userGame) => {
+                          const gameName = userGame.game.name
+                          if (!groups[gameName]) {
+                            groups[gameName] = []
+                          }
+                          groups[gameName].push(userGame)
+                          return groups
+                        }, {} as Record<string, typeof profile.userGames>)
+
+                        return Object.entries(gameGroups).map(([gameName, userGames]) => {
+                          const firstGame = userGames[0]
+                          const platforms = userGames.map(ug => ug.platform).filter(Boolean)
+                          const levels = userGames.map(ug => ug.level)
+                          const uniqueLevels = [...new Set(levels)]
+
+                          return (
+                            <div key={firstGame.id} className="group relative bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 hover:bg-white/[0.04] transition-all duration-300">
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-white font-black text-xs uppercase tracking-widest truncate mb-2">{gameName}</h4>
+                                  <div className="flex flex-wrap gap-2">
+                                    {platforms.slice(0, 2).map((p, i) => (
+                                      <span key={i} className="text-[9px] font-black uppercase text-gray-500 tracking-tighter">{p}</span>
+                                    ))}
                                   </div>
-                                  {review.comment && (
-                                    <p className="text-gray-300 text-sm pl-10">{review.comment}</p>
-                                  )}
                                 </div>
-                                <p className="text-gray-500 text-xs mt-1 flex-shrink-0">
-                                  {new Date(review.createdAt).toLocaleDateString()}
-                                </p>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 px-4 bg-white/[0.05] hover:bg-white/[0.1] text-gray-300 hover:text-white text-[9px] font-black uppercase tracking-widest rounded-lg transition-all"
+                                  onClick={() => {
+                                    setSelectedGame({
+                                      game: firstGame.game,
+                                      userGames: userGames,
+                                      platforms: platforms,
+                                      levels: uniqueLevels
+                                    })
+                                    setShowGameDialog(true)
+                                  }}
+                                >
+                                  Inspect
+                                </Button>
                               </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
+                            </div>
+                          )
+                        })
+                      })()
                     ) : (
-                      <div className="text-center py-8">
-                        <Star className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-400">No reviews yet</p>
-                        <p className="text-gray-500 text-sm mt-2">
-                          {canReview ? 'Be the first to review this gamer!' : 'No reviews available'}
-                        </p>
+                      <div className="col-span-full text-center py-12">
+                        <Gamepad2 className="h-8 w-8 text-gray-800 mx-auto mb-4" />
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-600">No data available</p>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="reviews" className="mt-0">
+                <div className="bg-[#070707]/90 border border-white/[0.05] rounded-[32px] p-8 backdrop-blur-sm">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Performance Reports</h3>
+                      <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
+                    </div>
+                    {canReview && (
+                      <Button onClick={() => setShowReviewDialog(true)} className="ml-6 h-9 px-6 bg-white/[0.05] hover:bg-white/[0.1] text-gray-300 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border border-white/[0.05]">
+                        <Plus className="h-3 w-3 mr-2" />
+                        File Report
+                      </Button>
+                    )}
+                  </div>
+
+                  {reviewsLoading ? (
+                    <LoadingSync fullScreen={false} subtext="Scanning Reports" />
+                  ) : reviewsData?.reviews && reviewsData.reviews.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {reviewsData.reviews.map((review) => (
+                        <div key={review.id} className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 relative group overflow-hidden">
+                          <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <div key={star} className={`w-1.5 h-1.5 rounded-full ${star <= review.rating ? 'bg-green-500' : 'bg-gray-800'}`}></div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-4 mb-4">
+                            <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-900 border border-white/[0.05]">
+                              {review.reviewer.avatar ? (
+                                <img src={review.reviewer.avatar} alt={review.reviewer.username} className="w-full h-full object-cover grayscale-[0.5]" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center"><User className="h-4 w-4 text-gray-700" /></div>
+                              )}
+                            </div>
+                            <div>
+                              <span className="block text-[10px] font-black text-white uppercase tracking-widest leading-none mb-1">{review.reviewer.username}</span>
+                              <span className="block text-[8px] font-black text-gray-600 uppercase tracking-tighter">{new Date(review.createdAt).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                          {review.comment && (
+                            <p className="text-[11px] font-bold text-gray-400 leading-relaxed italic line-clamp-3">"{review.comment}"</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <Star className="h-8 w-8 text-gray-800 mx-auto mb-4" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-600">No reports found</p>
+                    </div>
+                  )}
+                </div>
               </TabsContent>
             </Tabs>
           </div>
 
           {/* Right Column - Actions & Stats */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Quick Actions */}
-            <Card className="gaming-card">
-              <CardHeader>
-                <CardTitle className="text-white">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            <div className="bg-[#070707]/90 border border-white/[0.05] rounded-[32px] p-8 backdrop-blur-sm">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-8 text-center">Protocol Actions</h3>
+              <div className="space-y-4">
                 <Button
                   asChild
-                  className={`w-full ${profile.isActive ? 'gaming-button' : 'bg-gray-600/20 text-gray-400 border-gray-500/30 cursor-not-allowed'}`}
+                  className={`w-full h-12 ${profile.isActive ? 'bg-green-600/80 hover:bg-green-500 text-black' : 'bg-gray-800/50 text-gray-600 border-gray-800/30 cursor-not-allowed'} font-black text-[11px] uppercase tracking-widest rounded-xl transition-all`}
                   disabled={!profile.isActive}
                 >
                   <Link href={profile.isActive ? `/profile/${profile.username}/book` : '#'}>
-                    {profile.isActive ? (
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                    ) : (
-                      <Ban className="h-4 w-4 mr-2" />
-                    )}
-                    {profile.isActive ? 'Book Session' : 'Account Inactive'}
+                    {profile.isActive ? 'Initiate Session' : 'Offline Mode'}
                   </Link>
                 </Button>
-                {!profile.isActive && (
-                  <div className="text-center">
-                    <p className="text-xs text-gray-500 mb-1">
-                      Booking is disabled for inactive accounts
-                    </p>
-                    <p className="text-xs text-gray-600">
-                      This user is not available for gaming sessions
-                    </p>
-                  </div>
-                )}
-                <Button asChild variant="outline" className="w-full border-white/20 text-white hover:bg-white/10">
+
+                <Button asChild variant="outline" className="w-full h-12 bg-white/[0.03] border-white/[0.1] text-gray-300 hover:text-white hover:bg-white/[0.08] font-black text-[11px] uppercase tracking-widest rounded-xl transition-all">
                   <Link href={`/profile/${profile.username}/message`}>
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Send Message
+                    Direct Comm
                   </Link>
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Stats */}
-            <Card className="gaming-card">
-              <CardHeader>
-                <CardTitle className="text-white">Stats</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Games</span>
-                  <span className="text-white font-semibold">{profile.userGames.length}</span>
+            <div className="bg-[#070707]/90 border border-white/[0.05] rounded-[32px] p-8 backdrop-blur-sm">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-8 text-center">Operative Stats</h3>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-white/[0.05] pb-4">
+                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Deployments</span>
+                  <span className="text-xs font-black text-white uppercase">{profile.userGames.length} Missions</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Languages</span>
-                  <span className="text-white font-semibold">{profile.userLanguages.length}</span>
+
+                <div className="flex items-center justify-between border-b border-white/[0.05] pb-4">
+                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Availability</span>
+                  <span className="text-xs font-black text-white uppercase">
+                    {profile.userAvailability?.filter(av => av.isActive).length || 0} Slots
+                  </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Available Slots</span>
-                  <span className="text-white font-semibold">
-                    {profile.userAvailability?.filter(av => av.isActive).length || 0}
+                <div className="flex items-center justify-between border-b border-white/[0.05] pb-4">
+                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Experience</span>
+                  <span className="text-xs font-black text-white uppercase">
+                    {new Date().getFullYear() - new Date(profile.createdAt).getFullYear()} Years
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Member Since</span>
-                  <span className="text-white font-semibold">
-                    {new Date(profile.createdAt).getFullYear()}
+                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Reports</span>
+                  <span className="text-xs font-black text-white uppercase">
+                    {reviewsData?.totalReviews || 0} Filed
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Reviews</span>
-                  <span className="text-white font-semibold">
-                    {reviewsData?.totalReviews || 0}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Game Details Modal */}
       <Dialog open={showGameDialog} onOpenChange={setShowGameDialog}>
-        <DialogContent className="bg-gray-900 border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <Gamepad2 className="h-5 w-5" />
-              {selectedGame?.game.name}
-            </DialogTitle>
-            <DialogDescription className="text-gray-400">
-              Game details and player information
-            </DialogDescription>
-          </DialogHeader>
-          {selectedGame && (
-            <div className="space-y-4">
-              {/* Player Levels */}
-              <div>
-                <h4 className="text-white font-semibold mb-2">Player Levels</h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedGame.levels?.map((level: string, index: number) => (
-                    <Badge key={index} variant="secondary" className="bg-green-600/20 text-green-300 border-green-500/30">
-                      {level}
-                    </Badge>
-                  ))}
-                </div>
+        <DialogContent className="bg-black border-white/[0.05] backdrop-blur-xl sm:max-w-[500px] rounded-[32px] p-0 overflow-hidden">
+          <div className="p-10">
+            <DialogHeader className="mb-10 text-left">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-[1px] w-8 bg-white/[0.1]"></div>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">Intelligence Data</span>
               </div>
+              <DialogTitle className="text-2xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                <Gamepad2 className="h-6 w-6 text-gray-500" />
+                {selectedGame?.game.name}
+              </DialogTitle>
+            </DialogHeader>
 
-              {/* Platforms */}
-              {selectedGame.platforms && selectedGame.platforms.length > 0 && (
-                <div>
-                  <h4 className="text-white font-semibold mb-2">Platforms</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedGame.platforms.map((platform: string, index: number) => (
-                      <Badge key={index} variant="outline" className="border-blue-500/30 text-blue-300">
-                        {platform}
-                      </Badge>
-                    ))}
+            {selectedGame && (
+              <div className="space-y-10">
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-8">
+                  {/* Player Levels */}
+                  <div>
+                    <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Competency Levels</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedGame.levels?.map((level: string, index: number) => (
+                        <Badge key={index} variant="secondary" className="bg-white/[0.05] text-white border-white/[0.1] text-[9px] font-black uppercase px-2 py-1">
+                          {level}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
 
-              {/* Game Genre */}
-              {selectedGame.game.genre && (
-                <div>
-                  <h4 className="text-white font-semibold mb-2">Genre</h4>
-                  <Badge variant="outline" className="border-purple-500/30 text-purple-300">
-                    {selectedGame.game.genre}
-                  </Badge>
+                  {/* Platforms */}
+                  {selectedGame.platforms && selectedGame.platforms.length > 0 && (
+                    <div>
+                      <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Deployment</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedGame.platforms.map((platform: string, index: number) => (
+                          <Badge key={index} variant="outline" className="border-white/[0.1] text-gray-400 text-[9px] font-black uppercase px-2 py-1">
+                            {platform}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
 
-              {/* Game Platform */}
-              {selectedGame.game.platform && (
-                <div>
-                  <h4 className="text-white font-semibold mb-2">Game Platform</h4>
-                  <Badge variant="outline" className="border-orange-500/30 text-orange-300">
-                    {selectedGame.game.platform}
-                  </Badge>
+                {/* Additional Info */}
+                <div className="flex flex-wrap gap-8 pt-6 border-t border-white/[0.05]">
+                  {selectedGame.game.genre && (
+                    <div>
+                      <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Classification</h4>
+                      <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">{selectedGame.game.genre}</span>
+                    </div>
+                  )}
+
+                  {selectedGame.game.platform && (
+                    <div>
+                      <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Native Source</h4>
+                      <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">{selectedGame.game.platform}</span>
+                    </div>
+                  )}
                 </div>
-              )}
 
-              {/* Detailed Breakdown */}
-              {selectedGame.userGames && selectedGame.userGames.length > 1 && (
-                <div>
-                  <h4 className="text-white font-semibold mb-2">Detailed Breakdown</h4>
-                  <div className="space-y-2">
-                    {selectedGame.userGames.map((userGame: any, index: number) => (
-                      <div key={index} className="bg-white/5 p-3 rounded-lg">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-300">
-                            {userGame.platform || 'No platform'} - {userGame.level}
+                {/* Detailed Breakdown */}
+                {selectedGame.userGames && selectedGame.userGames.length > 1 && (
+                  <div className="pt-8 border-t border-white/[0.05]">
+                    <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Operational History</h4>
+                    <div className="space-y-3">
+                      {selectedGame.userGames.map((userGame: any, index: number) => (
+                        <div key={index} className="bg-white/[0.02] border border-white/[0.05] p-4 rounded-xl flex items-center justify-between">
+                          <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">
+                            {userGame.platform || 'General'}
+                          </span>
+                          <span className="text-[10px] font-black text-white px-3 py-1 bg-white/[0.05] rounded-lg border border-white/[0.05]">
+                            {userGame.level}
                           </span>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+            )}
+            <div className="mt-12 flex justify-end">
+              <Button
+                variant="ghost"
+                onClick={() => setShowGameDialog(false)}
+                className="h-10 px-8 bg-white/[0.05] hover:bg-white/[0.1] text-gray-400 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+              >
+                Close Portal
+              </Button>
             </div>
-          )}
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowGameDialog(false)}
-              className="border-gray-600 text-gray-300 hover:bg-gray-800"
-            >
-              Close
-            </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -3,7 +3,10 @@ import HorizontalLane from "@/components/HorizontalLane";
 
 async function getGames() {
   const games = await prisma.game.findMany({
-    where: { isActive: true },
+    where: {
+      isActive: true,
+      igdbRatingCount: { not: null }
+    },
     orderBy: [
       { igdbRatingCount: 'desc' },
       { igdbRating: 'desc' }
