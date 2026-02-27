@@ -58,122 +58,139 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 grid md:grid-cols-2">
+    <div className="min-h-screen bg-transparent grid md:grid-cols-2 overflow-hidden">
       {/* Video Section */}
       <div className="hidden md:block h-screen relative">
         <video
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover grayscale-[0.5] opacity-40 transition-all duration-1000"
           src="/videos/signinsignup.mp4"
           autoPlay
           muted
           loop
           playsInline
         />
-        <div className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-slate-900"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent opacity-60"></div>
+        <div className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-black"></div>
       </div>
 
       {/* Login Form */}
-      <div className="relative flex items-center justify-center p-8">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-green-900/50 to-transparent blur-3xl -translate-x-1/2"></div>
-        <Card className="w-full max-w-md gaming-card border-0 bg-gradient-to-br from-green-600/10 to-green-800/10 backdrop-blur-sm">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold text-white mb-2">
-              Login
+      <div className="relative flex items-center justify-center p-8 bg-black/20">
+        <div className="absolute top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-20">
+          <div className="absolute top-20 left-10 w-64 h-64 bg-primary/20 blur-[120px] rounded-full"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 blur-[150px] rounded-full"></div>
+        </div>
+
+        <Card className="w-full max-w-md bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl">
+          <CardHeader className="text-center pt-8 pb-4">
+            <div className="flex justify-center mb-6">
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] relative group">
+                <LogIn className="h-8 w-8 text-primary group-hover:scale-110 transition-transform duration-500" />
+                <div className="absolute -inset-1 bg-primary/20 blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </div>
+            </div>
+            <CardTitle className="text-3xl font-black text-white uppercase tracking-tighter leading-none mb-2">
+              System Access
             </CardTitle>
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Credentials Required</p>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-8 pt-4">
             {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
                 {error}
               </div>
             )}
             {message && (
-              <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm">
+              <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl text-primary text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
                 {message}
               </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium text-white flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  Email Address
-                </label>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <label htmlFor="email" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <Mail className="h-3 w-3" />
+                    // Auth_ID
+                  </label>
+                  <span className="text-[8px] font-black text-gray-700 uppercase italic">Encrypted</span>
+                </div>
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-3 bg-white/10 border border-green-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-400 transition-all duration-300"
+                  placeholder="NOMAD@DATABASE.SYS"
+                  className="w-full px-5 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium"
                   required
                 />
               </div>
 
               {/* Password Field */}
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium text-white flex items-center gap-2">
-                  <Lock className="h-4 w-4" />
-                  Password
-                </label>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <label htmlFor="password" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <Lock className="h-3 w-3" />
+                    // Security_Key
+                  </label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-[9px] font-black text-gray-600 hover:text-primary uppercase tracking-tighter underline transition-colors"
+                  >
+                    Forgot Key?
+                  </Link>
+                </div>
                 <div className="relative">
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full px-4 py-3 bg-white/10 border border-green-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-400 transition-all duration-300 pr-12"
+                    placeholder="••••••••••••"
+                    className="w-full px-5 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 pr-14 text-sm font-medium tracking-widest"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-white transition-colors p-2"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-              </div>
-
-              {/* Forgot Password */}
-              <div className="text-right">
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-green-400 hover:text-green-300 underline transition-colors"
-                >
-                  Forgot your password?
-                </Link>
               </div>
 
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full text-lg py-3 bg-green-300/30 backdrop-blur-md border border-green-300/50 text-white shadow-lg hover:bg-green-300/50 hover:border-green-400/70 hover:scale-105 transition-all duration-300 font-bold rounded-xl"
+                className="gaming-button w-full h-auto py-5 rounded-2xl group relative overflow-hidden"
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Logging In...</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span className="uppercase font-black text-[10px] tracking-[.3em]">Synchronizing...</span>
                   </div>
                 ) : (
-                  <>
-                    <LogIn className="h-5 w-5 mr-2" />
-                    Login
-                  </>
+                  <div className="flex items-center justify-center gap-3">
+                    <LogIn className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    <span className="uppercase font-black text-[10px] tracking-[.3em]">Establish Link</span>
+                  </div>
                 )}
               </Button>
 
               {/* Sign Up Link */}
-              <div className="text-center text-gray-300">
-                <span>New to GamingWithMe? </span>
-                <Link
-                  href="/registration"
-                  className="text-green-400 hover:text-green-300 underline font-medium transition-colors"
-                >
-                  Register
-                </Link>
+              <div className="pt-4 text-center">
+                <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
+                  No active profile?
+                  <Link
+                    href="/registration"
+                    className="ml-2 text-primary hover:text-primary/80 underline decoration-primary/20 transition-all"
+                  >
+                    Initialize New Account
+                  </Link>
+                </p>
               </div>
             </form>
           </CardContent>
