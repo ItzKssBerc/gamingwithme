@@ -1,66 +1,69 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import HorizontalLane from "@/components/HorizontalLane";
 
-export default function Home() {
+async function getGames() {
+  const games = await prisma.game.findMany({
+    where: { isActive: true },
+    orderBy: [
+      { igdbRatingCount: 'desc' },
+      { igdbRating: 'desc' }
+    ],
+    take: 12,
+  });
+  return games;
+}
+
+async function getGamers() {
+  const users = await prisma.user.findMany({
+    where: { isAdmin: false },
+    include: {
+      userGames: { include: { game: true } },
+      userLanguages: true,
+      userTags: true,
+      reviewsReceived: { select: { rating: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 12,
+  });
+
+  return users.map(user => {
+    const totalRating = user.reviewsReceived.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = user.reviewsReceived.length > 0 ? totalRating / user.reviewsReceived.length : 0;
+
+    return {
+      id: user.id,
+      username: user.username,
+      avatar: user.avatar || null,
+      bio: user.bio || 'No bio available',
+      rating: Math.round(averageRating * 10) / 10,
+      tags: user.userTags.filter(ut => !ut.tag.startsWith('category:')).map(ut => ut.tag),
+    };
+  });
+}
+
+export default async function Home() {
+  const [games, gamers] = await Promise.all([getGames(), getGamers()]);
+
   return (
     <>
-      <section className="relative h-screen flex items-center justify-center text-center text-white">
-        <video
-          autoPlay
-          muted
-          loop
-          className="absolute z-[-1] w-full h-full object-cover"
-        >
-          <source src="/frontpage/gaming_06.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50 z-[-1]"></div>
-        <div className="z-10">
-          <h1 className="text-4xl font-bold leading-none sm:text-5xl">
-            Welcome to
-            <span className="text-primary"> GamingWithMe</span>
-          </h1>
-          <p className="px-8 mt-8 mb-12 text-lg">
-            Find your next gaming partner or create your own gaming events. Join a community of passionate gamers!
-          </p>
-        </div>
-      </section>
-      <section id="how-it-works" className="py-20 bg-background text-foreground">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            How It Works
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="flex flex-col items-center">
-              <div className="flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-primary text-primary-foreground">
-                <span className="text-4xl font-bold">1</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Create an Account</h3>
-              <p className="text-muted-foreground">
-                Sign up and create your profile to start connecting with other gamers.
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-primary text-primary-foreground">
-                <span className="text-4xl font-bold">2</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Find or Create Events</h3>
-              <p className="text-muted-foreground">
-                Browse existing gaming events or create your own for others to join.
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-primary text-primary-foreground">
-                <span className="text-4xl font-bold">3</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Game On!</h3>
-              <p className="text-muted-foreground">
-                Join events, meet new people, and enjoy your favorite games together.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className="pt-4 flex flex-col gap-2"> {/* Further reduced top padding for tighter fit with nav */}
+        <HorizontalLane
+          title="Games"
+          href="/games"
+          type="game"
+          initialItems={games}
+          apiEndpoint="/api/games?ordering=trending"
+        />
+
+        <HorizontalLane
+          title="Top Gamers"
+          href="/gamers"
+          type="gamer"
+          initialItems={gamers}
+          apiEndpoint="/api/gamers"
+          emptyMessage="Our community is just starting to grow. Be the first gamer to join this list and show off your profile!"
+        />
+      </div>
     </>
-  )
+  );
 }

@@ -59,6 +59,9 @@ const config = {
           black: "#000000",
         },
       },
+      fontFamily: {
+        orbitron: ["var(--font-orbitron)"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

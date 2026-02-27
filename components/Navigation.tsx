@@ -1,11 +1,11 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { 
-  Gamepad2, 
-  Users, 
-  Calendar, 
-  Settings, 
+import {
+  Gamepad2,
+  Users,
+  Calendar,
+  Settings,
   LogOut,
   User,
   Menu,
@@ -58,25 +58,24 @@ export default function Navigation() {
   }
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
-      isScrolled 
-        ? 'bg-black/20 backdrop-blur-sm border-b border-green-500/30' 
-        : 'bg-black border-b border-green-700'
-    }`}>
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
+      ? 'bg-black/20 backdrop-blur-sm border-b border-green-500/30'
+      : 'bg-black border-b border-green-700'
+      }`}>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-3 items-center h-16">
           {/* Logo - col - balra igazítva */}
           <div className="col-span-1 flex items-center justify-start">
             <Link href="/" className="flex items-center space-x-2">
-              <Image 
-                src="/logo/logo.png" 
-                alt="GamingWithYou Logo" 
-                width={32} 
-                height={32} 
+              <Image
+                src="/logo/logo.png"
+                alt="GamingWithYou Logo"
+                width={32}
+                height={32}
                 className="h-8 w-auto"
                 priority
               />
-              <span className="text-xl font-bold text-white">GamingWithMe</span>
+              <span className="text-xl font-bold text-gaming-green font-orbitron tracking-wider">GamingWithMe</span>
             </Link>
           </div>
 
@@ -125,9 +124,9 @@ export default function Navigation() {
                     <Button variant="ghost" className="p-0 h-auto bg-transparent border-none hover:bg-transparent">
                       <div className="p-1 rounded-full hover:bg-emerald-600/20 transition-colors">
                         {userProfile?.avatar ? (
-                          <Image 
-                            src={userProfile.avatar} 
-                            alt="Profile" 
+                          <Image
+                            src={userProfile.avatar}
+                            alt="Profile"
                             width={32}
                             height={32}
                             className="w-8 h-8 rounded-full object-cover border-2 border-emerald-400/50 hover:border-emerald-300/70 transition-colors"
@@ -167,7 +166,7 @@ export default function Navigation() {
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator className="bg-emerald-400/50 mx-1" />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => signOut({ callbackUrl: "/" })}
                       className="flex items-center space-x-2 cursor-pointer text-red-400 hover:text-red-300 hover:bg-red-600/20 focus:bg-red-600/20 rounded-md mx-1 my-0.5 py-2"
                     >
@@ -179,14 +178,14 @@ export default function Navigation() {
               </div>
             ) : (
               <>
-                <Button asChild className="bg-green-300/30 backdrop-blur-md border border-green-300/50 text-white shadow-lg hover:bg-green-300/50 hover:border-green-400/70 transition-all duration-300">
+                <Button asChild className="min-w-[120px] justify-center bg-green-300/30 backdrop-blur-md border border-green-300/50 text-white shadow-lg hover:bg-green-300/50 hover:border-green-400/70 transition-all duration-300 font-orbitron tracking-wider">
                   <Link href="/login">
                     Login
                   </Link>
                 </Button>
-                <Button asChild className="bg-green-700/40 backdrop-blur-md border border-green-700/70 text-white shadow-lg hover:bg-green-700/60 hover:border-green-500/80 transition-all duration-300">
+                <Button asChild className="min-w-[120px] justify-center bg-green-700/40 backdrop-blur-md border border-green-700/70 text-white shadow-lg hover:bg-green-700/60 hover:border-green-500/80 transition-all duration-300 font-orbitron tracking-wider">
                   <Link href="/registration">
-                    Register
+                    Sign up
                   </Link>
                 </Button>
               </>
@@ -208,31 +207,31 @@ export default function Navigation() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-green-700">
             <div className="flex flex-col space-y-4">
-              <Link 
-                href="/games" 
+              <Link
+                href="/games"
                 className="text-green-200 hover:text-white transition-colors flex items-center space-x-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Gamepad2 className="h-5 w-5" />
                 <span>Games</span>
               </Link>
-              <Link 
-                href="/gamers" 
+              <Link
+                href="/gamers"
                 className="text-green-200 hover:text-white transition-colors flex items-center space-x-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Users className="h-5 w-5" />
                 <span>Gamers</span>
               </Link>
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="text-green-200 hover:text-white transition-colors flex items-center justify-between w-full space-x-2">
-                      <div className="flex items-center space-x-2">
-                          <Settings className="h-5 w-5" />
-                          <span>Support</span>
-                      </div>
-                      <ChevronDown className="h-4 w-4" />
+                    <div className="flex items-center space-x-2">
+                      <Settings className="h-5 w-5" />
+                      <span>Support</span>
+                    </div>
+                    <ChevronDown className="h-4 w-4" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-[calc(100vw-2rem)] bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/50 text-white rounded-lg shadow-xl" side="bottom" align="start" sideOffset={10}>
@@ -248,7 +247,7 @@ export default function Navigation() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              
+
               <div className="pt-4 border-t border-green-700">
                 {session ? (
                   <div className="flex flex-col space-y-2">
@@ -258,9 +257,9 @@ export default function Navigation() {
                         <Button variant="ghost" className="p-0 h-auto bg-transparent border-none hover:bg-transparent w-full justify-start">
                           <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg w-full hover:bg-green-600/20 transition-colors">
                             {userProfile?.avatar ? (
-                              <Image 
-                                src={userProfile.avatar} 
-                                alt="Profile" 
+                              <Image
+                                src={userProfile.avatar}
+                                alt="Profile"
                                 width={40}
                                 height={40}
                                 className="w-10 h-10 rounded-full object-cover border-2 border-green-500/30"
@@ -307,7 +306,7 @@ export default function Navigation() {
                         </DropdownMenuItem>
 
                         <DropdownMenuSeparator className="bg-emerald-400/50 mx-1" />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => {
                             signOut({ callbackUrl: "/" })
                             setIsMenuOpen(false)
@@ -322,14 +321,14 @@ export default function Navigation() {
                   </div>
                 ) : (
                   <div className="flex flex-col space-y-2">
-                    <Button asChild className="bg-green-600/20 backdrop-blur-sm border border-green-500/30 text-white hover:bg-green-600/30 hover:border-green-400/50 transition-all duration-300">
+                    <Button asChild className="w-full justify-center bg-green-600/20 backdrop-blur-sm border border-green-500/30 text-white hover:bg-green-600/30 hover:border-green-400/50 transition-all duration-300 font-orbitron tracking-wider">
                       <Link href="/login" onClick={() => setIsMenuOpen(false)}>
                         Login
                       </Link>
                     </Button>
-                    <Button asChild className="bg-green-700/40 backdrop-blur-md border border-green-700/70 text-white shadow-lg hover:bg-green-700/60 hover:border-green-500/80 transition-all duration-300">
+                    <Button asChild className="w-full justify-center bg-green-700/40 backdrop-blur-md border border-green-700/70 text-white shadow-lg hover:bg-green-700/60 hover:border-green-500/80 transition-all duration-300 font-orbitron tracking-wider">
                       <Link href="/registration" onClick={() => setIsMenuOpen(false)}>
-                        Register
+                        Sign up
                       </Link>
                     </Button>
                   </div>
