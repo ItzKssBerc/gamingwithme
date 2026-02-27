@@ -4,7 +4,7 @@
 [![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://reactjs.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![License: All Rights Reserved](https://img.shields.io/badge/License-All_Rights_Reserved-red?style=for-the-badge)](LICENSE)
 
 ## Overview
 
@@ -16,6 +16,10 @@
 - **Service Booking**: Simplified scheduling and management for gaming services.
 - **Premium UI/UX**: Built with a "dark mode first" aesthetic using Tailwind CSS and Framer Motion.
 - **Secure Architecture**: Robust authentication and database management via NextAuth and Prisma.
+
+## License
+
+© 2026 GamingWithMe. Minden jog fenntartva. Szigorúan tilos a szoftver bármilyen formában történő másolása, felhasználása vagy terjesztése az engedélyem nélkül.
 
 ---
 
