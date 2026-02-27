@@ -15,20 +15,7 @@ The application is currently running in **fallback mode** because IGDB credentia
 4. Note your **Client ID** and **Client Secret**
 
 ### 2. Configure Environment Variables
-Create a `.env.local` file in your project root with the following content:
-
-```env
-# IGDB API Configuration
-IGDB_CLIENT_ID=your_igdb_client_id_here
-IGDB_CLIENT_SECRET=your_igdb_client_secret_here
-
-# NextAuth Configuration (if using authentication)
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your_nextauth_secret_here
-
-# Database Configuration
-DATABASE_URL="file:./dev.db"
-```
+Create a `.env.local` file in your project root and add your IGDB credentials, NextAuth secret, and database URL.
 
 ### 3. Restart the Application
 After adding the environment variables, restart your development server:

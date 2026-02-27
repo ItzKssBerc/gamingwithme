@@ -9,16 +9,7 @@ This guide explains how to set up the email/password authentication system for G
 
 ## Environment Variables
 
-Create a `.env.local` file with the following variables:
-
-```env
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/gamingwithme"
-
-# NextAuth
-NEXTAUTH_SECRET="your-secret-key-here"
-NEXTAUTH_URL="http://localhost:3000"
-```
+See the provided environment variable templates for the required database and NextAuth configuration details.
 
 ### Important Notes:
 - Replace `username:password@localhost:5432/gamingwithme` with your actual database credentials

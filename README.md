@@ -90,30 +90,7 @@ For detailed setup instructions, see [IGDB_SETUP.md](./IGDB_SETUP.md).
 
 ## Environment Variables
 
-```env
-# Database
-POSTGRES_URL="postgresql://..."
-
-# Authentication
-NEXTAUTH_SECRET="your-secret"
-NEXTAUTH_URL="http://localhost:3000"
-
-# IGDB Integration
-IGDB_CLIENT_ID="your-twitch-client-id"
-IGDB_CLIENT_SECRET="your-twitch-client-secret"
-
-# Email (optional)
-EMAIL_SERVER_HOST="smtp.example.com"
-EMAIL_SERVER_PORT=587
-EMAIL_SERVER_USER="your-email"
-EMAIL_SERVER_PASSWORD="your-password"
-EMAIL_FROM="noreply@example.com"
-
-# Stripe (optional)
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_PUBLISHABLE_KEY="pk_test_..."
-STRIPE_WEBHOOK_SECRET="whsec_..."
-```
+See `.env.example` for the required environment variables. Never commit your `.env.local` or `.env.local.local` files to the repository.
 
 ## Database Schema
 
