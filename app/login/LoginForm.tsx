@@ -5,11 +5,11 @@ import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { 
-  LogIn, 
-  Mail, 
-  Lock, 
-  Eye, 
+import {
+  LogIn,
+  Mail,
+  Lock,
+  Eye,
   EyeOff
 } from "lucide-react"
 import Link from "next/link"
@@ -35,7 +35,7 @@ export default function LoginForm() {
     e.preventDefault()
     setError("")
     setIsLoading(true)
-    
+
     try {
       const result = await signIn("credentials", {
         email,
@@ -61,12 +61,12 @@ export default function LoginForm() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 grid md:grid-cols-2">
       {/* Video Section */}
       <div className="hidden md:block h-screen relative">
-        <video 
-          className="w-full h-full object-cover" 
-          src="/videos/signinsignup.mp4" 
-          autoPlay 
-          muted 
-          loop 
+        <video
+          className="w-full h-full object-cover"
+          src="/videos/signinsignup.mp4"
+          autoPlay
+          muted
+          loop
           playsInline
         />
         <div className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-slate-900"></div>
@@ -138,8 +138,8 @@ export default function LoginForm() {
 
               {/* Forgot Password */}
               <div className="text-right">
-                <Link 
-                  href="/forgot-password" 
+                <Link
+                  href="/forgot-password"
                   className="text-sm text-green-400 hover:text-green-300 underline transition-colors"
                 >
                   Forgot your password?
@@ -147,8 +147,8 @@ export default function LoginForm() {
               </div>
 
               {/* Submit Button */}
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full text-lg py-3 bg-green-300/30 backdrop-blur-md border border-green-300/50 text-white shadow-lg hover:bg-green-300/50 hover:border-green-400/70 hover:scale-105 transition-all duration-300 font-bold rounded-xl"
                 disabled={isLoading}
               >
@@ -167,9 +167,9 @@ export default function LoginForm() {
 
               {/* Sign Up Link */}
               <div className="text-center text-gray-300">
-                <span>New to GamingWithYou? </span>
-                <Link 
-                  href="/registration" 
+                <span>New to GamingWithMe? </span>
+                <Link
+                  href="/registration"
                   className="text-green-400 hover:text-green-300 underline font-medium transition-colors"
                 >
                   Register

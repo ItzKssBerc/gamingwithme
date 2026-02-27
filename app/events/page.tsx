@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Calendar, 
-  Clock, 
-  Users, 
-  Trophy, 
+import {
+  Calendar,
+  Clock,
+  Users,
+  Trophy,
   Star,
   MapPin,
   Gamepad2,
@@ -116,7 +116,7 @@ export default function EventsPage() {
               Gaming Events
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Join tournaments, community events, and gaming competitions. 
+              Join tournaments, community events, and gaming competitions.
               Connect with players and win amazing prizes!
             </p>
           </div>
@@ -206,7 +206,7 @@ export default function EventsPage() {
 
                     {/* Progress Bar */}
                     <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full"
                         style={{ width: `${(event.participants / event.maxParticipants) * 100}%` }}
                       ></div>
@@ -257,10 +257,10 @@ export default function EventsPage() {
                 </Badge>
               </div>
               <CardTitle className="text-white text-3xl mb-4">
-                GamingWithYou Championship 2024
+                GamingWithMe Championship 2024
               </CardTitle>
               <CardDescription className="text-gray-300 text-lg">
-                The ultimate gaming championship featuring multiple games, 
+                The ultimate gaming championship featuring multiple games,
                 massive prize pools, and the best players from around the world.
               </CardDescription>
             </CardHeader>
