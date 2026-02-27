@@ -69,7 +69,7 @@ export default function Navigation() {
             <Link href="/" className="flex items-center space-x-2">
               <Image
                 src="/logo/logo.png"
-                alt="GamingWithYou Logo"
+                alt="GamingWithMe Logo"
                 width={32}
                 height={32}
                 className="h-8 w-auto"

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title: "GamingWithMe - Connect with Gamers",
   description: "Connect with gamers, book sessions, and discover amazing gaming experiences. Your ultimate gaming community platform.",
   keywords: ["gaming", "community", "bookings", "gamers", "esports", "tournaments"],
-  authors: [{ name: "GamingWithYou Team" }],
+  authors: [{ name: "GamingWithMe Team" }],
   icons: {
     icon: '/favicon.ico',
   },

@@ -1,4 +1,4 @@
-# GamingWithYou
+# GamingWithMe
 
 A modern gaming platform that connects gamers and service providers.
 
@@ -58,7 +58,7 @@ For detailed setup instructions, see [IGDB_SETUP.md](./IGDB_SETUP.md).
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd gamingwithyou
+   cd gamingwithme
    ```
 
 2. **Install dependencies**
@@ -216,10 +216,10 @@ This will test:
 
 ```bash
 # Build the image
-docker build -t gamingwithyou .
+docker build -t gamingwithme .
 
 # Run the container
-docker run -p 3000:3000 gamingwithyou
+docker run -p 3000:3000 gamingwithme
 ```
 
 ## Contributing

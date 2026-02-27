@@ -1,6 +1,6 @@
 # Authentication Setup Guide
 
-This guide explains how to set up the email/password authentication system for GamingWithYou.
+This guide explains how to set up the email/password authentication system for GamingWithMe.
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ Create a `.env.local` file with the following variables:
 
 ```env
 # Database
-DATABASE_URL="postgresql://username:password@localhost:5432/gamingwithyou"
+DATABASE_URL="postgresql://username:password@localhost:5432/gamingwithme"
 
 # NextAuth
 NEXTAUTH_SECRET="your-secret-key-here"
@@ -21,7 +21,7 @@ NEXTAUTH_URL="http://localhost:3000"
 ```
 
 ### Important Notes:
-- Replace `username:password@localhost:5432/gamingwithyou` with your actual database credentials
+- Replace `username:password@localhost:5432/gamingwithme` with your actual database credentials
 - Generate a secure secret key for `NEXTAUTH_SECRET` (you can use `openssl rand -base64 32` to generate one)
 - Update `NEXTAUTH_URL` to your production URL when deploying
 
