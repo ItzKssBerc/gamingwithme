@@ -20,7 +20,7 @@ const getGames = unstable_cache(
       genre: game.genres?.[0]?.name || null,
     }));
   },
-  ["home-games-v7"],
+  ["home-games-force-v10"],
   { revalidate: 300 }
 );
 

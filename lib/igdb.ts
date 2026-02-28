@@ -198,7 +198,6 @@ class IGDBService {
     }
   }
 
-  // Public method to make custom requests
   async makeCustomRequest(endpoint: string, query: string): Promise<any[]> {
     return this.makeRequest(endpoint, query);
   }
@@ -208,7 +207,6 @@ class IGDBService {
       throw new Error('Search query cannot be empty');
     }
 
-    // Use name search instead of the search endpoint - only main games, no DLCs, expansions, or seasons
     const searchQuery = `
       fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id,game_modes.id;
       where version_parent = null & name ~ *"${query}"* & game_modes = (2,3,4,5,6);
@@ -221,138 +219,120 @@ class IGDBService {
 
   async getPopularGames(limit: number = 20): Promise<IGDBGame[]> {
     try {
-      // 1. Get trending games based on Visits (Type 1) from popularity_primitives
-      // Increasing limit to 250 to find enough games that pass strict competitive filters
+      console.log('--- IGDBService: getPopularGames (Trending) ---');
       const primQuery = `fields game_id,value; where popularity_type = 1; sort value desc; limit 250;`;
       const primitives = await this.makeRequest('popularity_primitives', primQuery);
 
       if (!primitives || primitives.length === 0) {
-        console.warn('No PopScore primitives found, falling back to all-time popular');
         return this.getFallbackPopularGames(limit);
       }
 
       const gameIds = primitives.map((p: any) => p.game_id);
+      const modernDate = Math.floor(new Date('2015-01-01').getTime() / 1000);
 
-      // 2. Fetch full game details for these IDs with multiplayer, non-mobile, and competitive filtering
-      // Enforcing multiplayer, non-mobile platforms, and broader competitive genres:
-      // Fighting(4), Shooter(5), Music(7), Racing(10), RTS(11), MOBA(14), Sport(15), Simulator(30)
-      // and modes (Multiplayer: 2, PvP: 3, Battle Royale: 6)
       const igdbQuery = `
         fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
-        where id = (${gameIds.join(',')}) & version_parent = null & game_modes = (2,3,6) & platforms = (6,48,49,130,167,169) & genres = (4,5,10,11,14,15,30);
+        where id = (${gameIds.join(',')}) & 
+              version_parent = null & 
+              first_release_date > ${modernDate} &
+              game_modes = (3,6) & 
+              platforms = (6,48,49,130,167,169) & 
+              genres = (4,5,10,11,14,15);
         limit ${limit};
       `;
 
       const games = await this.makeRequest('games', igdbQuery);
+      console.log(`getPopularGames: Found ${games.length} competitive matches.`);
 
-      // Sort games to match the PopScore order
+      if (games.length === 0) {
+        return this.getFallbackPopularGames(limit);
+      }
+
       return games.sort((a, b) => {
         const indexA = gameIds.indexOf(a.id);
         const indexB = gameIds.indexOf(b.id);
         return indexA - indexB;
       });
     } catch (error) {
-      console.error('Error fetching trending games from PopScore, falling back to all-time popular:', error);
+      console.error('Error in getPopularGames:', error);
       return this.getFallbackPopularGames(limit);
     }
   }
 
   private async getFallbackPopularGames(limit: number = 20): Promise<IGDBGame[]> {
-    // All-time popular using rating_count as proxy
+    console.log('--- IGDBService: getFallbackPopularGames (All-time Competitive) ---');
+    const modernDate = Math.floor(new Date('2015-01-01').getTime() / 1000);
     const query = `
       fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
-      where version_parent = null & game_modes = (2,3,4,5,6) & rating_count >= 100;
+      where version_parent = null & 
+            game_modes = (3,6) & 
+            rating_count >= 50 & 
+            first_release_date > ${modernDate} &
+            genres = (4,5,10,11,14,15) &
+            platforms = (6,48,49,130,167,169);
       sort rating_count desc;
-      limit ${Math.min(limit, 50)};
+      limit ${limit};
     `;
 
     return this.makeRequest('games', query);
   }
 
   async getGameById(id: number): Promise<IGDBGame | null> {
-    if (!id || id <= 0) {
-      throw new Error('Invalid game ID');
-    }
-
+    if (!id || id <= 0) throw new Error('Invalid game ID');
     const query = `
       fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
       where id = ${id};
     `;
-
     const games = await this.makeRequest('games', query);
     return games.length > 0 ? games[0] : null;
   }
 
   async getGameBySlug(slug: string): Promise<IGDBGame | null> {
-    if (!slug.trim()) {
-      throw new Error('Game slug cannot be empty');
-    }
-
+    if (!slug.trim()) throw new Error('Game slug cannot be empty');
     const query = `
       fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
       where slug = "${slug}";
     `;
-
     const games = await this.makeRequest('games', query);
     return games.length > 0 ? games[0] : null;
   }
 
   async getGenres(): Promise<Array<{ id: number; name: string }>> {
-    const query = `
-      fields name;
-      sort name asc;
-      limit 50;
-    `;
-
+    const query = `fields name; sort name asc; limit 50;`;
     return this.makeRequest('genres', query);
   }
 
   async getPlatforms(): Promise<Array<{ id: number; name: string }>> {
-    const query = `
-      fields name;
-      sort name asc;
-      limit 50;
-    `;
-
+    const query = `fields name; sort name asc; limit 50;`;
     return this.makeRequest('platforms', query);
   }
 
   async getGamesByGenre(genreId: number, limit: number = 20): Promise<IGDBGame[]> {
-    if (!genreId || genreId <= 0) {
-      throw new Error('Invalid genre ID');
-    }
-
+    if (!genreId || genreId <= 0) throw new Error('Invalid genre ID');
     const query = `
       fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
       where genres = ${genreId} & version_parent = null & category = 0 & game_modes = (2,3,4,5,6);
       sort rating desc;
       limit ${Math.min(limit, 50)};
     `;
-
     return this.makeRequest('games', query);
   }
 
   async getGamesByPlatform(platformId: number, limit: number = 20): Promise<IGDBGame[]> {
-    if (!platformId || platformId <= 0) {
-      throw new Error('Invalid platform ID');
-    }
-
+    if (!platformId || platformId <= 0) throw new Error('Invalid platform ID');
     const query = `
       fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
       where platforms = ${platformId} & version_parent = null & category = 0 & game_modes = (2,3,4,5,6);
       sort rating desc;
       limit ${Math.min(limit, 50)};
     `;
-
     return this.makeRequest('games', query);
   }
 
-  // Clear cache method for testing or manual cache management
   clearCache(): void {
     this.requestCache.clear();
   }
 
-  // Get cache statistics
   getCacheStats(): { size: number; keys: string[] } {
     return {
       size: this.requestCache.size,
@@ -360,11 +340,10 @@ class IGDBService {
     };
   }
 
-  // Check if IGDB is configured
   isConfigured(): boolean {
     return !!(this.clientId && this.clientSecret);
   }
 }
 
 export const igdbService = new IGDBService();
-export type { IGDBGame }; 
+export type { IGDBGame };

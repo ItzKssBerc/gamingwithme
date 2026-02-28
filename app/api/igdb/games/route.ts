@@ -36,11 +36,19 @@ export async function GET(request: NextRequest) {
 
     // Build the WHERE clause for the IGDB query
     const nowInSeconds = Math.floor(Date.now() / 1000);
-    // Trending: minden idők legnépszerűbb játékai + multiplayer szűrés
-    let whereClauses = ['version_parent = null', `first_release_date <= ${nowInSeconds}`, 'rating != null', 'game_modes = (2,3,4,5,6)'];
-    // Ha keresés van, ne legyen rating_count szűrés, de ha népszerűség szerint sorrendezünk, legyen alapvető népszerűség
-    if (!query.trim() && (!orderByParam || orderByParam === '-rating' || orderByParam === '-rating_count' || orderByParam === '-popularity')) {
-      whereClauses.push('rating_count >= 100');
+    // Trending: modern competitive játékok (2015 után, PvP/Battle Royale, Esport műfajok)
+    const modernDate = Math.floor(new Date('2015-01-01').getTime() / 1000);
+    let whereClauses = [
+      'version_parent = null',
+      `first_release_date > ${modernDate}`,
+      'game_modes = (3,6)',
+      'genres = (4,5,10,11,14,15)',
+      'platforms = (6,48,49,130,167,169)'
+    ];
+
+    // Ha nincs keresés, alkalmazunk egy alap népszerűségi szűrőt
+    if (!query.trim()) {
+      whereClauses.push('rating_count >= 50');
     }
     if (query.trim()) {
       whereClauses.push(`name ~ *\"${query}\"*`);
