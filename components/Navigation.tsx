@@ -63,16 +63,16 @@ export default function Navigation() {
       : 'bg-black border-b border-white/[0.05]'
       }`}>
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-3 items-center h-16">
+        <div className="grid grid-cols-3 items-center h-20">
           {/* Logo - col - balra igazítva */}
           <div className="col-span-1 flex items-center justify-start">
             <Link href="/" className="flex items-center space-x-2">
               <Image
                 src="/logo/logo.png"
                 alt="GamingWithMe Logo"
-                width={32}
-                height={32}
-                className="h-8 w-auto opacity-80"
+                width={48}
+                height={48}
+                className="h-12 w-auto opacity-80"
                 priority
               />
               <span className="text-xl font-black text-gray-200 font-orbitron tracking-wider" translate="no">GamingWithMe</span>
