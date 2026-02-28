@@ -9,18 +9,32 @@ import { igdbService } from "@/lib/igdb";
 // Cache games for 5 minutes
 const getGames = unstable_cache(
   async () => {
-    const igdbGames = await igdbService.getPopularGames(12);
-    return igdbGames.map(game => ({
-      id: game.id.toString(),
-      name: game.name,
-      slug: game.slug,
-      igdbCoverUrl: game.cover?.url ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover.url.split('/').pop()}` : null,
-      igdbRating: game.rating ? game.rating / 10 : null,
-      igdbRatingCount: game.rating_count || null,
-      genre: game.genres?.[0]?.name || null,
-    }));
+    console.log('--- Home Page: getGames() called ---');
+    try {
+      const igdbGames = await igdbService.getPopularGames(12);
+      console.log(`--- Home Page: Received ${igdbGames.length} games ---`);
+
+      if (igdbGames.length === 0) {
+        console.warn('--- Home Page: No popular games returned from IGDBService ---');
+      }
+
+      return igdbGames.map(game => ({
+        id: game.id.toString(),
+        name: game.name,
+        slug: game.slug,
+        igdbCoverUrl: game.cover?.url ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover.url.split('/').pop()}` : null,
+        igdbRating: game.rating ? game.rating / 10 : null,
+        rating: game.rating || null,
+        igdbRatingCount: game.rating_count || null,
+        genre: game.genres?.[0]?.name || null,
+        twitchViewerCount: game.twitchViewerCount || 0,
+      }));
+    } catch (error) {
+      console.error('--- Home Page: Error in getGames() ---', error);
+      return [];
+    }
   },
-  ["home-games-force-v10"],
+  ["home-games-esport-v3"],
   { revalidate: 300 }
 );
 
@@ -76,6 +90,7 @@ async function GamesLane() {
       type="game"
       initialItems={games}
       apiEndpoint="/api/igdb/games"
+      emptyMessage="We couldn't find any popular competitive titles at the moment. Please check back later or explore other games."
     />
   );
 }

@@ -18,13 +18,55 @@ export async function GET(request: NextRequest) {
     const platform = searchParams.get('platform');
 
     // Trending: rating_count szerint rendezünk, ha nincs orderBy megadva
-    // A PopScore-t elsősorban a "Popular" szekcióhoz használjuk
-    let orderByParam = searchParams.get('orderBy');
-    if (!orderByParam || orderByParam === '-rating') {
-      orderByParam = '-rating_count';
+    // A PopScore-t/Twitch-et elsősorban a "Popular" szekcióhoz használjuk
+    let orderByParam = searchParams.get('orderBy') || '-rating';
+    const isPopularRequest = orderByParam === '-rating' && !query.trim() && !genre && !platform;
+
+    if (isPopularRequest) {
+      console.log('Detected Popular Games request, using live Twitch viewership ranking');
+      // Fetch 100 popular games to handle pagination better
+      const popularGames = await igdbService.getPopularGames(100);
+
+      const offset = (page - 1) * limit;
+      const paginatedGames = popularGames.slice(offset, offset + limit);
+
+      const transformedGames = paginatedGames.map(game => {
+        const coverUrl = game.cover?.url;
+        const bigCoverUrl = coverUrl ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${coverUrl.split('/').pop()}` : null;
+        return {
+          id: game.id.toString(),
+          name: game.name,
+          slug: game.slug,
+          description: game.summary || game.storyline || '',
+          image: bigCoverUrl,
+          genre: game.genres?.[0]?.name || null,
+          platform: game.platforms?.[0]?.name || null,
+          platforms: game.platforms || [],
+          rating: game.rating || null,
+          releaseDate: game.first_release_date ? new Date(game.first_release_date * 1000) : null,
+          igdbRating: game.rating || null,
+          igdbRatingCount: game.rating_count || null,
+          igdbCoverUrl: bigCoverUrl,
+          twitchViewerCount: game.twitchViewerCount || 0
+        };
+      });
+
+      return NextResponse.json({
+        games: transformedGames,
+        pagination: {
+          page,
+          limit,
+          total: popularGames.length,
+          totalPages: Math.ceil(popularGames.length / limit),
+          hasNext: page < Math.ceil(popularGames.length / limit),
+          hasPrev: page > 1,
+          nextPage: page < Math.ceil(popularGames.length / limit) ? page + 1 : null,
+          prevPage: page > 1 ? page - 1 : null
+        }
+      });
     }
 
-    // Parse the orderBy parameter into a field and a direction (asc/desc)
+    // Normal filter-based logic for other sorts or searches
     let sortField = orderByParam;
     let sortOrder = 'asc';
     if (orderByParam.startsWith('-')) {
@@ -35,14 +77,13 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
 
     // Build the WHERE clause for the IGDB query
-    const nowInSeconds = Math.floor(Date.now() / 1000);
-    // Trending: modern competitive játékok (2015 után, PvP/Battle Royale, Esport műfajok)
-    const modernDate = Math.floor(new Date('2015-01-01').getTime() / 1000);
+    // Trending: established competitive games (PvP/Battle Royale, Esport műfajok)
     let whereClauses = [
       'version_parent = null',
-      `first_release_date > ${modernDate}`,
-      'game_modes = (3,6)',
-      'genres = (4,5,10,11,14,15)',
+      'game_modes = (2,6)',
+      'genres = (4,5,10,11,14,15,24,36)',
+      'genres != (12,31)',
+      'themes != (31,33,38)',
       'platforms = (6,48,49,130,167,169)'
     ];
 

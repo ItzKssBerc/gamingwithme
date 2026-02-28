@@ -37,6 +37,7 @@ interface Game {
   igdbRating?: number | null
   igdbRatingCount?: number | null
   igdbCoverUrl?: string | null
+  twitchViewerCount?: number | null
 }
 
 interface Pagination {
@@ -258,6 +259,15 @@ export default function GamesPage() {
                       <div className="absolute top-2 left-2 z-20 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded-full shadow border border-white/20">
                         {game.releaseDate ? new Date(game.releaseDate).getFullYear() : '----'}
                       </div>
+                      {game.twitchViewerCount && game.twitchViewerCount > 0 && (
+                        <div className="absolute top-2 right-2 z-20 bg-purple-600/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                          {game.twitchViewerCount >= 1000
+                            ? `${(game.twitchViewerCount / 1000).toFixed(1)}K`
+                            : game.twitchViewerCount}
+                          <span className="opacity-70">LIVE</span>
+                        </div>
+                      )}
                       {/* Értékelés badge eltávolítva */}
                       {/* Overlay feliratok */}
                       <div className="absolute bottom-0 left-0 w-full py-3 px-4 flex flex-col gap-2 z-20">

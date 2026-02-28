@@ -9,6 +9,7 @@ interface IGDBGame {
   rating?: number;
   rating_count?: number;
   first_release_date?: number;
+  twitchViewerCount?: number;
   cover?: {
     id: number;
     url: string;
@@ -154,7 +155,7 @@ class IGDBService {
     });
   }
 
-  private async makeRequest(endpoint: string, query: string): Promise<any[]> {
+  private async makeRequest(endpoint: string, query: string, baseUrl: string = 'https://api.igdb.com/v4/', method: 'GET' | 'POST' = 'POST'): Promise<any[]> {
     const cacheKey = this.getCacheKey(endpoint, query);
     const cachedData = this.getCachedData(cacheKey);
 
@@ -163,37 +164,45 @@ class IGDBService {
     }
 
     const token = await this.getAccessToken();
+    const isTwitch = baseUrl.includes('twitch.tv');
 
     try {
-      const response = await axios.post(
-        `https://api.igdb.com/v4/${endpoint}`,
-        query,
-        {
-          headers: {
-            'Client-ID': this.clientId,
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'text/plain'
-          },
-          timeout: 15000 // 15 second timeout
+      const headers = isTwitch
+        ? {
+          'Client-ID': this.clientId,
+          'Authorization': `Bearer ${token}`
         }
-      );
+        : {
+          'Client-ID': this.clientId,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'text/plain'
+        };
+
+      const url = method === 'GET'
+        ? `${baseUrl}${endpoint}?${query}`
+        : `${baseUrl}${endpoint}`;
+
+      const response = method === 'GET'
+        ? await axios.get(url, { headers, timeout: 15000 })
+        : await axios.post(url, query, { headers, timeout: 15000 });
 
       const data = response.data;
-      this.setCachedData(cacheKey, data);
-      return data;
+      // Handle Twitch data structure (wrapped in { data: [...] })
+      const result = data.data ? data.data : data;
+      this.setCachedData(cacheKey, result);
+      return result;
     } catch (error: any) {
       if (error.response?.status === 429) {
         throw new Error('IGDB rate limit exceeded. Please try again later.');
       } else if (error.response?.status === 401) {
-        // Clear token and retry once
         this.accessToken = null;
         this.tokenExpiry = 0;
         throw new Error('Authentication failed. Please check your IGDB credentials.');
       } else if (error.code === 'ECONNABORTED') {
         throw new Error('Request timeout. Please try again.');
       } else {
-        console.error(`Error making IGDB request to ${endpoint}:`, error);
-        throw new Error(`Failed to fetch data from IGDB ${endpoint}. Please try again later.`);
+        console.error(`Error making request to ${endpoint}:`, error);
+        throw new Error(`Failed to fetch data from ${endpoint}. Please try again later.`);
       }
     }
   }
@@ -202,79 +211,71 @@ class IGDBService {
     return this.makeRequest(endpoint, query);
   }
 
-  async searchGames(query: string, limit: number = 20): Promise<IGDBGame[]> {
-    if (!query.trim()) {
-      throw new Error('Search query cannot be empty');
-    }
+  async getPopularGames(limit: number = 20): Promise<IGDBGame[]> {
+    try {
+      console.log('--- IGDBService: getPopularGames (Twitch Viewership Ranking) ---');
 
+      // 1. Fetch top games from Twitch (higher limit to ensure enough esport hits)
+      const twitchTopGames = await this.makeRequest('games/top', `first=100`, 'https://api.twitch.tv/helix/', 'GET');
+
+      if (!twitchTopGames || twitchTopGames.length === 0) {
+        throw new Error('No top games returned from Twitch');
+      }
+
+      // 2. Map Twitch games to IGDB games and apply strict esport filters
+      const gameNames = twitchTopGames.map((tg: any) => `"${tg.name.replace(/"/g, '\\"')}"`).join(',');
+
+      const query = `
+        fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
+        where name = (${gameNames}) & 
+              game_modes = (2,6) & 
+              genres = (4,5,10,11,14,15,24,36) &
+              genres != (12,31) &
+              themes != (31,33,38) &
+              platforms = (6,48,49,130,167,169);
+        limit 100;
+      `;
+
+      const igdbGames = await this.makeRequest('games', query);
+
+      // 3. Sort IGDB games by their rank in the Twitch list
+      const twitchNamesMap = new Map(twitchTopGames.map((tg: any, index: number) => [tg.name.toLowerCase(), index]));
+
+      const sortedGames = igdbGames.sort((a, b) => {
+        const rankA = twitchNamesMap.get(a.name.toLowerCase()) ?? 999;
+        const rankB = twitchNamesMap.get(b.name.toLowerCase()) ?? 999;
+        return rankA - rankB;
+      });
+
+      console.log(`--- getPopularGames: Found ${sortedGames.length} filtered esport titles from top Twitch games ---`);
+      return sortedGames.slice(0, limit);
+    } catch (error) {
+      console.error('Error in getPopularGames (Twitch based):', error);
+      // Fallback to the rating_count based ranking if Twitch fails
+      const fallbackQuery = `
+        fields name,slug,cover.url,genres.name,rating_count; 
+        where rating_count > 50 & 
+              game_modes = (2,6) & 
+              genres = (4,5,10,11,14,15,24,36) &
+              genres != (12,31) &
+              themes != (31,33,38) &
+              platforms = (6,48,49,130,167,169);
+        sort rating_count desc; 
+        limit ${limit};
+      `;
+      return this.makeRequest('games', fallbackQuery);
+    }
+  }
+
+  async searchGames(query: string, limit: number = 20): Promise<IGDBGame[]> {
+    if (!query.trim()) throw new Error('Search query cannot be empty');
     const searchQuery = `
       fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id,game_modes.id;
       where version_parent = null & name ~ *"${query}"* & game_modes = (2,3,4,5,6);
       limit ${Math.min(limit, 50)};
       sort rating desc;
     `;
-
     return this.makeRequest('games', searchQuery);
-  }
-
-  async getPopularGames(limit: number = 20): Promise<IGDBGame[]> {
-    try {
-      console.log('--- IGDBService: getPopularGames (Trending) ---');
-      const primQuery = `fields game_id,value; where popularity_type = 1; sort value desc; limit 250;`;
-      const primitives = await this.makeRequest('popularity_primitives', primQuery);
-
-      if (!primitives || primitives.length === 0) {
-        return this.getFallbackPopularGames(limit);
-      }
-
-      const gameIds = primitives.map((p: any) => p.game_id);
-      const modernDate = Math.floor(new Date('2015-01-01').getTime() / 1000);
-
-      const igdbQuery = `
-        fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
-        where id = (${gameIds.join(',')}) & 
-              version_parent = null & 
-              first_release_date > ${modernDate} &
-              game_modes = (3,6) & 
-              platforms = (6,48,49,130,167,169) & 
-              genres = (4,5,10,11,14,15);
-        limit ${limit};
-      `;
-
-      const games = await this.makeRequest('games', igdbQuery);
-      console.log(`getPopularGames: Found ${games.length} competitive matches.`);
-
-      if (games.length === 0) {
-        return this.getFallbackPopularGames(limit);
-      }
-
-      return games.sort((a, b) => {
-        const indexA = gameIds.indexOf(a.id);
-        const indexB = gameIds.indexOf(b.id);
-        return indexA - indexB;
-      });
-    } catch (error) {
-      console.error('Error in getPopularGames:', error);
-      return this.getFallbackPopularGames(limit);
-    }
-  }
-
-  private async getFallbackPopularGames(limit: number = 20): Promise<IGDBGame[]> {
-    console.log('--- IGDBService: getFallbackPopularGames (All-time Competitive) ---');
-    const modernDate = Math.floor(new Date('2015-01-01').getTime() / 1000);
-    const query = `
-      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
-      where version_parent = null & 
-            game_modes = (3,6) & 
-            rating_count >= 50 & 
-            first_release_date > ${modernDate} &
-            genres = (4,5,10,11,14,15) &
-            platforms = (6,48,49,130,167,169);
-      sort rating_count desc;
-      limit ${limit};
-    `;
-
-    return this.makeRequest('games', query);
   }
 
   async getGameById(id: number): Promise<IGDBGame | null> {

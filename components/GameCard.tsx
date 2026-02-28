@@ -12,6 +12,7 @@ interface GameCardProps {
         igdbCoverUrl: string | null;
         igdbRating?: number | null;
         genre?: string | null;
+        twitchViewerCount?: number | null;
     };
 }
 
@@ -32,6 +33,8 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
                         No Image
                     </div>
                 )}
+
+
 
                 {/* Hover overlay with detail */}
                 <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
