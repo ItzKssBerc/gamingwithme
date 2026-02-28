@@ -35,7 +35,6 @@ import {
 import Link from "next/link"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import LoadingSync from "@/components/LoadingSync"
 
 
 interface UserProfile {
@@ -215,7 +214,24 @@ export default function UserProfilePage() {
   const canReview = session?.user && profile && session.user.id !== profile.id
 
   if (loading) {
-    return <LoadingSync subtext="Loading Operative Data" />
+    return (
+      <div className="min-h-screen bg-transparent">
+        <div className="container mx-auto px-10 py-8">
+          <div className="flex items-center gap-8 mb-12">
+            <div className="w-28 h-28 rounded-full bg-white/[0.04] border border-white/[0.06] animate-pulse flex-shrink-0" />
+            <div className="space-y-3 flex-1">
+              <div className="h-10 w-1/3 rounded bg-white/[0.04] animate-pulse" />
+              <div className="h-4 w-1/4 rounded bg-white/[0.04] animate-pulse" />
+            </div>
+          </div>
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-32 rounded-[32px] bg-white/[0.04] border border-white/[0.06] animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (error || !profile) {
@@ -248,7 +264,7 @@ export default function UserProfilePage() {
           <Button asChild variant="ghost" className="mb-8 p-0 h-auto hover:bg-transparent text-gray-500 hover:text-white transition-colors">
             <Link href="/gamers" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]">
               <ArrowLeft className="h-3 w-3" />
-              Return to Operations
+              Back to Gamers
             </Link>
           </Button>
 
@@ -258,9 +274,9 @@ export default function UserProfilePage() {
               <div className="flex items-start gap-4">
                 <Ban className="h-5 w-5 text-red-500/50 mt-1" />
                 <div>
-                  <h3 className="text-red-400 font-black text-xs uppercase tracking-widest mb-1">Dormant Account</h3>
+                  <h3 className="text-red-400 font-black text-xs uppercase tracking-widest mb-1">Inactive Account</h3>
                   <p className="text-red-300/60 text-[11px] font-medium leading-relaxed max-w-2xl">
-                    This operative is currently off the grid. Communication and session requests may remain unanswered until status is reactivated.
+                    This user is currently inactive. Communication and session requests may remain unanswered until their status is reactivated.
                   </p>
                 </div>
               </div>
@@ -311,7 +327,7 @@ export default function UserProfilePage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-3.5 w-3.5 text-gray-600" />
-                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Global Sector</span>
+                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Global</span>
                   </div>
                 </div>
               </div>
@@ -320,49 +336,49 @@ export default function UserProfilePage() {
             <div className="flex items-center gap-4 w-full md:w-auto">
               <Button asChild className="h-11 flex-1 md:flex-none px-8 bg-green-600/80 hover:bg-green-500 text-black font-black text-[11px] uppercase tracking-widest rounded-xl transition-all">
                 <Link href={`/profile/${profile.username}/book`}>
-                  Initiate Booking
+                  Booking
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-11 px-6 bg-white/[0.03] border-white/[0.05] text-gray-300 hover:text-white hover:bg-white/[0.08] font-black text-[11px] uppercase tracking-widest rounded-xl transition-all">
                 <Link href={`/profile/${profile.username}/message`}>
-                  Direct Comm
+                  Direct message
                 </Link>
               </Button>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-          {/* Left Column - Profile Info */}
-          <div className="lg:col-span-3">
+        <div className="grid grid-cols-1 gap-12">
+          {/* Main Content */}
+          <div className="w-full">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="inline-flex w-auto bg-black/40 border border-white/[0.02] p-1 rounded-2xl mb-8">
                 <TabsTrigger value="overview" className="h-10 px-8 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 data-[state=active]:bg-white/[0.05] data-[state=active]:text-white transition-all">Overview</TabsTrigger>
-                <TabsTrigger value="games" className="h-10 px-8 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 data-[state=active]:bg-white/[0.05] data-[state=active]:text-white transition-all">Intelligence</TabsTrigger>
-                <TabsTrigger value="reviews" className="h-10 px-8 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 data-[state=active]:bg-white/[0.05] data-[state=active]:text-white transition-all">Reports</TabsTrigger>
+                <TabsTrigger value="games" className="h-10 px-8 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 data-[state=active]:bg-white/[0.05] data-[state=active]:text-white transition-all">Games</TabsTrigger>
+                <TabsTrigger value="reviews" className="h-10 px-8 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 data-[state=active]:bg-white/[0.05] data-[state=active]:text-white transition-all">Review</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="mt-0">
                 <div className="bg-[#070707]/90 border border-white/[0.05] rounded-[32px] p-8 backdrop-blur-sm">
                   <div className="flex items-center gap-3 mb-8">
                     <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Operative Profile</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Gamer Profile</h3>
                     <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
                   </div>
 
                   <div className="space-y-12">
                     {/* Bio */}
                     <div>
-                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Background Intel</h3>
+                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">About Me</h3>
                       <p className="text-xs font-bold text-gray-400 leading-relaxed max-w-3xl">
-                        {profile.bio || "No background information available on this operative."}
+                        {profile.bio || "No background information available on this user."}
                       </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                       {/* Member Since */}
                       <div>
-                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Activation Date</h3>
+                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Joined</h3>
                         <div className="flex items-center gap-3">
                           <Calendar className="h-4 w-4 text-gray-700" />
                           <p className="text-xs font-black text-gray-300 uppercase tracking-widest">
@@ -373,7 +389,7 @@ export default function UserProfilePage() {
 
                       {/* Languages / Skills */}
                       <div>
-                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Core Competencies</h3>
+                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Skills & Languages</h3>
                         <div className="flex flex-wrap gap-2">
                           {profile.userLanguages.length > 0 ? profile.userLanguages.map(lang => (
                             <Badge key={lang.id} variant="outline" className="bg-white/[0.02] border-white/[0.05] text-[9px] font-black uppercase text-gray-400 px-3 py-1">
@@ -391,7 +407,7 @@ export default function UserProfilePage() {
                 <div className="bg-[#070707]/90 border border-white/[0.05] rounded-[32px] p-8 backdrop-blur-sm">
                   <div className="flex items-center gap-3 mb-8">
                     <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Intelligence Brief</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Games Library</h3>
                     <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
                   </div>
 
@@ -460,19 +476,23 @@ export default function UserProfilePage() {
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3 flex-1">
                       <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
-                      <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Performance Reports</h3>
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Reviews</h3>
                       <div className="h-[1px] flex-1 bg-white/[0.05]"></div>
                     </div>
                     {canReview && (
                       <Button onClick={() => setShowReviewDialog(true)} className="ml-6 h-9 px-6 bg-white/[0.05] hover:bg-white/[0.1] text-gray-300 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border border-white/[0.05]">
                         <Plus className="h-3 w-3 mr-2" />
-                        File Report
+                        Write Review
                       </Button>
                     )}
                   </div>
 
                   {reviewsLoading ? (
-                    <LoadingSync fullScreen={false} subtext="Scanning Reports" />
+                    <div className="space-y-3">
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="h-20 rounded-2xl bg-white/[0.04] animate-pulse" style={{ animationDelay: `${i * 60}ms` }} />
+                      ))}
+                    </div>
                   ) : reviewsData?.reviews && reviewsData.reviews.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {reviewsData.reviews.map((review) => (
@@ -507,67 +527,12 @@ export default function UserProfilePage() {
                   ) : (
                     <div className="text-center py-12">
                       <Star className="h-8 w-8 text-gray-800 mx-auto mb-4" />
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-600">No reports found</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-600">No reviews found</p>
                     </div>
                   )}
                 </div>
               </TabsContent>
             </Tabs>
-          </div>
-
-          {/* Right Column - Actions & Stats */}
-          <div className="space-y-8">
-            {/* Quick Actions */}
-            <div className="bg-[#070707]/90 border border-white/[0.05] rounded-[32px] p-8 backdrop-blur-sm">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-8 text-center">Protocol Actions</h3>
-              <div className="space-y-4">
-                <Button
-                  asChild
-                  className={`w-full h-12 ${profile.isActive ? 'bg-green-600/80 hover:bg-green-500 text-black' : 'bg-gray-800/50 text-gray-600 border-gray-800/30 cursor-not-allowed'} font-black text-[11px] uppercase tracking-widest rounded-xl transition-all`}
-                  disabled={!profile.isActive}
-                >
-                  <Link href={profile.isActive ? `/profile/${profile.username}/book` : '#'}>
-                    {profile.isActive ? 'Initiate Session' : 'Offline Mode'}
-                  </Link>
-                </Button>
-
-                <Button asChild variant="outline" className="w-full h-12 bg-white/[0.03] border-white/[0.1] text-gray-300 hover:text-white hover:bg-white/[0.08] font-black text-[11px] uppercase tracking-widest rounded-xl transition-all">
-                  <Link href={`/profile/${profile.username}/message`}>
-                    Direct Comm
-                  </Link>
-                </Button>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="bg-[#070707]/90 border border-white/[0.05] rounded-[32px] p-8 backdrop-blur-sm">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-8 text-center">Operative Stats</h3>
-              <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-white/[0.05] pb-4">
-                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Deployments</span>
-                  <span className="text-xs font-black text-white uppercase">{profile.userGames.length} Missions</span>
-                </div>
-
-                <div className="flex items-center justify-between border-b border-white/[0.05] pb-4">
-                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Availability</span>
-                  <span className="text-xs font-black text-white uppercase">
-                    {profile.userAvailability?.filter(av => av.isActive).length || 0} Slots
-                  </span>
-                </div>
-                <div className="flex items-center justify-between border-b border-white/[0.05] pb-4">
-                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Experience</span>
-                  <span className="text-xs font-black text-white uppercase">
-                    {new Date().getFullYear() - new Date(profile.createdAt).getFullYear()} Years
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Reports</span>
-                  <span className="text-xs font-black text-white uppercase">
-                    {reviewsData?.totalReviews || 0} Filed
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -579,7 +544,7 @@ export default function UserProfilePage() {
             <DialogHeader className="mb-10 text-left">
               <div className="flex items-center gap-3 mb-2">
                 <div className="h-[1px] w-8 bg-white/[0.1]"></div>
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">Intelligence Data</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">Game Details</span>
               </div>
               <DialogTitle className="text-2xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
                 <Gamepad2 className="h-6 w-6 text-gray-500" />
@@ -593,7 +558,7 @@ export default function UserProfilePage() {
                 <div className="grid grid-cols-2 gap-8">
                   {/* Player Levels */}
                   <div>
-                    <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Competency Levels</h4>
+                    <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Skill Levels</h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedGame.levels?.map((level: string, index: number) => (
                         <Badge key={index} variant="secondary" className="bg-white/[0.05] text-white border-white/[0.1] text-[9px] font-black uppercase px-2 py-1">
@@ -606,7 +571,7 @@ export default function UserProfilePage() {
                   {/* Platforms */}
                   {selectedGame.platforms && selectedGame.platforms.length > 0 && (
                     <div>
-                      <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Deployment</h4>
+                      <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Platforms</h4>
                       <div className="flex flex-wrap gap-2">
                         {selectedGame.platforms.map((platform: string, index: number) => (
                           <Badge key={index} variant="outline" className="border-white/[0.1] text-gray-400 text-[9px] font-black uppercase px-2 py-1">
@@ -622,14 +587,14 @@ export default function UserProfilePage() {
                 <div className="flex flex-wrap gap-8 pt-6 border-t border-white/[0.05]">
                   {selectedGame.game.genre && (
                     <div>
-                      <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Classification</h4>
+                      <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Genre</h4>
                       <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">{selectedGame.game.genre}</span>
                     </div>
                   )}
 
                   {selectedGame.game.platform && (
                     <div>
-                      <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Native Source</h4>
+                      <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Source</h4>
                       <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">{selectedGame.game.platform}</span>
                     </div>
                   )}
@@ -638,7 +603,7 @@ export default function UserProfilePage() {
                 {/* Detailed Breakdown */}
                 {selectedGame.userGames && selectedGame.userGames.length > 1 && (
                   <div className="pt-8 border-t border-white/[0.05]">
-                    <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Operational History</h4>
+                    <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Activity</h4>
                     <div className="space-y-3">
                       {selectedGame.userGames.map((userGame: any, index: number) => (
                         <div key={index} className="bg-white/[0.02] border border-white/[0.05] p-4 rounded-xl flex items-center justify-between">
@@ -661,7 +626,7 @@ export default function UserProfilePage() {
                 onClick={() => setShowGameDialog(false)}
                 className="h-10 px-8 bg-white/[0.05] hover:bg-white/[0.1] text-gray-400 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
               >
-                Close Portal
+                Close
               </Button>
             </div>
           </div>

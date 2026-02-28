@@ -67,10 +67,10 @@ export default function ContactUsPage() {
 
               <div className="flex items-center gap-3 text-gaming-green mb-3 md:mb-4 relative z-10">
                 <div className="h-2 w-2 rounded-full bg-gaming-green animate-pulse" />
-                <span className="text-[9px] md:text-[10px] font-black font-orbitron uppercase tracking-[0.3em]">Protocol Status</span>
+                <span className="text-[9px] md:text-[10px] font-black font-orbitron uppercase tracking-[0.3em]">Support Status</span>
               </div>
               <p className="text-gray-400 text-xs md:text-sm leading-relaxed relative z-10 font-medium tracking-tight">
-                Standard response window: <span className="text-white font-black">&lt; 24 hours</span>. For priority dispatch, join our command center on Discord.
+                Standard response window: <span className="text-white font-black">&lt; 24 hours</span>. For faster response, join our community on Discord.
               </p>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function ContactUsPage() {
                     Join Our <span className="text-white">Discord</span>
                   </h3>
                   <p className="text-gray-500 text-base md:text-xl leading-relaxed max-w-md mx-auto font-medium">
-                    Deploy alongside <span className="text-white font-black">5,000+ operatives</span>. Instant support, global events, and elite coordination.
+                    Join <span className="text-white font-black">5,000+ gamers</span>. Instant support, global events, and finding new teammates.
                   </p>
                 </div>
 
@@ -119,11 +119,11 @@ export default function ContactUsPage() {
                   </div>
                   <div className="p-4 md:p-6 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
                     <div className="text-white font-black font-orbitron text-lg md:text-2xl tracking-tighter italic">Daily</div>
-                    <div className="text-gray-600 text-[8px] md:text-[9px] uppercase tracking-widest font-black mt-1">Deploy</div>
+                    <div className="text-gray-600 text-[8px] md:text-[9px] uppercase tracking-widest font-black mt-1">Play</div>
                   </div>
                   <div className="p-4 md:p-6 rounded-2xl bg-white/[0.03] border border-white/[0.05] col-span-2 md:col-span-1">
                     <div className="text-white font-black font-orbitron text-lg md:text-2xl tracking-tighter italic">PRO</div>
-                    <div className="text-gray-600 text-[8px] md:text-[9px] uppercase tracking-widest font-black mt-1">Intel</div>
+                    <div className="text-gray-600 text-[8px] md:text-[9px] uppercase tracking-widest font-black mt-1">Tips</div>
                   </div>
                 </div>
 
@@ -135,12 +135,12 @@ export default function ContactUsPage() {
                     className="relative flex items-center justify-center gap-4 md:gap-6 w-full py-6 md:py-8 rounded-[20px] md:rounded-[24px] bg-white text-black font-black font-orbitron text-base md:text-xl uppercase tracking-[0.1em] md:tracking-[0.2em] transition-all duration-500 shadow-2xl hover:shadow-gaming-green/20 hover:-translate-y-2 overflow-hidden group/btn"
                   >
                     <Discord className="h-5 w-5 md:h-7 md:w-7" />
-                    <span>Enter Command Center</span>
+                    <span>Join the Server</span>
                     <div className="absolute inset-0 bg-black/5 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                   </a>
 
                   <p className="text-gray-600 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em] italic leading-tight">
-                    Universal access protocol enabled
+                    Secure connection enabled
                   </p>
                 </div>
               </div>

@@ -44,13 +44,13 @@ const Footer = () => {
                                     className="h-10 w-auto"
                                 />
                             </div>
-                            <h2 className="text-2xl font-black font-orbitron tracking-tighter text-white uppercase italic">
-                                Gaming<span className="text-gaming-green italic">WithMe</span>
+                            <h2 className="text-2xl font-black font-orbitron tracking-tighter text-gaming-green uppercase italic">
+                                GamingWithMe
                             </h2>
                         </div>
 
                         <p className="text-gray-500 text-sm md:text-base max-w-sm leading-relaxed font-medium">
-                            The ultimate tactical communication layer for elite operatives. Coordinate, compete, and dominate across every theater of play.
+                            The ultimate community platform for gamers. Connect, compete, and level up your gaming experience together.
                         </p>
 
 
@@ -90,7 +90,7 @@ const Footer = () => {
 
 
                     <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">
-                        © {new Date().getFullYear()} <span className="text-white italic">GamingWithMe</span>. All rights reserved.
+                        © {new Date().getFullYear()} <span className="text-gaming-green italic">GamingWithMe</span>. All rights reserved.
                     </p>
 
                     <div className="flex items-center gap-6">

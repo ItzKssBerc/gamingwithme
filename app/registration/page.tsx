@@ -100,7 +100,7 @@ export default function RegistrationPage() {
             <CardTitle className="text-3xl font-black text-white uppercase tracking-tighter leading-none mb-2">
               Join Authority
             </CardTitle>
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Initialize Operative Profile</p>
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Create Gamer Profile</p>
           </CardHeader>
           <CardContent className="pt-8">
             {error && (
@@ -113,14 +113,14 @@ export default function RegistrationPage() {
               <div className="space-y-2">
                 <label htmlFor="username" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                   <User className="h-3 w-3" />
-                  // Alias_Init
+                  // Username
                 </label>
                 <input
                   id="username"
                   type="text"
                   value={formData.username}
                   onChange={(e) => handleInputChange("username", e.target.value)}
-                  placeholder="NOMAD_UNITS"
+                  placeholder="GAMER_TAG"
                   className="w-full px-5 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium"
                   required
                 />
@@ -130,14 +130,14 @@ export default function RegistrationPage() {
               <div className="space-y-2">
                 <label htmlFor="email" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                   <Mail className="h-3 w-3" />
-                  // Contact_Vector
+                  // Email Address
                 </label>
                 <input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="UNIT@NOMAD.SYS"
+                  placeholder="gamer@gaming.com"
                   className="w-full px-5 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium"
                   required
                 />
@@ -147,7 +147,7 @@ export default function RegistrationPage() {
               <div className="space-y-2">
                 <label htmlFor="password" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                   <Lock className="h-3 w-3" />
-                  // Security_Protocol
+                  // Password
                 </label>
                 <div className="relative">
                   <input
@@ -181,7 +181,7 @@ export default function RegistrationPage() {
               <div className="space-y-2">
                 <label htmlFor="confirmPassword" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                   <Lock className="h-3 w-3" />
-                  // Integrity_Check
+                  // Confirm Password
                 </label>
                 <div className="relative">
                   <input

@@ -16,7 +16,6 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import LoadingSync from "@/components/LoadingSync"
 
 import { useParams } from "next/navigation"
 
@@ -121,7 +120,20 @@ export default function GameDetailPage() {
   }, [game]);
 
   if (loading) {
-    return <LoadingSync message="SYNC / DATABASE" subtext="Accessing IGDB Records" />
+    return (
+      <div className="min-h-screen bg-transparent">
+        <div className="container mx-auto px-4 py-12 max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-4 xl:col-span-3 aspect-[3/4] rounded-3xl bg-white/[0.04] border border-white/[0.06] animate-pulse" />
+            <div className="lg:col-span-8 xl:col-span-9 space-y-4 pt-4">
+              {["w-1/4", "w-3/4", "w-1/2"].map((w, i) => (
+                <div key={i} className={`h-6 ${w} rounded bg-white/[0.04] animate-pulse`} style={{ animationDelay: `${i * 80}ms` }} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (error || !game) {
@@ -182,7 +194,7 @@ export default function GameDetailPage() {
           <div className="lg:col-span-8 xl:col-span-9 space-y-8">
             <header className="space-y-4">
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-[10px] font-black text-green-500/60 uppercase tracking-[0.3em] border border-green-500/20 px-2 py-0.5 rounded">Game Object</span>
+                <span className="text-[10px] font-black text-green-500/60 uppercase tracking-[0.3em] border border-green-500/20 px-2 py-0.5 rounded">Database</span>
                 {game.first_release_date && (
                   <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">{new Date(game.first_release_date * 1000).getFullYear()} / Release</span>
                 )}
@@ -196,7 +208,7 @@ export default function GameDetailPage() {
               {/* Stats Module */}
               <div className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-6 rounded-3xl space-y-4">
                 <div className="flex items-center justify-between text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                  <span>Combat Rating</span>
+                  <span>Rating</span>
                   <Star className="h-3 w-3 text-primary" />
                 </div>
                 <div className="flex items-end gap-2">
@@ -318,7 +330,7 @@ export default function GameDetailPage() {
                   </div>
 
                   <div>
-                    <span className="block text-[8px] font-black text-gray-600 uppercase tracking-widest mb-3">Mission Modes</span>
+                    <span className="block text-[8px] font-black text-gray-600 uppercase tracking-widest mb-3">Game Modes</span>
                     <div className="flex flex-wrap gap-2">
                       {game.game_modes?.map((mode, index) => (
                         <span key={index} className="px-3 py-1 bg-white/[0.03] border border-white/[0.05] text-[9px] font-black text-gray-400 uppercase tracking-wider rounded-full">
@@ -352,8 +364,12 @@ export default function GameDetailPage() {
           </div>
 
           {playersLoading ? (
-            <div className="bg-[#070707]/40 border border-white/[0.05] rounded-[40px] overflow-hidden">
-              <LoadingSync fullScreen={false} subtext="Scanning Operative Roster" />
+            <div className="bg-[#070707]/40 border border-white/[0.05] rounded-[40px] overflow-hidden p-8">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="h-40 rounded-[32px] bg-white/[0.04] border border-white/[0.06] animate-pulse" style={{ animationDelay: `${i * 60}ms` }} />
+                ))}
+              </div>
             </div>
           ) : playersError ? (
             <div className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-12 rounded-[40px] text-center space-y-4">
@@ -390,7 +406,7 @@ export default function GameDetailPage() {
             </div>
           ) : (
             <div className="bg-[#070707]/40 border border-white/[0.05] p-12 rounded-[40px] text-center">
-              <p className="text-gray-600 font-bold uppercase tracking-[0.2em] text-[10px]">No operatives assigned to this sector.</p>
+              <p className="text-gray-600 font-bold uppercase tracking-[0.2em] text-[10px]">No gamers play this game yet.</p>
             </div>
           )}
         </section>

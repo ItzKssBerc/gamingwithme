@@ -46,7 +46,7 @@ export default function FAQPage() {
             </h1>
             <p className="text-gray-500 text-base md:text-xl font-medium max-w-2xl leading-relaxed">
               Find answers to common questions about our platform and procedures.
-              If you can't find what you're looking for, our tactical team is ready for dispatch.
+              If you can't find what you're looking for, our support team is ready to help.
             </p>
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function FAQPage() {
                 Still have <span className="text-gaming-green">questions?</span>
               </h3>
               <p className="text-gray-500 text-base md:text-xl font-medium max-w-xl mx-auto leading-relaxed">
-                Our support operatives are standing by to assist you in all sectors.
+                Our support staff are standing by to assist you.
               </p>
             </div>
 
@@ -122,7 +122,7 @@ export default function FAQPage() {
             </div>
 
             <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.4em] italic pt-4">
-              Universal access protocol enabled • 24/7 Monitoring
+              Secure connection enabled • 24/7 Monitoring
             </p>
           </div>
         </div>

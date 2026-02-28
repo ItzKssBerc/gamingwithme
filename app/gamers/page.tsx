@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import LoadingSync from "@/components/LoadingSync"
+import GridSkeleton from "@/components/GridSkeleton"
 
 
 interface User {
@@ -120,20 +120,6 @@ export default function GamersPage() {
               <p className="text-lg text-gray-300 mb-2">
                 Explore our community of gamers
               </p>
-              <div className="flex items-center gap-4 text-xs text-gray-400">
-                <span className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  10,000+ gamers registered
-                </span>
-                <span className="flex items-center gap-1">
-                  <Search className="h-4 w-4" />
-                  Real-time search
-                </span>
-                <span className="flex items-center gap-1">
-                  <Filter className="h-4 w-4" />
-                  Filter by country
-                </span>
-              </div>
             </div>
 
           </div>
@@ -177,7 +163,7 @@ export default function GamersPage() {
       <section className="relative z-0 py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           {loading ? (
-            <LoadingSync fullScreen={false} message="SYNC / OPERATIVES" subtext="Gathering Community Data" />
+            <GridSkeleton type="gamer" count={5} />
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-12">
               <AlertCircle className="h-12 w-12 text-red-400 mb-4" />
@@ -200,7 +186,7 @@ export default function GamersPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-12 gap-y-10">
                 {users.map((user) => (
                   <Link href={`/profile/${user.username}`} key={user.id} className="block group">
-                    <Card className="relative h-[250px] w-[5cm] min-w-[5cm] mx-auto overflow-hidden bg-slate-900/60 border border-white/10 hover:border-green-400/50 transition-all duration-300 shadow-xl group-hover:shadow-green-500/20 backdrop-blur-sm rounded-2xl flex flex-col group-hover:-translate-y-1">
+                    <Card className="relative h-[250px] w-full mx-auto overflow-hidden bg-zinc-800/80 border border-white/10 hover:border-green-400/50 transition-all duration-300 shadow-xl group-hover:shadow-green-500/20 backdrop-blur-sm rounded-2xl flex flex-col group-hover:-translate-y-1">
                       {/* Top Banner */}
                       <div className="h-20 w-full bg-gradient-to-tr from-green-600/40 via-emerald-500/40 to-teal-500/40 relative overflow-hidden group-hover:from-green-500/50 group-hover:via-emerald-400/50 group-hover:to-teal-400/50 transition-colors duration-500">
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500"></div>

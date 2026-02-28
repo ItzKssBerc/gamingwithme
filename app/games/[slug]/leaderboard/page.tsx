@@ -133,7 +133,7 @@ export default function GameLeaderboardPage() {
   }
 
   if (loading) {
-    return <LoadingSync message="SYNC / RANKINGS" subtext="Analyzing Combat Data" />
+    return <LoadingSync message="SYNC / RANKINGS" subtext="Loading Rankings" />
   }
 
   if (error || !game) {
@@ -164,7 +164,7 @@ export default function GameLeaderboardPage() {
         <Button asChild variant="ghost" className="text-gray-400 hover:text-white hover:bg-white/[0.05] rounded-full px-4">
           <Link href={`/games/${slug}`} className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Back / Intel</span>
+            <span className="text-[10px] font-black uppercase tracking-widest">Back / Game</span>
           </Link>
         </Button>
       </nav>
@@ -174,7 +174,7 @@ export default function GameLeaderboardPage() {
         <section className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 pb-8 border-b border-white/[0.05]">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] border border-primary/20 px-2 py-0.5 rounded">Combat Ranks</span>
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] border border-primary/20 px-2 py-0.5 rounded">Leaderboard</span>
               <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">{game.name}</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">
@@ -203,7 +203,7 @@ export default function GameLeaderboardPage() {
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 h-4 w-4" />
             <input
               type="text"
-              placeholder="Filter by Operative ID..."
+              placeholder="Filter by Username..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-primary/40 text-sm font-medium transition-all"
@@ -221,7 +221,7 @@ export default function GameLeaderboardPage() {
                   : 'bg-white/[0.02] border-white/[0.05] text-gray-500 hover:text-white hover:bg-white/[0.05]'
                   }`}
               >
-                <span className="text-[10px] font-black uppercase tracking-widest">/{option === 'rating' ? 'Combat' : option}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">/{option === 'rating' ? 'Rating' : option}</span>
               </Button>
             ))}
           </div>
@@ -266,14 +266,14 @@ export default function GameLeaderboardPage() {
                     {/* Stats HUD */}
                     <div className="flex items-center gap-12 shrink-0 px-6 py-3 bg-white/[0.02] border border-white/[0.05] rounded-2xl w-full md:w-auto justify-center md:justify-end">
                       <div className="space-y-1">
-                        <span className="block text-[8px] font-black text-gray-600 uppercase tracking-widest">Combat Rating</span>
+                        <span className="block text-[8px] font-black text-gray-600 uppercase tracking-widest">Rating</span>
                         <div className="flex items-center gap-2">
                           <Star className="h-3 w-3 text-primary" />
                           <span className="text-lg font-black text-white leading-none">{player.rating.toFixed(1)}</span>
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <span className="block text-[8px] font-black text-gray-600 uppercase tracking-widest">Mission Count</span>
+                        <span className="block text-[8px] font-black text-gray-600 uppercase tracking-widest">Games Played</span>
                         <div className="flex items-center gap-2">
                           <Users className="h-3 w-3 text-gray-500" />
                           <span className="text-lg font-black text-white leading-none">{player.totalGames}</span>
@@ -294,14 +294,14 @@ export default function GameLeaderboardPage() {
               <Trophy className="h-16 w-16 text-gray-700 mx-auto" />
               <div className="space-y-2">
                 <h3 className="text-xl font-black text-white uppercase tracking-tighter">No Gamers Match Query</h3>
-                <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.2em]">Reset filters to restore combat data sync</p>
+                <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.2em]">Reset filters to see the leaderboard</p>
               </div>
               <Button
                 onClick={() => { setSearchTerm(''); setSelectedPlatform('all'); }}
                 variant="ghost"
                 className="text-gray-400 hover:text-white uppercase font-black text-[10px] tracking-widest mt-4"
               >
-                / Reset Intel Sync
+                / Reset Filters
               </Button>
             </div>
           )}

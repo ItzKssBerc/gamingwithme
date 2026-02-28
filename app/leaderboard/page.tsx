@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import LoadingSync from "@/components/LoadingSync"
 
 import {
   Trophy,
@@ -143,7 +142,19 @@ export default function LeaderboardPage() {
   }
 
   if (loading) {
-    return <LoadingSync message="SYNC / RANKINGS" subtext="Analyzing Combat Data" />
+    return (
+      <div className="min-h-screen bg-transparent">
+        <div className="container mx-auto px-4 py-24 space-y-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-24 rounded-2xl bg-white/[0.04] border border-white/[0.06] animate-pulse"
+              style={{ animationDelay: `${i * 60}ms` }}
+            />
+          ))}
+        </div>
+      </div>
+    )
   }
 
   if (error) {

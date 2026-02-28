@@ -432,7 +432,7 @@ export default function BookSessionPage() {
                       </div>
                     ) : (
                       <div className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-600">
-                        Mission Parameters Pending
+                        Session Details Pending
                       </div>
                     )}
                   </div>
@@ -451,7 +451,7 @@ export default function BookSessionPage() {
                       disabled={isBookingLoading || !selectedTime}
                       className="h-12 px-10 bg-green-600/80 hover:bg-green-500 text-black font-black text-[11px] uppercase tracking-widest rounded-xl transition-all active:scale-95 disabled:grayscale disabled:opacity-10"
                     >
-                      {isBookingLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Initiate Booking"}
+                      {isBookingLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Book Session"}
                     </Button>
                   </div>
                 </div>

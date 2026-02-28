@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import LoadingSync from "@/components/LoadingSync"
+import GridSkeleton from "@/components/GridSkeleton"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -217,7 +217,7 @@ export default function GamesPage() {
       <section className="relative z-0 py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           {loading ? (
-            <LoadingSync fullScreen={false} message="SYNC / INTELLIGENCE" subtext="Retrieving Mission Data" />
+            <GridSkeleton type="game" count={12} />
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-12">
               <AlertCircle className="h-12 w-12 text-red-400 mb-4" />
