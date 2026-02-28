@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { signIn } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   UserPlus,
@@ -86,21 +87,14 @@ export default function RegistrationPage() {
   const doPasswordsMatch = formData.password === formData.confirmPassword
 
   return (
-    <div className="min-h-screen bg-transparent flex overflow-hidden">
-      {/* Left Column - Registration Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+    <div className="min-h-screen flex items-center justify-center">
+      {/* Registration Form */}
+      <div className="w-full flex items-center justify-center p-8">
         <Card className="w-full max-w-md bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl">
-          <CardHeader className="text-center pt-8 pb-4">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] relative group">
-                <UserPlus className="h-8 w-8 text-primary group-hover:scale-110 transition-transform duration-500" />
-                <div className="absolute -inset-1 bg-primary/20 blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-            </div>
+          <CardHeader className="text-center pt-12 pb-4">
             <CardTitle className="text-3xl font-black text-white uppercase tracking-tighter leading-none mb-2">
-              Join Authority
+              Create Account
             </CardTitle>
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Create Gamer Profile</p>
           </CardHeader>
           <CardContent className="pt-8">
             {error && (
@@ -113,14 +107,14 @@ export default function RegistrationPage() {
               <div className="space-y-2">
                 <label htmlFor="username" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                   <User className="h-3 w-3" />
-                  // Username
+                  Username
                 </label>
                 <input
                   id="username"
                   type="text"
                   value={formData.username}
                   onChange={(e) => handleInputChange("username", e.target.value)}
-                  placeholder="GAMER_TAG"
+                  placeholder="Username"
                   className="w-full px-5 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium"
                   required
                 />
@@ -130,14 +124,14 @@ export default function RegistrationPage() {
               <div className="space-y-2">
                 <label htmlFor="email" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                   <Mail className="h-3 w-3" />
-                  // Email Address
+                  Email Address
                 </label>
                 <input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="gamer@gaming.com"
+                  placeholder="email@example.com"
                   className="w-full px-5 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium"
                   required
                 />
@@ -147,7 +141,7 @@ export default function RegistrationPage() {
               <div className="space-y-2">
                 <label htmlFor="password" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                   <Lock className="h-3 w-3" />
-                  // Password
+                  Password
                 </label>
                 <div className="relative">
                   <input
@@ -181,7 +175,7 @@ export default function RegistrationPage() {
               <div className="space-y-2">
                 <label htmlFor="confirmPassword" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                   <Lock className="h-3 w-3" />
-                  // Confirm Password
+                  Confirm Password
                 </label>
                 <div className="relative">
                   <input
@@ -245,6 +239,36 @@ export default function RegistrationPage() {
 
 
 
+              <div className="relative py-8">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-white/10"></span>
+                </div>
+                <div className="relative flex justify-center text-[8px] uppercase font-black tracking-[.3em]">
+                  <span className="bg-[#0a0a0a] px-4 text-gray-500">Or continue with</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <Button
+                  type="button"
+                  onClick={() => signIn("google")}
+                  variant="outline"
+                  className="bg-white/5 border-white/10 hover:bg-white/10 text-white rounded-xl h-12 gap-2"
+                >
+                  <span className="text-xl font-bold">G</span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase">Google</span>
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => signIn("twitch")}
+                  variant="outline"
+                  className="bg-purple-600/10 border-purple-600/30 hover:bg-purple-600/20 text-white rounded-xl h-12 gap-2"
+                >
+                  <Twitch className="h-4 w-4 text-purple-400" />
+                  <span className="text-[10px] font-bold tracking-widest uppercase">Twitch</span>
+                </Button>
+              </div>
+
               {/* Sign In Link */}
               <div className="text-center text-gray-300">
                 <span>Already have an account? </span>
@@ -258,42 +282,6 @@ export default function RegistrationPage() {
             </form>
           </CardContent>
         </Card>
-      </div>
-      {/* Right Column - Video Showcase */}
-      <div className="hidden lg:flex lg:w-1/2 p-0 overflow-hidden relative group">
-        <video
-          className="w-full h-full object-cover transition-all duration-1000 ease-in-out group-hover:scale-105"
-          src="/videos/signinsignup2.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-        <div className="absolute inset-0 bg-green-900/20 backdrop-blur-sm"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20"></div>
-        <div className="absolute inset-0 bg-green-950/30 mix-blend-multiply"></div>
-        <div className="absolute inset-0 flex flex-col items-start justify-start text-left p-16 pointer-events-none">
-          <h1 className="text-5xl font-bold text-white drop-shadow-xl mb-2">
-            Join the Gaming Community!
-          </h1>
-          <h2 className="text-4xl font-bold text-green-400 drop-shadow-lg mb-6">
-            Create Account
-          </h2>
-          <p className="text-xl text-gray-200 max-w-md drop-shadow-lg mb-8">
-            Ready to level up? Let's get you started on your gaming journey!
-          </p>
-          <div className="w-full flex flex-col items-center pointer-events-auto mt-8">
-            <p className="text-lg text-gray-300 mb-6">Or continue with</p>
-            <div className="flex gap-8">
-              <button className="h-28 w-28 flex items-center justify-center rounded-full bg-white/10 border border-green-500/30 text-white hover:bg-white/20 transition-all duration-300">
-                <span className="text-5xl font-bold">G</span>
-              </button>
-              <button className="h-28 w-28 flex items-center justify-center rounded-full bg-white/10 border border-green-500/30 text-white hover:bg-white/20 transition-all duration-300">
-                <Twitch className="h-14 w-14" />
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )

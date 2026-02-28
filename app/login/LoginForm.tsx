@@ -10,7 +10,8 @@ import {
   Mail,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  Twitch
 } from "lucide-react"
 import Link from "next/link"
 
@@ -58,40 +59,14 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent grid md:grid-cols-2 overflow-hidden">
-      {/* Video Section */}
-      <div className="hidden md:block h-screen relative">
-        <video
-          className="w-full h-full object-cover grayscale-[0.5] opacity-40 transition-all duration-1000"
-          src="/videos/signinsignup.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent opacity-60"></div>
-        <div className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-black"></div>
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center p-4">
       {/* Login Form */}
-      <div className="relative flex items-center justify-center p-8 bg-black/20">
-        <div className="absolute top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-20">
-          <div className="absolute top-20 left-10 w-64 h-64 bg-primary/20 blur-[120px] rounded-full"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 blur-[150px] rounded-full"></div>
-        </div>
-
+      <div className="relative w-full flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl">
-          <CardHeader className="text-center pt-8 pb-4">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] relative group">
-                <LogIn className="h-8 w-8 text-primary group-hover:scale-110 transition-transform duration-500" />
-                <div className="absolute -inset-1 bg-primary/20 blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-            </div>
+          <CardHeader className="text-center pt-12 pb-4">
             <CardTitle className="text-3xl font-black text-white uppercase tracking-tighter leading-none mb-2">
-              System Access
+              Sign In
             </CardTitle>
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Credentials Required</p>
           </CardHeader>
           <CardContent className="p-8 pt-4">
             {error && (
@@ -109,19 +84,16 @@ export default function LoginForm() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <label htmlFor="email" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                    <Mail className="h-3 w-3" />
-                    // Auth_ID
-                  </label>
-                  <span className="text-[8px] font-black text-gray-700 uppercase italic">Encrypted</span>
-                </div>
+                <label htmlFor="email" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                  <Mail className="h-3 w-3" />
+                  Email Address
+                </label>
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="NOMAD@DATABASE.SYS"
+                  placeholder="email@example.com"
                   className="w-full px-5 py-4 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium"
                   required
                 />
@@ -132,13 +104,13 @@ export default function LoginForm() {
                 <div className="flex justify-between items-center">
                   <label htmlFor="password" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                     <Lock className="h-3 w-3" />
-                    // Security_Key
+                    Password
                   </label>
                   <Link
                     href="/forgot-password"
                     className="text-[9px] font-black text-gray-600 hover:text-primary uppercase tracking-tighter underline transition-colors"
                   >
-                    Forgot Key?
+                    Forgot Password?
                   </Link>
                 </div>
                 <div className="relative">
@@ -170,15 +142,45 @@ export default function LoginForm() {
                 {isLoading ? (
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span className="uppercase font-black text-[10px] tracking-[.3em]">Synchronizing...</span>
+                    <span className="uppercase font-black text-[10px] tracking-[.3em]">Signing In...</span>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center gap-3">
                     <LogIn className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    <span className="uppercase font-black text-[10px] tracking-[.3em]">Establish Link</span>
+                    <span className="uppercase font-black text-[10px] tracking-[.3em]">Sign In</span>
                   </div>
                 )}
               </Button>
+
+              <div className="relative py-8">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-white/10"></span>
+                </div>
+                <div className="relative flex justify-center text-[8px] uppercase font-black tracking-[.3em]">
+                  <span className="bg-[#0a0a0a] px-4 text-gray-500">Or continue with</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <Button
+                  type="button"
+                  onClick={() => signIn("google")}
+                  variant="outline"
+                  className="bg-white/5 border-white/10 hover:bg-white/10 text-white rounded-xl h-12 gap-2"
+                >
+                  <span className="text-xl font-bold">G</span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase">Google</span>
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => signIn("twitch")}
+                  variant="outline"
+                  className="bg-purple-600/10 border-purple-600/30 hover:bg-purple-600/20 text-white rounded-xl h-12 gap-2"
+                >
+                  <Twitch className="h-4 w-4 text-purple-400" />
+                  <span className="text-[10px] font-bold tracking-widest uppercase">Twitch</span>
+                </Button>
+              </div>
 
               {/* Sign Up Link */}
               <div className="pt-4 text-center">
@@ -188,7 +190,7 @@ export default function LoginForm() {
                     href="/registration"
                     className="ml-2 text-primary hover:text-primary/80 underline decoration-primary/20 transition-all"
                   >
-                    Initialize New Account
+                    Create Account
                   </Link>
                 </p>
               </div>

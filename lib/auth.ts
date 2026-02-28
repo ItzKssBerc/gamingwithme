@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import TwitchProvider from "next-auth/providers/twitch"
 import { prisma } from "./prisma"
 import bcrypt from "bcryptjs"
 
@@ -76,7 +77,11 @@ export const authOptions: NextAuthOptions = {
           return null
         }
       }
-    })
+    }),
+    TwitchProvider({
+      clientId: process.env.IGDB_CLIENT_ID || "",
+      clientSecret: process.env.IGDB_CLIENT_SECRET || "",
+    }),
   ],
   session: {
     strategy: "jwt",
