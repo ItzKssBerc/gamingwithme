@@ -21,21 +21,42 @@ export async function POST(req: NextRequest) {
     }
 
     // Handle the event
-    if (event.type === "checkout.session.completed") {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const bookingId = session.metadata?.bookingId;
+    switch (event.type) {
+        case "checkout.session.completed": {
+            const session = event.data.object as Stripe.Checkout.Session;
+            const bookingId = session.metadata?.bookingId;
 
-        if (bookingId) {
-            // Update booking status and save payment info
-            await prisma.booking.update({
-                where: { id: bookingId },
-                data: {
-                    status: "confirmed",
-                    stripePaymentIntentId: session.payment_intent as string,
-                },
-            });
-            console.log(`Booking ${bookingId} confirmed via Stripe`);
+            if (bookingId) {
+                await prisma.booking.update({
+                    where: { id: bookingId },
+                    data: {
+                        status: "confirmed",
+                        stripePaymentIntentId: session.payment_intent as string,
+                    },
+                });
+                console.log(`Booking ${bookingId} confirmed via Stripe`);
+            }
+            break;
         }
+
+        case "account.updated": {
+            const account = event.data.object as Stripe.Account;
+            // If the coach has finished onboarding and can receive payouts
+            if (account.details_submitted && account.payouts_enabled) {
+                const userId = account.metadata?.userId;
+                if (userId) {
+                    await (prisma.user as any).update({
+                        where: { id: userId },
+                        data: { stripeOnboardingComplete: true }
+                    });
+                    console.log(`User ${userId} Stripe onboarding complete`);
+                }
+            }
+            break;
+        }
+
+        default:
+            console.log(`Unhandled event type ${event.type}`);
     }
 
     return NextResponse.json({ received: true });

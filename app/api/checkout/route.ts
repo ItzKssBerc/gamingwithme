@@ -14,12 +14,21 @@ export async function POST(req: NextRequest) {
         const { coachUsername, bookingId, price, serviceTitle } = await req.json();
 
         if (!price || price <= 0) {
-            // Handle free bookings or invalid price
             return NextResponse.json({ error: "Invalid price for checkout" }, { status: 400 });
         }
 
+        // Fetch coach's Stripe Account ID to enable split payment
+        const coach = await prisma.user.findUnique({
+            where: { username: coachUsername },
+            select: { stripeAccountId: true, stripeOnboardingComplete: true }
+        });
+
+        const totalAmount = Math.round(price * 100);
+        const platformFeePercent = 0.10; // 10% commission
+        const applicationFeeAmount = Math.round(totalAmount * platformFeePercent);
+
         // Create a Stripe Checkout Session
-        const checkoutSession = await stripe.checkout.sessions.create({
+        const sessionOptions: any = {
             payment_method_types: ["card"],
             line_items: [
                 {
@@ -28,7 +37,7 @@ export async function POST(req: NextRequest) {
                         product_data: {
                             name: `${serviceTitle || 'Coaching Session'} with ${coachUsername}`,
                         },
-                        unit_amount: Math.round(price * 100), // Stripe expects cents
+                        unit_amount: totalAmount,
                     },
                     quantity: 1,
                 },
@@ -41,7 +50,19 @@ export async function POST(req: NextRequest) {
                 coachUsername,
                 userEmail: session.user.email,
             },
-        });
+        };
+
+        // If coach has a connected and onboarded Stripe account, use split payment
+        if (coach?.stripeAccountId && coach?.stripeOnboardingComplete) {
+            sessionOptions.payment_intent_data = {
+                application_fee_amount: applicationFeeAmount,
+                transfer_data: {
+                    destination: coach.stripeAccountId,
+                },
+            };
+        }
+
+        const checkoutSession = await stripe.checkout.sessions.create(sessionOptions);
 
         return NextResponse.json({ url: checkoutSession.url });
     } catch (error) {

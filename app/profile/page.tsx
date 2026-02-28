@@ -10,15 +10,15 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { Save, User, Mail, Lock, AlertTriangle, Eye, EyeOff, Settings, Gamepad2, Languages, Tags, Camera, Upload, Star, Plus, X, Loader2, Image } from "lucide-react"
+import { Save, User, Mail, Lock, AlertTriangle, Eye, EyeOff, Settings, Gamepad2, Languages, Tags, Camera, Upload, Star, Plus, X, Loader2, Image, CreditCard, ExternalLink, CheckCircle2 } from "lucide-react"
 
 interface Game {
-      id: string
-      name: string
+  id: string
+  name: string
   slug: string
-      genre?: string | null
-      platform?: string | null
-  platforms?: Array<{id: number, name: string}> | null
+  genre?: string | null
+  platform?: string | null
+  platforms?: Array<{ id: number, name: string }> | null
   igdbCoverUrl?: string | null
 }
 
@@ -37,7 +37,7 @@ const LANGUAGE_LEVELS = [
 ]
 
 const COMMON_LANGUAGES = [
-  "English", "Spanish", "French", "German", "Italian", "Portuguese", 
+  "English", "Spanish", "French", "German", "Italian", "Portuguese",
   "Russian", "Chinese", "Japanese", "Korean", "Arabic", "Hindi"
 ]
 
@@ -81,14 +81,14 @@ const GAMING_CATEGORIES = [
 ]
 
 const COMMON_TAGS = [
-  "Gamer", "Streamer", "Competitive", "Casual", "FPS", "RPG", 
+  "Gamer", "Streamer", "Competitive", "Casual", "FPS", "RPG",
   "Strategy", "MOBA", "Racing", "Fighting", "Puzzle", "Indie"
 ]
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  
+
   // Account settings states
   const [savingAccount, setSavingAccount] = useState(false)
   const [accountForm, setAccountForm] = useState({
@@ -98,8 +98,8 @@ export default function ProfilePage() {
     newPassword: "",
     confirmPassword: ""
   })
-  const [accountErrors, setAccountErrors] = useState<{[key: string]: string}>({})
-  
+  const [accountErrors, setAccountErrors] = useState<{ [key: string]: string }>({})
+
   // Confirmation modal states
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [confirmForm, setConfirmForm] = useState({
@@ -107,8 +107,8 @@ export default function ProfilePage() {
     email: "",
     newPassword: ""
   })
-  const [confirmErrors, setConfirmErrors] = useState<{[key: string]: string}>({})
-  
+  const [confirmErrors, setConfirmErrors] = useState<{ [key: string]: string }>({})
+
   // Password visibility states
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -117,22 +117,27 @@ export default function ProfilePage() {
 
   // Sidebar and section states
   const [activeSection, setActiveSection] = useState("account")
-  
+
+  // Stripe Connect states
+  const [stripeAccountId, setStripeAccountId] = useState<string | null>(null)
+  const [stripeOnboardingComplete, setStripeOnboardingComplete] = useState(false)
+  const [connectingStripe, setConnectingStripe] = useState(false)
+
   // Onboarding form states
   const [onboardingForm, setOnboardingForm] = useState({
     bio: "",
     games: [] as string[],
     languages: [] as string[]
   })
-  const [onboardingErrors, setOnboardingErrors] = useState<{[key: string]: string}>({})
+  const [onboardingErrors, setOnboardingErrors] = useState<{ [key: string]: string }>({})
   const [savingOnboarding, setSavingOnboarding] = useState(false)
-  
+
   // Enhanced onboarding states
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [selectedGames, setSelectedGames] = useState<{gameId: string, level: string, name?: string, platform?: string}[]>([])
-  const [languages, setLanguages] = useState<{language: string, level: string}[]>([])
+  const [selectedGames, setSelectedGames] = useState<{ gameId: string, level: string, name?: string, platform?: string }[]>([])
+  const [languages, setLanguages] = useState<{ language: string, level: string }[]>([])
   const [tags, setTags] = useState<string[]>([])
-  
+
   // Game search states
   const [gameSearchQuery, setGameSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<Game[]>([])
@@ -140,19 +145,19 @@ export default function ProfilePage() {
   const [allGames, setAllGames] = useState<Game[]>([])
   const [loadingPlatforms, setLoadingPlatforms] = useState<Set<string>>(new Set())
   const [savingPlatforms, setSavingPlatforms] = useState<Set<string>>(new Set())
-  
+
   // Game selection modal states
   const [selectedGameForSetup, setSelectedGameForSetup] = useState<Game | null>(null)
   const [showGameSetupModal, setShowGameSetupModal] = useState(false)
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([])
-  const [selectedSkillLevels, setSelectedSkillLevels] = useState<{[platform: string]: string}>({})
-  
+  const [selectedSkillLevels, setSelectedSkillLevels] = useState<{ [platform: string]: string }>({})
+
   // Edit game modal states
-  const [editingGame, setEditingGame] = useState<{gameId: string, level: string, name?: string, platform?: string} | null>(null)
+  const [editingGame, setEditingGame] = useState<{ gameId: string, level: string, name?: string, platform?: string } | null>(null)
   const [showEditGameModal, setShowEditGameModal] = useState(false)
   const [editPlatforms, setEditPlatforms] = useState<string[]>([])
-  const [editSkillLevels, setEditSkillLevels] = useState<{[platform: string]: string}>({})
-  
+  const [editSkillLevels, setEditSkillLevels] = useState<{ [platform: string]: string }>({})
+
   // Profile picture states
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
@@ -167,7 +172,7 @@ export default function ProfilePage() {
     password: "",
     confirmText: ""
   })
-  const [deleteErrors, setDeleteErrors] = useState<{[key: string]: string}>({})
+  const [deleteErrors, setDeleteErrors] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -178,7 +183,7 @@ export default function ProfilePage() {
   useEffect(() => {
     console.log('Session status:', status)
     console.log('Session data:', session)
-    
+
     if (session?.user && status === 'authenticated') {
       console.log('Session is authenticated, loading profile data')
       setAccountForm({
@@ -188,7 +193,7 @@ export default function ProfilePage() {
         newPassword: "",
         confirmPassword: ""
       })
-      
+
       // Load profile data from API
       fetchProfileData()
     }
@@ -199,39 +204,39 @@ export default function ProfilePage() {
       console.log('Fetching profile data...')
       console.log('Session user:', session?.user)
       console.log('Session user email:', session?.user?.email)
-      
+
       // Get session token
       const token = await fetch('/api/auth/session')
       const sessionData = await token.json()
       console.log('Session data from API:', sessionData)
-      
+
       const response = await fetch('/api/user/profile-data', {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         }
       })
-      
+
       if (response.ok) {
         const data = await response.json()
         console.log('Profile data received:', data)
-        
+
         const profile = data.profile
-        
+
         // Set onboarding form data
         setOnboardingForm({
           bio: profile.bio || "",
           games: profile.userGames?.map((ug: any) => ug.game.name) || [],
           languages: profile.userLanguages?.map((ul: any) => ul.language) || []
         })
-        
+
         // Set enhanced onboarding data
         setSelectedCategories(
           profile.userTags
             ?.filter((ut: any) => ut.tag.startsWith('category:'))
             ?.map((ut: any) => ut.tag.replace('category:', '')) || []
         )
-        
+
         setSelectedGames(
           profile.userGames?.map((ug: any) => ({
             gameId: ug.game.id.toString(),
@@ -240,28 +245,32 @@ export default function ProfilePage() {
             platform: ug.platform
           })) || []
         )
-        
+
         setLanguages(
           profile.userLanguages?.map((ul: any) => ({
             language: ul.language,
             level: ul.level
           })) || []
         )
-        
+
         setTags(
           profile.userTags
             ?.filter((ut: any) => !ut.tag.startsWith('category:'))
             ?.map((ut: any) => ut.tag) || []
         )
-        
+
         // Set profile image if exists
         if (profile.avatar) {
           setProfileImage(profile.avatar)
         }
-        
+
         // Set account status
         setAccountStatus(profile.isActive !== false) // Default to true if not set
-        
+
+        // Set Stripe status
+        setStripeAccountId(profile.stripeAccountId || null)
+        setStripeOnboardingComplete(!!profile.stripeOnboardingComplete)
+
         console.log('Profile data loaded successfully')
       } else {
         console.error('Failed to fetch profile data:', response.status)
@@ -272,7 +281,7 @@ export default function ProfilePage() {
   }
 
   const validateAccountForm = () => {
-    const errors: {[key: string]: string} = {}
+    const errors: { [key: string]: string } = {}
 
     if (!accountForm.username.trim()) {
       errors.username = "Username is required"
@@ -301,7 +310,7 @@ export default function ProfilePage() {
   }
 
   const validateConfirmForm = () => {
-    const errors: {[key: string]: string} = {}
+    const errors: { [key: string]: string } = {}
 
     // Check if username matches
     if (accountForm.username !== confirmForm.username) {
@@ -331,7 +340,7 @@ export default function ProfilePage() {
     if (!validateAccountForm()) return
 
     // Check if any changes were made
-    const hasChanges = 
+    const hasChanges =
       accountForm.username !== (session?.user?.username || "") ||
       accountForm.email !== (session?.user?.email || "") ||
       accountForm.newPassword
@@ -418,7 +427,7 @@ export default function ProfilePage() {
 
   // Onboarding functions
   const validateOnboardingForm = () => {
-    const errors: {[key: string]: string} = {}
+    const errors: { [key: string]: string } = {}
 
     if (!onboardingForm.bio.trim()) {
       errors.bio = "Bio is required"
@@ -507,7 +516,7 @@ export default function ProfilePage() {
     try {
       const newStatus = !accountStatus
       console.log('Toggling account status to:', newStatus)
-      
+
       const response = await fetch('/api/user/account', {
         method: 'PATCH',
         headers: {
@@ -572,7 +581,7 @@ export default function ProfilePage() {
   }
 
   const validateDeleteForm = () => {
-    const errors: {[key: string]: string} = {}
+    const errors: { [key: string]: string } = {}
 
     if (!deleteForm.password) {
       errors.password = 'Password is required'
@@ -604,7 +613,7 @@ export default function ProfilePage() {
           id: game.id.toString()
         }))
         setSearchResults(transformedGames)
-        
+
         // Store in allGames for reference
         setAllGames(prev => {
           const newGames = [...prev]
@@ -629,23 +638,23 @@ export default function ProfilePage() {
 
   const handleAddGame = (game: Game, level: string, platform?: string) => {
     const selectedPlatform = platform || game.platform || undefined
-    const existingGame = selectedGames.find(g => 
-      g.gameId === game.id && 
-      g.platform === selectedPlatform && 
+    const existingGame = selectedGames.find(g =>
+      g.gameId === game.id &&
+      g.platform === selectedPlatform &&
       g.level === level
     )
-    
+
     if (existingGame) {
       return
     } else {
-      setSelectedGames(prev => [...prev, { 
-        gameId: game.id, 
+      setSelectedGames(prev => [...prev, {
+        gameId: game.id,
         level,
         name: game.name,
         platform: selectedPlatform
       }])
     }
-    
+
     setAllGames(prev => {
       const existingGameInAll = prev.find(g => g.id === game.id)
       if (!existingGameInAll) {
@@ -654,14 +663,14 @@ export default function ProfilePage() {
         return prev.map(g => g.id === game.id ? { ...g, ...game } : g)
       }
     })
-    
+
     setGameSearchQuery("")
     setSearchResults([])
   }
 
   const handleRemoveGame = (gameId: string, platform?: string, level?: string) => {
     if (platform && level) {
-      setSelectedGames(prev => prev.filter(g => 
+      setSelectedGames(prev => prev.filter(g =>
         !(g.gameId === gameId && g.platform === platform && g.level === level)
       ))
     } else {
@@ -682,12 +691,12 @@ export default function ProfilePage() {
   }
 
   const handlePlatformToggle = (platform: string) => {
-    setSelectedPlatforms(prev => 
-      prev.includes(platform) 
+    setSelectedPlatforms(prev =>
+      prev.includes(platform)
         ? prev.filter(p => p !== platform)
         : [...prev, platform]
     )
-    
+
     if (!selectedPlatforms.includes(platform)) {
       setSelectedSkillLevels(prev => ({
         ...prev,
@@ -750,11 +759,32 @@ export default function ProfilePage() {
 
   // Category functions
   const handleCategoryToggle = (categoryId: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(categoryId) 
+    setSelectedCategories(prev =>
+      prev.includes(categoryId)
         ? prev.filter(id => id !== categoryId)
         : [...prev, categoryId]
     )
+  }
+
+  const handleStripeConnect = async () => {
+    setConnectingStripe(true)
+    try {
+      const response = await fetch('/api/stripe/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      const data = await response.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        alert(data.error || "Failed to start Stripe Connect onboarding")
+      }
+    } catch (error) {
+      console.error("Stripe Connect Error:", error)
+      alert("An unexpected error occurred")
+    } finally {
+      setConnectingStripe(false)
+    }
   }
 
   // Profile picture functions
@@ -856,26 +886,35 @@ export default function ProfilePage() {
                 <div className="space-y-2">
                   <button
                     onClick={() => setActiveSection("account")}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                      activeSection === "account"
-                        ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
-                        : "text-gray-300 hover:bg-white/10 hover:text-white"
-                    }`}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${activeSection === "account"
+                      ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
+                      : "text-gray-300 hover:bg-white/10 hover:text-white"
+                      }`}
                   >
                     <Settings className="h-5 w-5" />
-                Account Settings
+                    Account Settings
                   </button>
-                  
+
                   <button
                     onClick={() => setActiveSection("profile")}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                      activeSection === "profile"
-                        ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
-                        : "text-gray-300 hover:bg-white/10 hover:text-white"
-                    }`}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${activeSection === "profile"
+                      ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
+                      : "text-gray-300 hover:bg-white/10 hover:text-white"
+                      }`}
                   >
                     <User className="h-5 w-5" />
                     Profile Information
+                  </button>
+
+                  <button
+                    onClick={() => setActiveSection("payouts")}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${activeSection === "payouts"
+                      ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
+                      : "text-gray-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                  >
+                    <CreditCard className="h-5 w-5" />
+                    Payout Settings
                   </button>
                 </div>
               </CardContent>
@@ -885,27 +924,27 @@ export default function ProfilePage() {
           {/* Main Content */}
           <div className="flex-1">
             {activeSection === "account" && (
-                  <Card className="gaming-card">
-                    <CardHeader>
-                      <CardTitle className="text-white flex items-center gap-2">
+              <Card className="gaming-card">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
                     <Settings className="h-6 w-6" />
                     Account Settings
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                   <div className="space-y-6">
                     {accountErrors.general && (
                       <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
                         <p className="text-red-300 text-sm">{accountErrors.general}</p>
                       </div>
                     )}
-                    
+
                     {accountErrors.success && (
                       <div className="p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
                         <p className="text-green-300 text-sm">{accountErrors.success}</p>
                       </div>
                     )}
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="username" className="text-white flex items-center gap-2">
@@ -923,7 +962,7 @@ export default function ProfilePage() {
                           <p className="text-red-400 text-xs">{accountErrors.username}</p>
                         )}
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="email" className="text-white flex items-center gap-2">
                           <Mail className="h-4 w-4" />
@@ -942,7 +981,7 @@ export default function ProfilePage() {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="currentPassword" className="text-white flex items-center gap-2">
@@ -970,7 +1009,7 @@ export default function ProfilePage() {
                           <p className="text-red-400 text-xs">{accountErrors.currentPassword}</p>
                         )}
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="newPassword" className="text-white">New Password</Label>
@@ -995,7 +1034,7 @@ export default function ProfilePage() {
                             <p className="text-red-400 text-xs">{accountErrors.newPassword}</p>
                           )}
                         </div>
-                        
+
                         <div className="space-y-2">
                           <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
                           <div className="relative">
@@ -1021,8 +1060,8 @@ export default function ProfilePage() {
                         </div>
                       </div>
                     </div>
-                    
-                    <Button 
+
+                    <Button
                       className="gaming-button w-full"
                       onClick={handleSaveClick}
                       disabled={savingAccount}
@@ -1037,33 +1076,33 @@ export default function ProfilePage() {
                         <AlertTriangle className="h-5 w-5" />
                         Account Status
                       </h3>
-                      
-                                                                      <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/20">
-                          <div>
-                            <p className="text-white font-medium">Account Status</p>
-                            <p className="text-gray-400 text-sm">
-                              {accountStatus ? 'Your account is currently active' : 'Your account is currently inactive'}
-                            </p>
-                            {accountStatus ? (
-                              <p className="text-green-400 text-xs mt-1">✓ Active - You can use all features</p>
-                            ) : (
-                              <p className="text-red-400 text-xs mt-1">⚠ Inactive - Some features may be limited</p>
-                            )}
-                          </div>
-                          <Button
-                            onClick={handleToggleAccountStatus}
-                            disabled={togglingStatus}
-                            variant={accountStatus ? "destructive" : "default"}
-                            className={accountStatus ? "bg-red-600/20 text-red-400 border-red-500/30 hover:bg-red-600/30" : "gaming-button"}
-                          >
-                            {togglingStatus ? (
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            ) : (
-                              <AlertTriangle className="h-4 w-4 mr-2" />
-                            )}
-                            {accountStatus ? 'Deactivate Account' : 'Activate Account'}
-                          </Button>
+
+                      <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/20">
+                        <div>
+                          <p className="text-white font-medium">Account Status</p>
+                          <p className="text-gray-400 text-sm">
+                            {accountStatus ? 'Your account is currently active' : 'Your account is currently inactive'}
+                          </p>
+                          {accountStatus ? (
+                            <p className="text-green-400 text-xs mt-1">✓ Active - You can use all features</p>
+                          ) : (
+                            <p className="text-red-400 text-xs mt-1">⚠ Inactive - Some features may be limited</p>
+                          )}
                         </div>
+                        <Button
+                          onClick={handleToggleAccountStatus}
+                          disabled={togglingStatus}
+                          variant={accountStatus ? "destructive" : "default"}
+                          className={accountStatus ? "bg-red-600/20 text-red-400 border-red-500/30 hover:bg-red-600/30" : "gaming-button"}
+                        >
+                          {togglingStatus ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <AlertTriangle className="h-4 w-4 mr-2" />
+                          )}
+                          {accountStatus ? 'Deactivate Account' : 'Activate Account'}
+                        </Button>
+                      </div>
                     </div>
 
                     {/* Account Deletion Section */}
@@ -1072,7 +1111,7 @@ export default function ProfilePage() {
                         <AlertTriangle className="h-5 w-5" />
                         Danger Zone
                       </h3>
-                      
+
                       <div className="p-4 bg-red-500/10 rounded-lg border border-red-500/30">
                         <p className="text-red-300 text-sm mb-4">
                           Once you delete your account, there is no going back. Please be certain.
@@ -1088,12 +1127,12 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   </div>
-                    </CardContent>
-                  </Card>
+                </CardContent>
+              </Card>
             )}
 
             {activeSection === "profile" && (
-                <div className="space-y-6">
+              <div className="space-y-6">
                 {onboardingErrors.general && (
                   <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
                     <p className="text-red-300 text-sm">{onboardingErrors.general}</p>
@@ -1101,8 +1140,8 @@ export default function ProfilePage() {
                 )}
 
                 {/* Profile Picture Section */}
-                  <Card className="gaming-card">
-                    <CardHeader>
+                <Card className="gaming-card">
+                  <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
                       <Image className="h-6 w-6" />
                       Profile Picture
@@ -1110,30 +1149,30 @@ export default function ProfilePage() {
                     <CardDescription className="text-gray-300">
                       Upload a profile picture to personalize your account
                     </CardDescription>
-                    </CardHeader>
+                  </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-6">
                       {/* Current Profile Picture */}
                       <div className="flex-shrink-0">
                         <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center">
                           {profileImage ? (
-                            <img 
-                              src={profileImage} 
-                              alt="Profile" 
+                            <img
+                              src={profileImage}
+                              alt="Profile"
                               className="w-full h-full object-cover"
                             />
                           ) : (session?.user as any)?.image ? (
-                            <img 
-                              src={(session?.user as any).image} 
-                              alt="Profile" 
+                            <img
+                              src={(session?.user as any).image}
+                              alt="Profile"
                               className="w-full h-full object-cover"
                             />
                           ) : (
                             <User className="h-12 w-12 text-white" />
                           )}
+                        </div>
                       </div>
-                      </div>
-                      
+
                       {/* Upload Controls */}
                       <div className="flex-1">
                         <div className="space-y-3">
@@ -1149,19 +1188,19 @@ export default function ProfilePage() {
                             )}
                             {uploadingImage ? 'Uploading...' : 'Change Picture'}
                           </Button>
-                          
+
                           <p className="text-gray-400 text-sm">
                             Supported formats: JPG, PNG, GIF (max 5MB)
                           </p>
+                        </div>
                       </div>
-                      </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </CardContent>
+                </Card>
 
                 {/* Bio Section */}
-                  <Card className="gaming-card">
-                    <CardHeader>
+                <Card className="gaming-card">
+                  <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
                       <User className="h-6 w-6" />
                       About You
@@ -1169,7 +1208,7 @@ export default function ProfilePage() {
                     <CardDescription className="text-gray-300">
                       Tell other gamers about yourself
                     </CardDescription>
-                    </CardHeader>
+                  </CardHeader>
                   <CardContent>
                     <Textarea
                       placeholder="Share your gaming story, interests, or what you're looking for..."
@@ -1197,36 +1236,35 @@ export default function ProfilePage() {
                         <div
                           key={`${category.id}-${index}`}
                           onClick={() => handleCategoryToggle(category.id)}
-                          className={`p-4 rounded-xl border-2 cursor-pointer transition-all backdrop-blur-sm ${
-                            selectedCategories.includes(category.id)
-                              ? 'border-green-500 bg-green-600/20 backdrop-blur-md'
-                              : 'border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/20'
-                          }`}
+                          className={`p-4 rounded-xl border-2 cursor-pointer transition-all backdrop-blur-sm ${selectedCategories.includes(category.id)
+                            ? 'border-green-500 bg-green-600/20 backdrop-blur-md'
+                            : 'border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/20'
+                            }`}
                         >
                           <div className="flex items-center gap-3">
                             <span className="text-2xl">{category.icon}</span>
                             <div>
                               <h3 className="text-white font-medium">{category.name}</h3>
                               <p className="text-gray-400 text-sm">{category.description}</p>
-                      </div>
-                      </div>
+                            </div>
+                          </div>
                         </div>
                       ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </CardContent>
+                </Card>
 
                 {/* Games Section */}
-              <Card className="gaming-card">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Gamepad2 className="h-6 w-6" />
-                    Your Games
-                  </CardTitle>
+                <Card className="gaming-card">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Gamepad2 className="h-6 w-6" />
+                      Your Games
+                    </CardTitle>
                     <CardDescription className="text-gray-300">
                       Add the games you play and your skill level
                     </CardDescription>
-                </CardHeader>
+                  </CardHeader>
                   <CardContent className="space-y-6">
                     {/* Game Search */}
                     <div>
@@ -1242,21 +1280,21 @@ export default function ProfilePage() {
                           <Loader2 className="absolute right-3 top-3 h-5 w-5 animate-spin text-green-400" />
                         )}
                       </div>
-                      
+
                       {/* Search Results */}
                       {searchResults.length > 0 && (
                         <div className="mt-4 space-y-2">
                           {searchResults.map((game: Game, index) => {
                             const existingGame = selectedGames.find(g => g.gameId === game.id)
                             const isSelected = !!existingGame
-                            
+
                             return (
                               <div key={`search-${game.id}-${index}`} className="flex items-center justify-between p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
                                 <div className="flex items-center gap-3">
                                   <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center">
                                     {game.igdbCoverUrl ? (
-                                      <img 
-                                        src={game.igdbCoverUrl} 
+                                      <img
+                                        src={game.igdbCoverUrl}
                                         alt={game.name}
                                         className="w-full h-full object-cover rounded-lg"
                                       />
@@ -1329,12 +1367,12 @@ export default function ProfilePage() {
                           </Button>
                         </div>
                         <div className="space-y-2">
-                      {(() => {
+                          {(() => {
                             // Group games by gameId to show only one entry per game
                             const groupedGames = selectedGames.reduce((acc, userGame) => {
                               const gameId = userGame.gameId
-                          if (!acc[gameId]) {
-                            acc[gameId] = {
+                              if (!acc[gameId]) {
+                                acc[gameId] = {
                                   gameId: userGame.gameId,
                                   name: userGame.name,
                                   // Get all platforms and levels for this game
@@ -1348,9 +1386,9 @@ export default function ProfilePage() {
                             }, {} as Record<string, any>)
 
                             return Object.values(groupedGames).map((groupedGame: any, index) => {
-                              const game = allGames.find(g => g.id === groupedGame.gameId) || 
-                                          { id: groupedGame.gameId, slug: "", name: groupedGame.name || `Game ${groupedGame.gameId}`, genre: "", platform: "", platforms: [] } as Game
-                              
+                              const game = allGames.find(g => g.id === groupedGame.gameId) ||
+                                { id: groupedGame.gameId, slug: "", name: groupedGame.name || `Game ${groupedGame.gameId}`, genre: "", platform: "", platforms: [] } as Game
+
                               return (
                                 <div key={`${groupedGame.gameId}-${index}`} className="flex items-center justify-between p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
                                   <div className="flex items-center gap-3">
@@ -1360,33 +1398,33 @@ export default function ProfilePage() {
                                       <p className="text-gray-400 text-sm">
                                         {game.genre} • {groupedGame.platforms.length} platform{groupedGame.platforms.length > 1 ? 's' : ''}
                                       </p>
-                                </div>
+                                    </div>
                                   </div>
                                   <div className="flex items-center gap-2">
-                                <Button
-                                  size="sm"
+                                    <Button
+                                      size="sm"
                                       variant="outline"
                                       className="border-red-500/30 text-red-400 hover:bg-red-500/20"
                                       onClick={() => handleRemoveGame(groupedGame.gameId)}
                                     >
                                       Remove
-                                </Button>
-                              </div>
+                                    </Button>
+                                  </div>
                                 </div>
                               )
                             })
-                      })()}
-                    </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                          })()}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
 
-                
 
-                
-                      
-                      <Button 
+
+
+
+                <Button
                   className="gaming-button w-full"
                   onClick={handleOnboardingSave}
                   disabled={savingOnboarding}
@@ -1397,9 +1435,93 @@ export default function ProfilePage() {
                     <Save className="h-4 w-4 mr-2" />
                   )}
                   Save Profile
-                      </Button>
+                </Button>
+              </div>
+            )}
+
+            {activeSection === "payouts" && (
+              <Card className="gaming-card">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <CreditCard className="h-6 w-6" />
+                    Payout Settings
+                  </CardTitle>
+                  <CardDescription className="text-gray-300">
+                    Connect your Stripe account to receive payments from your coaching sessions.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {!stripeOnboardingComplete ? (
+                      <div className="p-6 bg-blue-600/10 border border-blue-500/30 rounded-2xl">
+                        <div className="flex items-start gap-4">
+                          <div className="p-3 bg-blue-600/20 rounded-xl">
+                            <CreditCard className="h-6 w-6 text-blue-400" />
+                          </div>
+                          <div>
+                            <h3 className="text-white font-semibold mb-1">Get Paid for Coaching</h3>
+                            <p className="text-gray-300 text-sm mb-4">
+                              To receive payments from students, you need to link your bank account or debit card through Stripe. This is secure and only take a few minutes.
+                            </p>
+                            <Button
+                              onClick={handleStripeConnect}
+                              className="gaming-button"
+                              disabled={connectingStripe}
+                            >
+                              {connectingStripe ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              ) : (
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                              )}
+                              {stripeAccountId ? "Complete Onboarding" : "Connect Stripe Account"}
+                            </Button>
+                          </div>
                         </div>
-                      )}
+                      </div>
+                    ) : (
+                      <div className="p-6 bg-emerald-600/10 border border-emerald-500/30 rounded-2xl">
+                        <div className="flex items-start gap-4">
+                          <div className="p-3 bg-emerald-600/20 rounded-xl">
+                            <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-white font-semibold mb-1">Stripe Connected</h3>
+                            <p className="text-gray-300 text-sm mb-4">
+                              Your account is successfully linked and you are ready to receive payments.
+                            </p>
+                            <div className="flex items-center gap-2 text-sm text-emerald-400 bg-emerald-400/10 w-fit px-3 py-1 rounded-full border border-emerald-400/20">
+                              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                              Active Account: {stripeAccountId}
+                            </div>
+                            <Button
+                              variant="outline"
+                              onClick={handleStripeConnect}
+                              className="mt-4 border-white/20 text-white hover:bg-white/10"
+                              disabled={connectingStripe}
+                            >
+                              <Settings className="h-4 w-4 mr-2" />
+                              Manage Stripe Account
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="p-4 bg-white/5 border border-white/10 rounded-xl">
+                      <h4 className="text-white font-medium mb-2 flex items-center gap-2 text-sm">
+                        <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                        Important Note
+                      </h4>
+                      <ul className="text-xs text-gray-400 space-y-1 list-disc pl-4">
+                        <li>All payments are processed securely via Stripe.</li>
+                        <li>GamingWithYou takes a 10% platform fee on all transactions.</li>
+                        <li>Payouts are subject to standard Stripe processing times.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
@@ -1423,24 +1545,23 @@ export default function ProfilePage() {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            
+
             {/* Platform Selection with Skill Levels */}
             <div className="mb-6">
               <label className="block text-white font-medium mb-3">Select Platforms & Skill Levels</label>
               <div className="space-y-3">
-                {(selectedGameForSetup.platforms && selectedGameForSetup.platforms.length > 0 ? 
-                  Array.from(new Set(selectedGameForSetup.platforms.map(p => p.name))) : 
+                {(selectedGameForSetup.platforms && selectedGameForSetup.platforms.length > 0 ?
+                  Array.from(new Set(selectedGameForSetup.platforms.map(p => p.name))) :
                   ["PC", "PlayStation", "Xbox", "Nintendo", "Mobile", "VR", "Other"]
                 ).map((platform) => (
                   <div key={`platform-${platform}`} className="flex items-center p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
                     <Button
                       variant="outline"
                       size="sm"
-                      className={`border-white/20 text-white hover:bg-white/10 text-sm py-2 backdrop-blur-sm ${
-                        selectedPlatforms.includes(platform)
-                          ? 'bg-green-600/80 border-green-500 backdrop-blur-md'
-                          : 'bg-white/10'
-                      }`}
+                      className={`border-white/20 text-white hover:bg-white/10 text-sm py-2 backdrop-blur-sm ${selectedPlatforms.includes(platform)
+                        ? 'bg-green-600/80 border-green-500 backdrop-blur-md'
+                        : 'bg-white/10'
+                        }`}
                       onClick={() => handlePlatformToggle(platform)}
                     >
                       {platform}
@@ -1450,46 +1571,44 @@ export default function ProfilePage() {
                         <span className="text-white text-sm mr-2">Skill:</span>
                         <div className="flex gap-3">
                           {[1, 2, 3, 4].map((level) => {
-                            const skillValue = level === 1 ? 'beginner' : 
-                                              level === 2 ? 'intermediate' : 
-                                              level === 3 ? 'advanced' : 'expert'
+                            const skillValue = level === 1 ? 'beginner' :
+                              level === 2 ? 'intermediate' :
+                                level === 3 ? 'advanced' : 'expert'
                             const isSelected = selectedSkillLevels[platform] === skillValue
-                            
+
                             return (
                               <button
                                 key={`skill-${platform}-${level}`}
                                 onClick={() => handleModalSkillLevelChange(platform, skillValue)}
-                                className={`w-4 h-4 rounded-full transition-all backdrop-blur-sm ${
-                                  isSelected 
-                                    ? 'bg-green-500 scale-125 shadow-lg' 
-                                    : 'bg-white/30 hover:bg-white/50 hover:scale-110'
-                                }`}
+                                className={`w-4 h-4 rounded-full transition-all backdrop-blur-sm ${isSelected
+                                  ? 'bg-green-500 scale-125 shadow-lg'
+                                  : 'bg-white/30 hover:bg-white/50 hover:scale-110'
+                                  }`}
                                 title={skillValue}
                               />
                             )
                           })}
                         </div>
                         <span className={`ml-auto px-3 py-1 rounded-full text-xs font-semibold 
-                          ${
-                            selectedSkillLevels[platform] === 'beginner' ? 'bg-green-600/30 text-green-200 border border-green-400/40' :
+                          ${selectedSkillLevels[platform] === 'beginner' ? 'bg-green-600/30 text-green-200 border border-green-400/40' :
                             selectedSkillLevels[platform] === 'intermediate' ? 'bg-yellow-600/30 text-yellow-200 border border-yellow-400/40' :
-                            selectedSkillLevels[platform] === 'advanced' ? 'bg-orange-600/30 text-orange-200 border border-orange-400/40' :
-                            selectedSkillLevels[platform] === 'expert' ? 'bg-red-600/30 text-red-200 border border-red-400/40' :
-                            'bg-white/10 text-white border border-white/20'
+                              selectedSkillLevels[platform] === 'advanced' ? 'bg-orange-600/30 text-orange-200 border border-orange-400/40' :
+                                selectedSkillLevels[platform] === 'expert' ? 'bg-red-600/30 text-red-200 border border-red-400/40' :
+                                  'bg-white/10 text-white border border-white/20'
                           }
                         `}>
                           {selectedSkillLevels[platform] === 'beginner' ? 'Beginner' :
                             selectedSkillLevels[platform] === 'intermediate' ? 'Intermediate' :
-                            selectedSkillLevels[platform] === 'advanced' ? 'Advanced' :
-                            selectedSkillLevels[platform] === 'expert' ? 'Expert' : 'Beginner'}
+                              selectedSkillLevels[platform] === 'advanced' ? 'Advanced' :
+                                selectedSkillLevels[platform] === 'expert' ? 'Expert' : 'Beginner'}
                         </span>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
-                        </div>
-                        
+            </div>
+
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/10">
               <Button
@@ -1523,7 +1642,7 @@ export default function ProfilePage() {
               Choose an image to upload as your profile picture
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             {/* Drag & Drop Area */}
             <div
@@ -1553,14 +1672,14 @@ export default function ProfilePage() {
                 </div>
               </label>
             </div>
-            
+
             {uploadingImage && (
               <div className="flex items-center gap-3 p-3 bg-emerald-600/20 border border-emerald-500/30 rounded-lg">
                 <Loader2 className="h-5 w-5 animate-spin text-emerald-400" />
                 <span className="text-emerald-300">Uploading image...</span>
               </div>
             )}
-            
+
             <div className="flex gap-3 pt-4">
               <Button
                 variant="outline"
@@ -1570,8 +1689,8 @@ export default function ProfilePage() {
               >
                 Cancel
               </Button>
-                        </div>
-                      </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -1587,58 +1706,58 @@ export default function ProfilePage() {
               Please confirm your changes by re-entering the modified information
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             {confirmErrors.general && (
               <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
                 <p className="text-red-300 text-sm">{confirmErrors.general}</p>
               </div>
             )}
-                      
-                      <div className="space-y-4">
-                        <div className="space-y-2">
+
+            <div className="space-y-4">
+              <div className="space-y-2">
                 <Label htmlFor="confirmUsername" className="text-white flex items-center gap-2">
                   <User className="h-4 w-4" />
                   Confirm Username
                 </Label>
-                          <Input
+                <Input
                   id="confirmUsername"
                   value={confirmForm.username}
                   onChange={(e) => setConfirmForm(prev => ({ ...prev, username: e.target.value }))}
-                            className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
                   placeholder="Re-enter username"
-                          />
+                />
                 {confirmErrors.username && (
                   <p className="text-red-400 text-xs">{confirmErrors.username}</p>
-                          )}
-                        </div>
-                        
-                          <div className="space-y-2">
+                )}
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="confirmEmail" className="text-white flex items-center gap-2">
                   <Mail className="h-4 w-4" />
                   Confirm Email
                 </Label>
-                            <Input
+                <Input
                   id="confirmEmail"
                   type="email"
                   value={confirmForm.email}
                   onChange={(e) => setConfirmForm(prev => ({ ...prev, email: e.target.value }))}
-                              className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
                   placeholder="Re-enter email"
-                            />
+                />
                 {confirmErrors.email && (
                   <p className="text-red-400 text-xs">{confirmErrors.email}</p>
-                            )}
-                          </div>
-                          
+                )}
+              </div>
+
               {accountForm.newPassword && (
-                          <div className="space-y-2">
+                <div className="space-y-2">
                   <Label htmlFor="confirmNewPassword" className="text-white flex items-center gap-2">
                     <Lock className="h-4 w-4" />
                     Confirm New Password
                   </Label>
                   <div className="relative">
-                            <Input
+                    <Input
                       id="confirmNewPassword"
                       type={showConfirmNewPassword ? "text" : "password"}
                       value={confirmForm.newPassword}
@@ -1656,35 +1775,35 @@ export default function ProfilePage() {
                   </div>
                   {confirmErrors.newPassword && (
                     <p className="text-red-400 text-xs">{confirmErrors.newPassword}</p>
-                            )}
-                          </div>
+                  )}
+                </div>
               )}
-                      </div>
-                      
+            </div>
+
             <div className="flex gap-3 pt-4">
-                        <Button 
+              <Button
                 className="gaming-button flex-1"
                 onClick={handleConfirmSave}
-                          disabled={savingAccount}
-                        >
-                          {savingAccount ? (
+                disabled={savingAccount}
+              >
+                {savingAccount ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          ) : (
-                            <Save className="h-4 w-4 mr-2" />
-                          )}
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
                 Confirm & Save
-                        </Button>
-                        
-                        <Button 
-                          variant="outline"
+              </Button>
+
+              <Button
+                variant="outline"
                 className="border-white/20 text-white hover:bg-white/10 flex-1"
                 onClick={handleCancelConfirm}
-                          disabled={savingAccount}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
+                disabled={savingAccount}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -1700,20 +1819,20 @@ export default function ProfilePage() {
               This action cannot be undone. This will permanently delete your account and remove all your data.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             {deleteErrors.general && (
               <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
                 <p className="text-red-300 text-sm">{deleteErrors.general}</p>
               </div>
             )}
-            
+
             {deleteErrors.success && (
               <div className="p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
                 <p className="text-green-300 text-sm">{deleteErrors.success}</p>
               </div>
             )}
-            
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="deletePassword" className="text-white flex items-center gap-2">
@@ -1732,7 +1851,7 @@ export default function ProfilePage() {
                   <p className="text-red-400 text-xs">{deleteErrors.password}</p>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="confirmDelete" className="text-white flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4" />
@@ -1750,9 +1869,9 @@ export default function ProfilePage() {
                 )}
               </div>
             </div>
-            
+
             <div className="flex gap-3 pt-4">
-              <Button 
+              <Button
                 className="bg-red-600/20 text-red-400 border-red-500/30 hover:bg-red-600/30 flex-1"
                 onClick={handleDeleteAccount}
                 disabled={deletingAccount}
@@ -1764,8 +1883,8 @@ export default function ProfilePage() {
                 )}
                 Delete Account
               </Button>
-              
-              <Button 
+
+              <Button
                 variant="outline"
                 className="border-white/20 text-white hover:bg-white/10 flex-1"
                 onClick={() => {

@@ -6,12 +6,12 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request: NextRequest) {
   try {
     console.log('=== PROFILE DATA GET REQUEST ===');
-    
+
     const session = await getServerSession(authOptions);
-    
+
     console.log('Session:', session ? 'exists' : 'missing');
     console.log('Session user:', session?.user);
-    
+
     if (!session?.user?.email) {
       console.log('No session user email, returning 401');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -46,7 +46,9 @@ export async function GET(request: NextRequest) {
       bio: user.bio,
       avatar: user.avatar,
       isAdmin: user.isAdmin,
-      isActive: (user as any).isActive !== undefined ? (user as any).isActive : true, // Default to true if field doesn't exist
+      isActive: (user as any).isActive !== undefined ? (user as any).isActive : true,
+      stripeAccountId: user.stripeAccountId,
+      stripeOnboardingComplete: user.stripeOnboardingComplete,
       createdAt: user.createdAt.toISOString(),
       userGames: user.userGames,
       userLanguages: user.userLanguages,
@@ -61,7 +63,7 @@ export async function GET(request: NextRequest) {
       tagsCount: profileData.userTags?.length || 0
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       profile: profileData
     });
 
@@ -77,16 +79,16 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     console.log('=== PROFILE DATA UPDATE START ===');
-    
+
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { bio, categories, games, languages, tags } = body;
-    
+
     console.log('Received data:', {
       hasBio: !!bio,
       hasCategories: !!categories,
@@ -115,7 +117,7 @@ export async function PUT(request: NextRequest) {
     // Update games if provided
     if (games && Array.isArray(games)) {
       console.log('Processing games:', games);
-      
+
       // Get current game combinations from the request
       const currentGameCombinations = games.map(g => ({
         gameId: g.gameId,
@@ -123,7 +125,7 @@ export async function PUT(request: NextRequest) {
         level: g.level
       })).filter(g => g.gameId && g.level);
       console.log('Current game combinations:', currentGameCombinations);
-      
+
       // Remove all existing user games for this user
       await prisma.userGame.deleteMany({
         where: { userId: user.id }
@@ -134,14 +136,14 @@ export async function PUT(request: NextRequest) {
         if (gameData.gameId && gameData.level) {
           // Check if game exists
           let game = await prisma.game.findFirst({
-            where: { 
+            where: {
               OR: [
                 { igdbId: parseInt(gameData.gameId) },
                 { id: gameData.gameId }
               ]
             }
           });
-          
+
           // Create game if doesn't exist
           if (!game) {
             console.log('Creating new game:', gameData.name);
@@ -170,7 +172,7 @@ export async function PUT(request: NextRequest) {
     // Update languages if provided
     if (languages && Array.isArray(languages)) {
       console.log('Processing languages:', languages);
-      
+
       // Remove all existing user languages for this user
       await prisma.userLanguage.deleteMany({
         where: { userId: user.id }
@@ -193,7 +195,7 @@ export async function PUT(request: NextRequest) {
     // Update tags if provided
     if (tags && Array.isArray(tags)) {
       console.log('Processing tags:', tags);
-      
+
       // Remove all existing user tags for this user
       await prisma.userTag.deleteMany({
         where: { userId: user.id }
@@ -225,9 +227,9 @@ export async function PUT(request: NextRequest) {
     }
 
     console.log('Profile updated successfully');
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      message: 'Profile updated successfully' 
+      message: 'Profile updated successfully'
     });
 
   } catch (error) {
