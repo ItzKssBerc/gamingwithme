@@ -220,10 +220,49 @@ class IGDBService {
   }
 
   async getPopularGames(limit: number = 20): Promise<IGDBGame[]> {
+    try {
+      // 1. Get trending games based on Visits (Type 1) from popularity_primitives
+      // Increasing limit to 250 to find enough games that pass strict competitive filters
+      const primQuery = `fields game_id,value; where popularity_type = 1; sort value desc; limit 250;`;
+      const primitives = await this.makeRequest('popularity_primitives', primQuery);
+
+      if (!primitives || primitives.length === 0) {
+        console.warn('No PopScore primitives found, falling back to all-time popular');
+        return this.getFallbackPopularGames(limit);
+      }
+
+      const gameIds = primitives.map((p: any) => p.game_id);
+
+      // 2. Fetch full game details for these IDs with multiplayer, non-mobile, and competitive filtering
+      // Enforcing multiplayer, non-mobile platforms, and broader competitive genres:
+      // Fighting(4), Shooter(5), Music(7), Racing(10), RTS(11), MOBA(14), Sport(15), Simulator(30)
+      // and modes (Multiplayer: 2, PvP: 3, Battle Royale: 6)
+      const igdbQuery = `
+        fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
+        where id = (${gameIds.join(',')}) & version_parent = null & game_modes = (2,3,6) & platforms = (6,48,49,130,167,169) & genres = (4,5,10,11,14,15,30);
+        limit ${limit};
+      `;
+
+      const games = await this.makeRequest('games', igdbQuery);
+
+      // Sort games to match the PopScore order
+      return games.sort((a, b) => {
+        const indexA = gameIds.indexOf(a.id);
+        const indexB = gameIds.indexOf(b.id);
+        return indexA - indexB;
+      });
+    } catch (error) {
+      console.error('Error fetching trending games from PopScore, falling back to all-time popular:', error);
+      return this.getFallbackPopularGames(limit);
+    }
+  }
+
+  private async getFallbackPopularGames(limit: number = 20): Promise<IGDBGame[]> {
+    // All-time popular using rating_count as proxy
     const query = `
-      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
-      where rating_count > 100 & version_parent = null & game_modes = (2,3,4,5,6);
-      sort rating desc;
+      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
+      where version_parent = null & game_modes = (2,3,4,5,6) & rating_count >= 100;
+      sort rating_count desc;
       limit ${Math.min(limit, 50)};
     `;
 

@@ -17,7 +17,8 @@ export async function GET(request: NextRequest) {
     const genre = searchParams.get('genre');
     const platform = searchParams.get('platform');
 
-    // Trending: popularity szerint rendezünk, ha nincs orderBy megadva
+    // Trending: rating_count szerint rendezünk, ha nincs orderBy megadva
+    // A PopScore-t elsősorban a "Popular" szekcióhoz használjuk
     let orderByParam = searchParams.get('orderBy');
     if (!orderByParam || orderByParam === '-rating') {
       orderByParam = '-rating_count';
@@ -35,11 +36,11 @@ export async function GET(request: NextRequest) {
 
     // Build the WHERE clause for the IGDB query
     const nowInSeconds = Math.floor(Date.now() / 1000);
-    // Trending: minden idők legmagasabb értékelésű játékok
-    let whereClauses = ['version_parent = null', `first_release_date <= ${nowInSeconds}`, 'rating != null'];
-    // Ha keresés van, ne legyen rating_count szűrés
+    // Trending: minden idők legnépszerűbb játékai + multiplayer szűrés
+    let whereClauses = ['version_parent = null', `first_release_date <= ${nowInSeconds}`, 'rating != null', 'game_modes = (2,3,4,5,6)'];
+    // Ha keresés van, ne legyen rating_count szűrés, de ha népszerűség szerint sorrendezünk, legyen alapvető népszerűség
     if (!query.trim() && (!orderByParam || orderByParam === '-rating' || orderByParam === '-rating_count' || orderByParam === '-popularity')) {
-      whereClauses.push('rating_count >= 1000');
+      whereClauses.push('rating_count >= 100');
     }
     if (query.trim()) {
       whereClauses.push(`name ~ *\"${query}\"*`);
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
 
     // Build the final IGDB query string
     const igdbQuery = `
-      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;
+      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id,game_modes.id;
       where ${whereClauses.join(' & ')};
       sort ${sortField} ${sortOrder};
       limit ${limit};
@@ -64,34 +65,37 @@ export async function GET(request: NextRequest) {
     console.log('Sending IGDB query:', igdbQuery);
 
     const games = await igdbService.makeCustomRequest('games', igdbQuery);
-    console.log('IGDB response:', games);
-    console.log('Number of games received:', games.length);
+    console.log(`Received ${games.length} games from IGDB`);
 
-    // For pagination, we need a total count. This is tricky with IGDB's API without a separate count endpoint.
-    // We will estimate the total count to provide a functional pagination experience.
-    let totalCount = 0;
-    if (games.length === limit) {
-      totalCount = page * limit + 100; // Estimate more results exist
-    } else {
-      totalCount = (page - 1) * limit + games.length;
-    }
+    // For pagination
+    const totalCount = games.length === limit ? (page * limit + 100) : ((page - 1) * limit + games.length);
 
     // Transform IGDB data to our application's format
-    const transformedGames = games.map(game => ({
-      id: game.id.toString(),
-      name: game.name,
-      slug: game.slug,
-      description: game.summary || game.storyline,
-      image: game.cover?.url ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover.url.split('/').pop()}` : null,
-      genre: game.genres?.[0]?.name || null,
-      platform: game.platforms?.[0]?.name || null,
-      platforms: game.platforms || [],
-      rating: game.rating || null,
-      releaseDate: game.first_release_date ? new Date(game.first_release_date * 1000) : null,
-      igdbRating: game.rating || null,
-      igdbRatingCount: game.rating_count || null,
-      igdbCoverUrl: game.cover?.url ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover.url.split('/').pop()}` : null
-    }));
+    const transformedGames = (games || []).map(game => {
+      try {
+        const coverUrl = game.cover?.url;
+        const bigCoverUrl = coverUrl ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${coverUrl.split('/').pop()}` : null;
+
+        return {
+          id: game.id?.toString() || Math.random().toString(),
+          name: game.name || 'Unknown Game',
+          slug: game.slug || '',
+          description: game.summary || game.storyline || '',
+          image: bigCoverUrl,
+          genre: game.genres?.[0]?.name || null,
+          platform: game.platforms?.[0]?.name || null,
+          platforms: game.platforms || [],
+          rating: game.rating || null,
+          releaseDate: game.first_release_date ? new Date(game.first_release_date * 1000) : null,
+          igdbRating: game.rating || null,
+          igdbRatingCount: game.rating_count || null,
+          igdbCoverUrl: bigCoverUrl
+        };
+      } catch (transformError) {
+        console.error(`Error transforming game ${game.id}:`, transformError);
+        return null;
+      }
+    }).filter(Boolean);
 
     const totalPages = Math.ceil(totalCount / limit);
     const hasNext = page < totalPages && games.length === limit;

@@ -4,29 +4,23 @@ import { unstable_cache } from "next/cache";
 import HorizontalLane from "@/components/HorizontalLane";
 import LaneSkeleton from "@/components/LaneSkeleton";
 
+import { igdbService } from "@/lib/igdb";
+
 // Cache games for 5 minutes
 const getGames = unstable_cache(
   async () => {
-    return prisma.game.findMany({
-      where: {
-        isActive: true,
-        isMultiplayer: true,
-        igdbRatingCount: { not: null },
-      },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        igdbCoverUrl: true,
-        igdbRating: true,
-        igdbRatingCount: true,
-        genre: true,
-      },
-      orderBy: [{ igdbRatingCount: "desc" }, { igdbRating: "desc" }],
-      take: 12,
-    });
+    const igdbGames = await igdbService.getPopularGames(12);
+    return igdbGames.map(game => ({
+      id: game.id.toString(),
+      name: game.name,
+      slug: game.slug,
+      igdbCoverUrl: game.cover?.url ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover.url.split('/').pop()}` : null,
+      igdbRating: game.rating ? game.rating / 10 : null,
+      igdbRatingCount: game.rating_count || null,
+      genre: game.genres?.[0]?.name || null,
+    }));
   },
-  ["home-games"],
+  ["home-games-v7"],
   { revalidate: 300 }
 );
 
@@ -81,7 +75,7 @@ async function GamesLane() {
       href="/games"
       type="game"
       initialItems={games}
-      apiEndpoint="/api/games?ordering=trending"
+      apiEndpoint="/api/igdb/games"
     />
   );
 }

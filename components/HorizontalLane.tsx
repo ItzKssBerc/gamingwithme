@@ -38,7 +38,11 @@ const HorizontalLane: React.FC<HorizontalLaneProps> = ({ title, href, type, init
             const newItems = type === 'game' ? data.games : data.gamers;
 
             if (newItems && newItems.length > 0) {
-                setItems(prev => [...prev, ...newItems]);
+                setItems(prev => {
+                    const existingIds = new Set(prev.map((item: any) => item.id.toString()));
+                    const uniqueNewItems = newItems.filter((item: any) => !existingIds.has(item.id.toString()));
+                    return [...prev, ...uniqueNewItems];
+                });
                 setPage(nextPage);
                 setHasMore(data.pagination.hasNext);
             } else {
