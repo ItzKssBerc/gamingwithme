@@ -10,6 +10,7 @@ const getGames = unstable_cache(
     return prisma.game.findMany({
       where: {
         isActive: true,
+        isMultiplayer: true,
         igdbRatingCount: { not: null },
       },
       select: {

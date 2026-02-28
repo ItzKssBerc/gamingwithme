@@ -210,8 +210,8 @@ class IGDBService {
 
     // Use name search instead of the search endpoint - only main games, no DLCs, expansions, or seasons
     const searchQuery = `
-      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id;
-      where version_parent = null & name ~ *"${query}"*;
+      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,platforms.id,game_modes.id;
+      where version_parent = null & name ~ *"${query}"* & game_modes = (2,3,4,5,6);
       limit ${Math.min(limit, 50)};
       sort rating desc;
     `;
@@ -221,8 +221,8 @@ class IGDBService {
 
   async getPopularGames(limit: number = 20): Promise<IGDBGame[]> {
     const query = `
-      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
-      where rating_count > 100 & version_parent = null;
+      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
+      where rating_count > 100 & version_parent = null & game_modes = (2,3,4,5,6);
       sort rating desc;
       limit ${Math.min(limit, 50)};
     `;
@@ -284,8 +284,8 @@ class IGDBService {
     }
 
     const query = `
-      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
-      where genres = ${genreId} & version_parent = null & category = 0;
+      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
+      where genres = ${genreId} & version_parent = null & category = 0 & game_modes = (2,3,4,5,6);
       sort rating desc;
       limit ${Math.min(limit, 50)};
     `;
@@ -299,8 +299,8 @@ class IGDBService {
     }
 
     const query = `
-      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
-      where platforms = ${platformId} & version_parent = null & category = 0;
+      fields name,slug,summary,storyline,rating,rating_count,first_release_date,cover.url,genres.name,platforms.name,screenshots.url,videos.video_id,age_ratings.category,age_ratings.rating,game_modes.name,game_modes.id,player_perspectives.name,websites.category,websites.url,similar_games.name,similar_games.cover.url,dlcs.name,dlcs.cover.url,expansions.name,expansions.cover.url,standalone_expansions.name,standalone_expansions.cover.url;
+      where platforms = ${platformId} & version_parent = null & category = 0 & game_modes = (2,3,4,5,6);
       sort rating desc;
       limit ${Math.min(limit, 50)};
     `;

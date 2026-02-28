@@ -130,6 +130,7 @@ model Game {
   igdbCoverUrl String?
   igdbScreenshots String[] // JSON array of screenshot URLs
   igdbVideos  String[] // JSON array of video IDs
+  isMultiplayer Boolean @default(true)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

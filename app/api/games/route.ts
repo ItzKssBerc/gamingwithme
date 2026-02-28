@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
     let orderBy: any[] = [];
     let where: any = {
       // We can add global filters here if needed in the future
-      // For example: isActive: true
+      isActive: true,
+      isMultiplayer: true
     };
 
     // Handle search query

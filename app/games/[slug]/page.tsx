@@ -342,10 +342,7 @@ export default function GameDetailPage() {
                 </div>
               </div>
 
-              <div className="pt-8 border-t border-white/[0.05] flex items-center justify-between">
-                <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Status</span>
-                <span className="text-[10px] font-black text-green-500 uppercase tracking-widest animate-pulse">Synced</span>
-              </div>
+
             </div>
           </div>
         </section>

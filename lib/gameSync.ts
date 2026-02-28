@@ -11,17 +11,17 @@ export class GameSyncService {
 
       // Enhanced description with more details
       let enhancedDescription = igdbGame.summary || igdbGame.storyline || '';
-      
+
       // Add game modes if available
       if (igdbGame.game_modes && igdbGame.game_modes.length > 0) {
         enhancedDescription += `\n\nGame Modes: ${igdbGame.game_modes.map(mode => mode.name).join(', ')}`;
       }
-      
+
       // Add player perspectives if available
       if (igdbGame.player_perspectives && igdbGame.player_perspectives.length > 0) {
         enhancedDescription += `\n\nPerspective: ${igdbGame.player_perspectives.map(p => p.name).join(', ')}`;
       }
-      
+
       // Add age rating if available
       if (igdbGame.age_ratings && igdbGame.age_ratings.length > 0) {
         const ageRating = igdbGame.age_ratings[0];
@@ -40,10 +40,10 @@ export class GameSyncService {
         igdbId: igdbGame.id,
         igdbSlug: igdbGame.slug,
         igdbRating: igdbGame.rating ? igdbGame.rating / 10 : null,
-        igdbRatingCount: igdbGame.rating_count || null,
         igdbCoverUrl: igdbGame.cover?.url ? `https:${igdbGame.cover.url.replace('t_thumb', 't_cover_big')}` : null,
         igdbScreenshots: igdbGame.screenshots?.map(s => `https:${s.url.replace('t_thumb', 't_screenshot_big')}`) || [],
         igdbVideos: igdbGame.videos?.map(v => v.video_id) || [],
+        isMultiplayer: igdbGame.game_modes ? igdbGame.game_modes.some(mode => [2, 3, 4, 5, 6].includes(mode.id)) : true,
       };
 
       // Check if game already exists
@@ -87,10 +87,10 @@ export class GameSyncService {
       }
 
       console.log(`Searching IGDB for: "${query}" (limit: ${limit})`);
-      
+
       const igdbGames = await igdbService.searchGames(query, limit);
       console.log(`Found ${igdbGames.length} games in IGDB`);
-      
+
       const syncedGames = [];
       const errors = [];
 
@@ -130,10 +130,10 @@ export class GameSyncService {
       }
 
       console.log(`Syncing ${limit} popular games from IGDB`);
-      
+
       const igdbGames = await igdbService.getPopularGames(limit);
       console.log(`Found ${igdbGames.length} popular games in IGDB`);
-      
+
       const syncedGames = [];
       const errors = [];
 
@@ -173,7 +173,7 @@ export class GameSyncService {
       }
 
       console.log(`Syncing game by slug: ${slug}`);
-      
+
       const igdbGame = await igdbService.getGameBySlug(slug);
       if (!igdbGame) {
         throw new Error(`Game with slug ${slug} not found in IGDB`);
@@ -181,7 +181,7 @@ export class GameSyncService {
 
       const syncedGame = await this.syncGameFromIGDB(igdbGame);
       console.log(`Successfully synced game: ${igdbGame.name}`);
-      
+
       return syncedGame;
     } catch (error) {
       console.error('Error syncing game by slug:', error);
@@ -197,10 +197,10 @@ export class GameSyncService {
       }
 
       console.log(`Syncing ${limit} games for genre ID: ${genreId}`);
-      
+
       const igdbGames = await igdbService.getGamesByGenre(genreId, limit);
       console.log(`Found ${igdbGames.length} games for genre ID ${genreId}`);
-      
+
       const syncedGames = [];
       const errors = [];
 
@@ -240,10 +240,10 @@ export class GameSyncService {
       }
 
       console.log(`Syncing ${limit} games for platform ID: ${platformId}`);
-      
+
       const igdbGames = await igdbService.getGamesByPlatform(platformId, limit);
       console.log(`Found ${igdbGames.length} games for platform ID ${platformId}`);
-      
+
       const syncedGames = [];
       const errors = [];
 

@@ -133,7 +133,12 @@ export default function GameLeaderboardPage() {
   }
 
   if (loading) {
-    return <LoadingSync message="SYNC / RANKINGS" subtext="Loading Rankings" />
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-4">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Loading Rankings</p>
+      </div>
+    )
   }
 
   if (error || !game) {
