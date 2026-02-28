@@ -75,7 +75,7 @@ export default function Navigation() {
                 className="h-8 w-auto opacity-80"
                 priority
               />
-              <span className="text-xl font-black text-gray-200 font-orbitron tracking-wider">GamingWithMe</span>
+              <span className="text-xl font-black text-gray-200 font-orbitron tracking-wider" translate="no">GamingWithMe</span>
             </Link>
           </div>
 

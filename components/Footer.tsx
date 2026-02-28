@@ -44,7 +44,7 @@ const Footer = () => {
                                     className="h-10 w-auto"
                                 />
                             </div>
-                            <h2 className="text-2xl font-black font-orbitron tracking-tighter text-gaming-green uppercase italic">
+                            <h2 className="text-2xl font-black font-orbitron tracking-tighter text-gaming-green uppercase italic" translate="no">
                                 GamingWithMe
                             </h2>
                         </div>
@@ -90,7 +90,7 @@ const Footer = () => {
 
 
                     <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">
-                        © {new Date().getFullYear()} <span className="text-gaming-green italic">GamingWithMe</span>. All rights reserved.
+                        © {new Date().getFullYear()} <span className="text-gaming-green italic" translate="no">GamingWithMe</span>. All rights reserved.
                     </p>
 
                     <div className="flex items-center gap-6">
