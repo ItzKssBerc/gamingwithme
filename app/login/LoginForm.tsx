@@ -14,6 +14,7 @@ import {
   Twitch
 } from "lucide-react"
 import Link from "next/link"
+import HudBackground from "@/components/HudBackground"
 
 export default function LoginForm() {
   const router = useRouter()
@@ -30,6 +31,8 @@ export default function LoginForm() {
     if (messageParam) {
       setMessage(messageParam)
     }
+    // Clear registration intent cookie to allow regular logins
+    document.cookie = "is_signup=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
   }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,9 +62,9 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen bg-transparent text-white selection:bg-primary/30 font-sans flex items-center justify-center p-4">
       {/* Login Form */}
-      <div className="relative w-full flex items-center justify-center p-4">
+      <div className="relative z-10 w-full flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl">
           <CardHeader className="text-center pt-12 pb-4">
             <CardTitle className="text-3xl font-black text-white uppercase tracking-tighter leading-none mb-2">

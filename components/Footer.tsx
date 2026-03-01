@@ -28,7 +28,7 @@ const links = [
 
 const Footer = () => {
     return (
-        <footer className="relative mt-20 border-t border-white/[0.05] bg-[#050505] selection:bg-gaming-green selection:text-black">
+        <footer className="relative border-t border-white/[0.05] bg-[#050505] selection:bg-gaming-green selection:text-black">
 
             <div className="container mx-auto py-16 px-6 md:px-10 max-w-7xl">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">

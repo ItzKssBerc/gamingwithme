@@ -4,6 +4,7 @@ import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SessionProvider from "@/components/SessionProvider";
+import HudBackground from "@/components/HudBackground";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
 
@@ -52,15 +53,19 @@ export default async function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} antialiased bg-[#050505] text-white`}
       >
         <SessionProvider session={session}>
-          <div className="app-background" />
-          <Navigation />
-          <main className="min-h-screen relative z-0">
-            {children}
-          </main>
-          <Footer />
+          <div className="flex flex-col min-h-screen">
+            <Navigation />
+            <main className="flex-1 relative z-0 bg-[#050505]">
+              <HudBackground />
+              <div className="relative z-10">
+                {children}
+              </div>
+            </main>
+            <Footer />
+          </div>
         </SessionProvider>
       </body>
     </html>

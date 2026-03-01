@@ -54,90 +54,93 @@ export default function MyServicesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-green-500/30">
-      {/* Dynamic Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-green-900/10 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-900/10 rounded-full blur-[120px] animate-pulse delay-700"></div>
-      </div>
+    <div className="min-h-screen bg-transparent text-white selection:bg-primary/30 font-sans">
 
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 py-12">
-        {/* Breadcrumbs / Back */}
-        <Link href="/profile" className="inline-flex items-center text-sm text-gray-500 hover:text-green-400 transition-colors mb-8 group">
-          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          Back to Profile
+      <div className="relative z-10 max-w-[1200px] mx-auto px-6 py-12">
+        {/* Navigation */}
+        <Link href="/profile" className="inline-flex items-center text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 hover:text-white transition-colors mb-12 group">
+          <ArrowLeft className="w-3 h-3 mr-2 group-hover:-translate-x-1 transition-transform" />
+          Navigate: Return to Profile
         </Link>
 
         {/* Dashboard Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-green-500/10 rounded-lg border border-green-500/20">
-                <Layers className="w-6 h-6 text-green-400" />
-              </div>
-              <span className="text-sm font-bold uppercase tracking-[0.2em] text-green-500/80">Creator Studio</span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 border-b border-white/[0.05] pb-12">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="w-8 h-[2px] bg-primary"></span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Service.Dashboard // v2.0</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-black tracking-tighter mb-4">
-              Manage <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">Services</span>
+            <h1 className="text-6xl md:text-7xl font-black tracking-tighter mb-6 leading-[0.9]">
+              My <span className="text-white/20">Coaching</span><br />Services
             </h1>
-            <p className="text-gray-400 max-w-xl text-lg leading-relaxed">
-              Create and manage your professional coaching sessions. Set your own prices, schedule availability, and track your bookings.
+            <p className="text-gray-500 text-sm font-medium leading-relaxed max-w-lg">
+              Authorized access to professional service management. Configure session parameters, pricing structures, and overall availability.
             </p>
           </div>
 
           <Link href="/profile/my-services/create">
-            <Button className="h-14 px-8 bg-green-500 hover:bg-green-400 text-black font-bold rounded-2xl shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-              <Plus className="w-5 h-5" />
-              New Coaching Service
+            <Button className="h-14 px-10 bg-white text-black hover:bg-white/90 font-black rounded-full shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-3 uppercase text-[10px] tracking-[0.2em]">
+              <Plus className="w-4 h-4 stroke-[3]" />
+              Create New Service
             </Button>
           </Link>
         </div>
 
-        {/* Stats / Filter Bar (Placeholder for future) */}
+        {/* Stats Section */}
         {!loading && services.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20">
             {[
-              { label: 'Total Services', value: services.length, icon: LayoutGrid },
-              { label: 'Active Status', value: services.filter(s => s.isActive).length, icon: Settings },
-              { label: 'Upcoming Slots', value: '–', icon: Calendar },
-              { label: 'New Requests', value: '0', icon: Inbox },
+              { label: 'Active Services', value: services.length, icon: LayoutGrid },
+              { label: 'Live Status', value: services.filter(s => s.isActive).length, icon: Settings },
+              { label: 'Total Sales', value: '00', icon: Calendar },
+              { label: 'New Requests', value: '00', icon: Inbox },
             ].map((stat, i) => (
-              <div key={i} className="bg-white/5 border border-white/5 rounded-2xl p-6 backdrop-blur-md">
-                <div className="flex items-center gap-3 mb-2">
-                  <stat.icon className="w-4 h-4 text-green-400" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{stat.label}</span>
+              <div key={i} className="bg-white/5 border border-white/5 rounded-2xl p-6 backdrop-blur-sm group hover:bg-white/[0.07] transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <stat.icon className="w-3.5 h-3.5 text-gray-500 group-hover:text-primary transition-colors" />
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-600 group-hover:text-gray-400 transition-colors">{stat.label}</span>
                 </div>
-                <div className="text-2xl font-black">{stat.value}</div>
+                <div className="text-3xl font-black tracking-tighter">
+                  {typeof stat.value === 'number' && stat.value < 10 && stat.value !== 0 ? `0${stat.value}` : stat.value}
+                </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Main Content Area */}
+        {/* Loading State */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-32 space-y-4">
-            <div className="w-12 h-12 border-4 border-green-500/20 border-t-green-500 rounded-full animate-spin"></div>
-            <p className="text-gray-500 font-medium animate-pulse">Syncing your studio data...</p>
+          <div className="flex flex-col items-center justify-center py-40 space-y-6">
+            <div className="relative">
+              <div className="w-12 h-12 border-2 border-white/5 border-t-primary rounded-full animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-1 h-1 bg-primary rounded-full animate-pulse"></div>
+              </div>
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600 animate-pulse">Syncing Database Cluster...</p>
           </div>
         ) : services.length === 0 ? (
-          <div className="bg-white/[0.02] border border-white/5 rounded-[40px] p-16 text-center backdrop-blur-sm border-dashed">
-            <div className="w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-8 animate-float">
-              <Plus className="w-12 h-12 text-green-500" />
+          <div className="bg-white/[0.01] border border-white/5 rounded-[48px] p-24 text-center backdrop-blur-sm border-dashed">
+            <div className="group relative w-20 h-20 mx-auto mb-10">
+              <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse"></div>
+              <div className="relative w-full h-full bg-[#0a0a0a] border border-white/10 rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
+                <Plus className="w-8 h-8 text-primary" />
+              </div>
             </div>
-            <h2 className="text-3xl font-bold mb-4">No services built yet</h2>
-            <p className="text-gray-400 max-w-md mx-auto mb-10 text-lg">
-              You haven't created any coaching services yet. Start your journey by offering your first session to the community.
+            <h2 className="text-3xl font-black tracking-tighter mb-4 uppercase">No Services Found</h2>
+            <p className="text-gray-500 max-w-sm mx-auto mb-12 text-sm font-medium leading-relaxed">
+              Your service manifest is currently empty. Create your first professional service to begin coaching.
             </p>
             <Link href="/profile/my-services/create">
-              <Button variant="outline" className="border-green-500/50 text-green-400 hover:bg-green-500/10 h-14 px-10 rounded-2xl">
-                Launch Your First Service
+              <Button variant="outline" className="border-white/10 text-white hover:bg-white hover:text-black h-12 px-10 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all">
+                Add First Service
               </Button>
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {services.map((service, index) => (
-              <div key={service.id} className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+              <div key={service.id} className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700" style={{ animationDelay: `${index * 150}ms` }}>
                 <ServiceCard
                   service={service}
                   memberCount={service.sessionsPerWeek || 0}
@@ -147,32 +150,32 @@ export default function MyServicesPage() {
                   platformName={service.platformName}
                 />
 
-                {/* Management Actions */}
-                <div className="grid grid-cols-2 gap-3">
-                  <Link href={`/profile/my-services/plan?id=${service.id}`} className="flex-1">
-                    <Button variant="secondary" className="w-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5 rounded-xl text-xs font-bold uppercase tracking-wider py-5 flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5" />
-                      Schedule
+                {/* Tactical Management Actions */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <Link href={`/profile/my-services/plan?id=${service.id}`}>
+                    <Button variant="secondary" className="w-full bg-white/[0.03] hover:bg-white/[0.08] text-gray-400 hover:text-white border border-white/5 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] h-10 transition-all flex items-center justify-center gap-2">
+                      <Calendar className="w-3 h-3" />
+                      Plan
                     </Button>
                   </Link>
-                  <Link href={`/profile/my-services/requests?id=${service.id}`} className="flex-1">
-                    <Button variant="secondary" className="w-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5 rounded-xl text-xs font-bold uppercase tracking-wider py-5 flex items-center gap-2">
-                      <Inbox className="w-3.5 h-3.5" />
+                  <Link href={`/profile/my-services/requests?id=${service.id}`}>
+                    <Button variant="secondary" className="w-full bg-white/[0.03] hover:bg-white/[0.08] text-gray-400 hover:text-white border border-white/5 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] h-10 transition-all flex items-center justify-center gap-2">
+                      <Inbox className="w-3 h-3" />
                       Orders
                     </Button>
                   </Link>
-                  <Link href={`/profile/my-services/create?id=${service.id}`} className="flex-1">
-                    <Button variant="secondary" className="w-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5 rounded-xl text-xs font-bold uppercase tracking-wider py-5 flex items-center gap-2">
-                      <Edit2 className="w-3.5 h-3.5" />
+                  <Link href={`/profile/my-services/create?id=${service.id}`}>
+                    <Button variant="secondary" className="w-full bg-white/[0.03] hover:bg-white/[0.08] text-gray-400 hover:text-white border border-white/5 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] h-10 transition-all flex items-center justify-center gap-2">
+                      <Edit2 className="w-3 h-3" />
                       Edit
                     </Button>
                   </Link>
                   <Button
                     onClick={() => handleDelete(service.id)}
                     variant="secondary"
-                    className="flex-1 bg-red-500/5 hover:bg-red-500/10 text-red-400/80 border border-red-500/10 rounded-xl text-xs font-bold uppercase tracking-wider py-5 flex items-center gap-2"
+                    className="w-full bg-red-500/5 hover:bg-red-500/15 text-red-500/60 hover:text-red-500 border border-red-500/10 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] h-10 transition-all flex items-center justify-center gap-2"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-3 h-3" />
                     Delete
                   </Button>
                 </div>

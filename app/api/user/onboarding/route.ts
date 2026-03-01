@@ -5,58 +5,58 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const token = await getToken({ 
+    const token = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
     });
-    
+
     if (!token?.email) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: 'Unauthorized',
         details: 'No valid session found'
       }, { status: 401 });
     }
-    
+
     // Parse request body
     const body = await request.json();
-    
+
     // Find user
     const user = await prisma.user.findUnique({
       where: { email: token.email }
     });
-    
+
     if (!user) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: 'User not found',
         details: 'User not found in database'
       }, { status: 404 });
     }
-    
+
     // Update user bio and avatar
     if (body.bio || body.profilePictureUrl) {
       const updateData: any = {};
       if (body.bio) updateData.bio = body.bio;
       if (body.profilePictureUrl) updateData.avatar = body.profilePictureUrl;
-      
+
       await prisma.user.update({
         where: { id: user.id },
         data: updateData
       });
     }
-    
+
     // Process games
     if (body.games && body.games.length > 0) {
       for (const gameData of body.games) {
         // Find or create game
         let game = await prisma.game.findFirst({
-          where: { 
+          where: {
             OR: [
               { igdbId: parseInt(gameData.gameId) },
               { id: gameData.gameId }
             ]
           }
         });
-        
+
         if (!game) {
           game = await prisma.game.create({
             data: {
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
             }
           });
         }
-        
+
         // Create or update user game relationship
         try {
           await prisma.userGame.create({
@@ -100,14 +100,14 @@ export async function POST(request: NextRequest) {
         }
       }
     }
-    
+
     // Process languages
     if (body.languages && body.languages.length > 0) {
       // Remove existing languages
       await prisma.userLanguage.deleteMany({
         where: { userId: user.id }
       });
-      
+
       // Add new languages
       for (const langData of body.languages) {
         if (langData.language && langData.level) {
@@ -121,12 +121,12 @@ export async function POST(request: NextRequest) {
         }
       }
     }
-    
+
     // Process tags
     if (body.tags && body.tags.length > 0) {
       // Remove existing non-category tags
       await prisma.userTag.deleteMany({
-        where: { 
+        where: {
           userId: user.id,
           tag: {
             not: {
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
           }
         }
       });
-      
+
       // Add new tags
       for (const tag of body.tags) {
         if (tag) {
@@ -148,19 +148,19 @@ export async function POST(request: NextRequest) {
         }
       }
     }
-    
+
     // Process categories
     if (body.categories && body.categories.length > 0) {
       // Remove existing category tags
       await prisma.userTag.deleteMany({
-        where: { 
+        where: {
           userId: user.id,
           tag: {
             startsWith: 'category:'
           }
         }
       });
-      
+
       // Add new categories
       for (const category of body.categories) {
         await prisma.userTag.create({
@@ -171,16 +171,22 @@ export async function POST(request: NextRequest) {
         });
       }
     }
-    
-    return NextResponse.json({ 
+
+    // Mark onboarding as completed
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { onboardingCompleted: true }
+    });
+
+    return NextResponse.json({
       success: true,
       message: 'Onboarding completed successfully'
     });
-    
+
   } catch (error) {
     console.error('Onboarding error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Onboarding failed',
         details: error instanceof Error ? error.message : 'Unknown error'
       },

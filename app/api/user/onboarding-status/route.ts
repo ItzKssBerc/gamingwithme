@@ -5,11 +5,11 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    const token = await getToken({ 
+    const token = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
     });
-    
+
     if (!token?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -28,14 +28,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Consider onboarding completed if user has bio or any games/languages/tags
-    const hasProfileData = user.bio || 
-                          user.userGames.length > 0 || 
-                          user.userLanguages.length > 0 || 
-                          user.userTags.length > 0;
+    // Check if user has completed onboarding
+    const isCompleted = user.onboardingCompleted;
 
-    return NextResponse.json({ 
-      completed: hasProfileData,
+    return NextResponse.json({
+      completed: isCompleted,
       hasBio: !!user.bio,
       hasGames: user.userGames.length > 0,
       hasLanguages: user.userLanguages.length > 0,

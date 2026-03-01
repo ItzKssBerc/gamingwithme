@@ -1039,7 +1039,7 @@ export default function OnboardingPage() {
                     </div>
                   )}
 
-                  </CardContent>
+                </CardContent>
               </Card>
             )}
 
@@ -1054,6 +1054,14 @@ export default function OnboardingPage() {
                 <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Previous</span>
                 <span className="sm:hidden">Prev</span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="text-gray-500 hover:text-white hover:bg-white/5 text-[10px] uppercase font-black tracking-[0.3em] transition-all"
+                onClick={() => router.push('/')}
+              >
+                Skip for now
               </Button>
 
               <Button

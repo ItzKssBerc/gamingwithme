@@ -35,8 +35,46 @@ export async function GET(request: NextRequest) {
     console.log('User found:', user ? 'yes' : 'no');
 
     if (!user) {
-      console.log('User not found, returning 404');
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      console.log('User not found in database, but session exists. Attempting auto-registration...');
+
+      // Auto-create user from session data
+      try {
+        const newUser = await prisma.user.create({
+          data: {
+            email: session.user.email,
+            username: session.user.username || (session.user as any).name || session.user.email.split('@')[0],
+            avatar: (session.user as any).image || (session.user as any).avatar_url,
+            isVerified: true,
+          }
+        });
+
+        console.log('Auto-registration successful for:', newUser.email);
+
+        // Use the newly created user for the rest of the profile data
+        const profileData = {
+          id: newUser.id,
+          username: newUser.username,
+          email: newUser.email,
+          bio: newUser.bio,
+          avatar: newUser.avatar,
+          isAdmin: newUser.isAdmin,
+          isActive: (newUser as any).isActive !== undefined ? (newUser as any).isActive : true,
+          stripeAccountId: (newUser as any).stripeAccountId || null,
+          stripeOnboardingComplete: !!(newUser as any).stripeOnboardingComplete,
+          createdAt: newUser.createdAt.toISOString(),
+          userGames: [],
+          userLanguages: [],
+          userTags: [],
+        };
+
+        return NextResponse.json({
+          profile: profileData
+        });
+
+      } catch (createError) {
+        console.error('Failed to auto-register user:', createError);
+        return NextResponse.json({ error: 'User not found and auto-registration failed' }, { status: 404 });
+      }
     }
 
     const profileData = {
@@ -47,8 +85,8 @@ export async function GET(request: NextRequest) {
       avatar: user.avatar,
       isAdmin: user.isAdmin,
       isActive: (user as any).isActive !== undefined ? (user as any).isActive : true,
-      stripeAccountId: user.stripeAccountId,
-      stripeOnboardingComplete: user.stripeOnboardingComplete,
+      stripeAccountId: (user as any).stripeAccountId || null,
+      stripeOnboardingComplete: !!(user as any).stripeOnboardingComplete,
       createdAt: user.createdAt.toISOString(),
       userGames: user.userGames,
       userLanguages: user.userLanguages,

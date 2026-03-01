@@ -20,56 +20,68 @@ interface ServiceCardProps {
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ service, memberCount, onDelete, gameName, platformName, gamePlatform }) => {
   return (
-    <Card className="relative overflow-hidden bg-slate-900/40 backdrop-blur-md border border-white/10 hover:border-green-400/50 transition-all duration-500 group/scard flex flex-col h-full shadow-2xl">
-      {/* Decorative Background Gradient */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover/scard:bg-green-400/20 transition-colors duration-500"></div>
+    <Card className="relative overflow-hidden bg-[#0a0a0a] backdrop-blur-md border border-white/5 hover:border-green-500/30 transition-all duration-300 group/scard flex flex-col h-full rounded-2xl">
+      {/* HUD Accent */}
+      <div className="absolute top-0 left-0 w-1 h-0 bg-green-500 group-hover/scard:h-full transition-all duration-500"></div>
 
       {/* Content Header */}
       <div className="p-6 pb-2">
-        <div className="flex justify-between items-start mb-3">
+        <div className="flex justify-between items-start mb-4">
           <div className="flex-1 min-w-0">
-            <h3 className="text-xl font-bold text-white group-hover/scard:text-green-400 transition-colors truncate mb-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-500">Service ID: {service.id.slice(-6)}</span>
+              {service.isActive ? (
+                <span className="flex items-center gap-1 text-[8px] font-black uppercase tracking-[0.2em] text-green-500">
+                  <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse"></span>
+                  Active
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 text-[8px] font-black uppercase tracking-[0.2em] text-red-500">
+                  <span className="w-1 h-1 rounded-full bg-red-500"></span>
+                  Inactive
+                </span>
+              )}
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover/scard:text-green-400 transition-colors truncate mb-2 tracking-tight">
               {service.title}
             </h3>
             <div className="flex items-center gap-2 flex-wrap">
               {gameName && (
-                <span className="text-[10px] uppercase tracking-wider font-extrabold bg-green-500/20 text-green-400 px-2 py-0.5 rounded border border-green-500/30">
+                <span className="text-[9px] font-black uppercase tracking-[0.1em] bg-white/[0.03] text-gray-400 px-2 py-0.5 rounded border border-white/5">
                   {gameName}
                 </span>
               )}
               {platformName && (
-                <span className="text-[10px] uppercase tracking-wider font-extrabold bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">
+                <span className="text-[9px] font-black uppercase tracking-[0.1em] bg-white/[0.03] text-gray-400 px-2 py-0.5 rounded border border-white/5">
                   {platformName}
                 </span>
               )}
             </div>
           </div>
           <div className="flex flex-col items-end">
-            <div className="text-2xl font-black text-white">$ {service.price}</div>
-            <div className="text-[10px] text-gray-400 uppercase tracking-widest">per session</div>
+            <div className="text-2xl font-black text-white tracking-tighter">${service.price}</div>
+            <div className="text-[9px] text-gray-600 uppercase font-black tracking-widest">Fixed Rate</div>
           </div>
         </div>
 
-        <p className="text-sm text-gray-400 line-clamp-2 min-h-[40px] leading-relaxed">
+        <p className="text-xs text-gray-500 line-clamp-2 min-h-[32px] leading-relaxed font-medium">
           {service.description || "No description provided."}
         </p>
       </div>
 
       {/* Details Row */}
-      <div className="px-6 py-4 flex items-center gap-6 mt-auto">
-        <div className="flex items-center gap-2 text-gray-300">
-          <Clock className="w-4 h-4 text-green-400" />
-          <span className="text-xs font-medium">{service.duration}m</span>
+      <div className="px-6 py-5 flex items-center gap-6 mt-auto border-t border-white/[0.03] bg-white/[0.01]">
+        <div className="flex items-center gap-2">
+          <Clock className="w-3.5 h-3.5 text-gray-600" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{service.duration}m</span>
         </div>
-        <div className="flex items-center gap-2 text-gray-300">
-          <Users className="w-4 h-4 text-green-400" />
-          <span className="text-xs font-medium">{memberCount} Bookings</span>
+        <div className="flex items-center gap-2">
+          <Users className="w-3.5 h-3.5 text-gray-600" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{memberCount} Bookings</span>
         </div>
-        <div className="ml-auto">
-          <span className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${service.isActive ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${service.isActive ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
-            {service.isActive ? 'Live' : 'Hidden'}
-          </span>
+
+        <div className="ml-auto opacity-0 group-hover/scard:opacity-100 transition-opacity">
+          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-green-500 underline decoration-green-500/30">Sync Status: OK</span>
         </div>
       </div>
     </Card>

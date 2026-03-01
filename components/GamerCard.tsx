@@ -16,45 +16,32 @@ interface GamerCardProps {
 
 const GamerCard: React.FC<GamerCardProps> = ({ gamer }) => {
     return (
-        <Link href={`/profile/${gamer.username}`} className="group flex-shrink-0 w-52 transition-transform duration-300 hover:scale-105">
-            <div className="relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900 p-4">
-                <div className="flex items-center gap-4">
-                    <div className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-primary/50 group-hover:border-primary transition-colors">
+        <Link href={`/profile/${gamer.username}`} className="group flex-shrink-0 w-48 transition-transform duration-300 hover:scale-105">
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-4 backdrop-blur-sm group-hover:border-primary/50 transition-all duration-300">
+                <div className="flex flex-col items-center gap-4 text-center">
+                    <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-white/10 group-hover:border-primary transition-all duration-500 shadow-xl">
                         {gamer.avatar ? (
                             <Image
                                 src={gamer.avatar}
                                 alt={gamer.username}
                                 fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                className="object-cover"
+                                className="object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                         ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-zinc-400 font-bold text-xl uppercase">
+                            <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-zinc-400 font-bold text-2xl uppercase">
                                 {gamer.username.charAt(0)}
                             </div>
                         )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-bold text-white truncate group-hover:text-primary transition-colors">
+                    <div className="w-full">
+                        <h3 className="text-lg font-bold text-white truncate group-hover:text-primary transition-colors tracking-tight">
                             {gamer.username}
                         </h3>
-                        <div className="flex items-center gap-1 text-sm font-semibold text-yellow-400">
-                            <Star className="h-3 w-3 fill-yellow-400" />
-                            {gamer.rating > 0 ? gamer.rating : "New"}
-                        </div>
+                        <p className="text-[10px] text-zinc-500 uppercase font-black tracking-[0.2em] mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            View Profile
+                        </p>
                     </div>
-                </div>
-
-                <p className="mt-3 text-xs text-zinc-400 line-clamp-2 h-8 leading-relaxed">
-                    {gamer.bio}
-                </p>
-
-                <div className="mt-4 flex flex-wrap gap-1">
-                    {gamer.tags.slice(0, 3).map((tag, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded-full bg-primary/10 text-[10px] font-medium text-primary">
-                            {tag}
-                        </span>
-                    ))}
                 </div>
             </div>
         </Link>

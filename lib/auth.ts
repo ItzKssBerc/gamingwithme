@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import TwitchProvider from "next-auth/providers/twitch"
 import { prisma } from "./prisma"
 import bcrypt from "bcryptjs"
+import { cookies } from "next/headers"
 
 // Típusdefiníciók kiterjesztése
 declare module "next-auth" {
@@ -11,6 +12,7 @@ declare module "next-auth" {
     email: string
     username: string
     isAdmin: boolean
+    onboardingCompleted: boolean
   }
 
   interface Session {
@@ -19,6 +21,7 @@ declare module "next-auth" {
       email: string
       username: string
       isAdmin: boolean
+      onboardingCompleted: boolean
     }
   }
 }
@@ -29,6 +32,7 @@ declare module "next-auth/jwt" {
     email: string
     username: string
     isAdmin: boolean
+    onboardingCompleted: boolean
   }
 }
 
@@ -71,6 +75,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             username: user.username,
             isAdmin: user.isAdmin,
+            onboardingCompleted: user.onboardingCompleted,
           }
         } catch (error) {
           console.error("Authorize error:", error)
@@ -91,12 +96,13 @@ export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
   },
   callbacks: {
-    async jwt({ token, user }: { token: any; user: any }) {
+    async jwt({ token, user, account }: { token: any; user: any; account: any }) {
       if (user) {
         token.id = user.id
         token.email = user.email
         token.username = user.username
         token.isAdmin = user.isAdmin
+        token.onboardingCompleted = user.onboardingCompleted
       }
       return token
     },
@@ -106,8 +112,60 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email
         session.user.username = token.username
         session.user.isAdmin = token.isAdmin
+        session.user.onboardingCompleted = token.onboardingCompleted
       }
       return session
+    },
+    async signIn({ user, account, profile }: { user: any; account: any; profile?: any }) {
+      if (account?.provider === "twitch" || account?.provider === "google") {
+        try {
+          // Check if user exists in database
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email }
+          });
+
+          // OAuth Registration Guard: Check if this started from the registration page
+          const cookieStore = await cookies();
+          const isSignUp = cookieStore.get('is_signup')?.value === 'true';
+
+          if (isSignUp && existingUser) {
+            // User already exists and we are in a registration flow
+            return false; // This will redirect to /api/auth/error?error=AccessDenied
+          }
+
+          if (!existingUser) {
+            // Create user if they don't exist
+            const newUser = await prisma.user.create({
+              data: {
+                email: user.email,
+                username: user.username || user.name || user.email.split('@')[0],
+                avatar: user.image || user.avatar_url,
+                isVerified: true,
+              }
+            });
+            user.id = newUser.id;
+            user.username = newUser.username;
+            user.isAdmin = newUser.isAdmin;
+            user.onboardingCompleted = newUser.onboardingCompleted;
+          } else {
+            // User exists - update details
+            const updatedUser = await prisma.user.update({
+              where: { id: existingUser.id },
+              data: {
+                avatar: user.image || user.avatar_url || existingUser.avatar,
+              }
+            });
+            user.id = updatedUser.id;
+            user.username = updatedUser.username;
+            user.isAdmin = updatedUser.isAdmin;
+            user.onboardingCompleted = updatedUser.onboardingCompleted;
+          }
+        } catch (error) {
+          console.error("Error during provider sign-in:", error);
+          return false;
+        }
+      }
+      return true;
     }
   },
   pages: {

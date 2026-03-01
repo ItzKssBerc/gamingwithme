@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { Save, User, Mail, Lock, AlertTriangle, Eye, EyeOff, Settings, Gamepad2, Languages, Tags, Camera, Upload, Star, Plus, X, Loader2, Image, CreditCard, ExternalLink, CheckCircle2 } from "lucide-react"
+import { Save, User, Mail, Lock, AlertTriangle, ShieldAlert, Eye, EyeOff, Settings, Gamepad2, Languages, Tags, Camera, Upload, Star, Plus, X, Loader2, Image, CreditCard, ExternalLink, CheckCircle2 } from "lucide-react"
 
 interface Game {
   id: string
@@ -23,10 +23,10 @@ interface Game {
 }
 
 const SKILL_LEVELS = [
-  { value: "beginner", label: "Beginner", color: "bg-green-600/20 text-green-300 border-green-500/30" },
-  { value: "intermediate", label: "Intermediate", color: "bg-yellow-600/20 text-yellow-300 border-yellow-500/30" },
-  { value: "advanced", label: "Advanced", color: "bg-orange-600/20 text-orange-300 border-orange-500/30" },
-  { value: "expert", label: "Expert", color: "bg-red-600/20 text-red-300 border-red-500/30" }
+  { value: "beginner", label: "Beginner", color: "bg-white/[0.03] text-gray-400 border-white/10" },
+  { value: "intermediate", label: "Intermediate", color: "bg-primary/[0.03] text-primary/70 border-primary/20" },
+  { value: "advanced", label: "Advanced", color: "bg-primary/[0.05] text-primary border-primary/30" },
+  { value: "expert", label: "Expert", color: "bg-primary/[0.08] text-primary font-black border-primary/40" }
 ]
 
 const LANGUAGE_LEVELS = [
@@ -852,10 +852,10 @@ export default function ProfilePage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex items-center justify-center">
-        <div className="flex items-center gap-3 text-white text-xl">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-          Loading...
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
+        <div className="relative z-10 flex items-center gap-3 text-white/50 text-sm font-black uppercase tracking-[0.3em]">
+          <div className="w-4 h-4 border-2 border-white/10 border-t-primary rounded-full animate-spin"></div>
+          Synchronizing...
         </div>
       </div>
     )
@@ -866,55 +866,58 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-transparent text-white selection:bg-primary/30 font-sans">
+      <div className="relative z-10 container mx-auto px-4 py-16">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Profile Settings
+        <div className="mb-12">
+          <h1 className="text-4xl font-black text-white uppercase tracking-tighter leading-none mb-2">
+            Settings
           </h1>
-          <p className="text-xl text-gray-300">
-            Manage your account and profile information
-          </p>
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-1 rounded-full bg-primary animate-pulse"></div>
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">
+              Manage your identity and preferences
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
-          <div className="lg:w-64 flex-shrink-0">
-            <Card className="gaming-card">
+          <div className="lg:w-72 flex-shrink-0">
+            <Card className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl">
               <CardContent className="p-4">
                 <div className="space-y-2">
                   <button
                     onClick={() => setActiveSection("account")}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${activeSection === "account"
-                      ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
-                      : "text-gray-300 hover:bg-white/10 hover:text-white"
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl transition-all duration-300 ${activeSection === "account"
+                      ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_20px_rgba(var(--primary),0.1)]"
+                      : "text-gray-500 hover:bg-white/[0.03] hover:text-white border border-transparent"
                       }`}
                   >
-                    <Settings className="h-5 w-5" />
-                    Account Settings
+                    <Settings className={`h-4 w-4 ${activeSection === "account" ? "animate-spin-slow" : ""}`} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Account Settings</span>
                   </button>
 
                   <button
                     onClick={() => setActiveSection("profile")}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${activeSection === "profile"
-                      ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
-                      : "text-gray-300 hover:bg-white/10 hover:text-white"
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl transition-all duration-300 ${activeSection === "profile"
+                      ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_20px_rgba(var(--primary),0.1)]"
+                      : "text-gray-500 hover:bg-white/[0.03] hover:text-white border border-transparent"
                       }`}
                   >
-                    <User className="h-5 w-5" />
-                    Profile Information
+                    <User className="h-4 w-4" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Profile Details</span>
                   </button>
 
                   <button
                     onClick={() => setActiveSection("payouts")}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${activeSection === "payouts"
-                      ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30"
-                      : "text-gray-300 hover:bg-white/10 hover:text-white"
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl transition-all duration-300 ${activeSection === "payouts"
+                      ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_20px_rgba(var(--primary),0.1)]"
+                      : "text-gray-500 hover:bg-white/[0.03] hover:text-white border border-transparent"
                       }`}
                   >
-                    <CreditCard className="h-5 w-5" />
-                    Payout Settings
+                    <CreditCard className="h-4 w-4" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Payout Settings</span>
                   </button>
                 </div>
               </CardContent>
@@ -924,10 +927,12 @@ export default function ProfilePage() {
           {/* Main Content */}
           <div className="flex-1">
             {activeSection === "account" && (
-              <Card className="gaming-card">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Settings className="h-6 w-6" />
+              <Card className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl">
+                <CardHeader className="pt-8 pb-4 px-8 text-left">
+                  <CardTitle className="text-2xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+                      <Settings className="h-5 w-5 text-primary" />
+                    </div>
                     Account Settings
                   </CardTitle>
                 </CardHeader>
@@ -945,47 +950,47 @@ export default function ProfilePage() {
                       </div>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="username" className="text-white flex items-center gap-2">
-                          <User className="h-4 w-4" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <Label htmlFor="username" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                          <User className="h-3 w-3" />
                           Username
                         </Label>
                         <Input
                           id="username"
                           value={accountForm.username}
                           onChange={(e) => setAccountForm(prev => ({ ...prev, username: e.target.value }))}
-                          className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                          placeholder="Enter username"
+                          className="px-5 py-6 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium"
+                          placeholder="Your unique ID"
                         />
                         {accountErrors.username && (
-                          <p className="text-red-400 text-xs">{accountErrors.username}</p>
+                          <p className="text-red-500 text-[10px] font-black uppercase tracking-widest ml-1 mt-1">{accountErrors.username}</p>
                         )}
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="text-white flex items-center gap-2">
-                          <Mail className="h-4 w-4" />
-                          Email
+                      <div className="space-y-3">
+                        <Label htmlFor="email" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                          <Mail className="h-3 w-3" />
+                          Email Address
                         </Label>
                         <Input
                           id="email"
                           type="email"
                           value={accountForm.email}
                           onChange={(e) => setAccountForm(prev => ({ ...prev, email: e.target.value }))}
-                          className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                          placeholder="Enter email"
+                          className="px-5 py-6 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium"
+                          placeholder="email@example.com"
                         />
                         {accountErrors.email && (
-                          <p className="text-red-400 text-xs">{accountErrors.email}</p>
+                          <p className="text-red-500 text-[10px] font-black uppercase tracking-widest ml-1 mt-1">{accountErrors.email}</p>
                         )}
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="currentPassword" className="text-white flex items-center gap-2">
-                          <Lock className="h-4 w-4" />
+                    <div className="space-y-6 pt-4">
+                      <div className="space-y-3">
+                        <Label htmlFor="currentPassword" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                          <Lock className="h-3 w-3" />
                           Current Password
                         </Label>
                         <div className="relative">
@@ -994,134 +999,136 @@ export default function ProfilePage() {
                             type={showCurrentPassword ? "text" : "password"}
                             value={accountForm.currentPassword}
                             onChange={(e) => setAccountForm(prev => ({ ...prev, currentPassword: e.target.value }))}
-                            className="bg-white/10 border-white/20 text-white placeholder-gray-400 pr-10"
-                            placeholder="Enter current password (required for changes)"
+                            className="px-5 py-6 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 pr-14 text-sm font-medium tracking-widest"
+                            placeholder="Required for changes"
                           />
                           <button
                             type="button"
                             onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-white transition-colors p-2"
                           >
                             {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
                         </div>
                         {accountErrors.currentPassword && (
-                          <p className="text-red-400 text-xs">{accountErrors.currentPassword}</p>
+                          <p className="text-red-500 text-[10px] font-black uppercase tracking-widest ml-1 mt-1">{accountErrors.currentPassword}</p>
                         )}
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="newPassword" className="text-white">New Password</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <Label htmlFor="newPassword" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">New Password</Label>
                           <div className="relative">
                             <Input
                               id="newPassword"
                               type={showNewPassword ? "text" : "password"}
                               value={accountForm.newPassword}
                               onChange={(e) => setAccountForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                              className="bg-white/10 border-white/20 text-white placeholder-gray-400 pr-10"
-                              placeholder="Enter new password (optional)"
+                              className="px-5 py-6 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 pr-14 text-sm font-medium tracking-widest"
+                              placeholder="New key (optional)"
                             />
                             <button
                               type="button"
                               onClick={() => setShowNewPassword(!showNewPassword)}
-                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-white transition-colors p-2"
                             >
                               {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
                           {accountErrors.newPassword && (
-                            <p className="text-red-400 text-xs">{accountErrors.newPassword}</p>
+                            <p className="text-red-500 text-[10px] font-black uppercase tracking-widest ml-1 mt-1">{accountErrors.newPassword}</p>
                           )}
                         </div>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
+                        <div className="space-y-3">
+                          <Label htmlFor="confirmPassword" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Confirm Password</Label>
                           <div className="relative">
                             <Input
                               id="confirmPassword"
                               type={showConfirmPassword ? "text" : "password"}
                               value={accountForm.confirmPassword}
                               onChange={(e) => setAccountForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                              className="bg-white/10 border-white/20 text-white placeholder-gray-400 pr-10"
-                              placeholder="Confirm new password"
+                              className="px-5 py-6 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 pr-14 text-sm font-medium tracking-widest"
+                              placeholder="Confirm new key"
                             />
                             <button
                               type="button"
                               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-white transition-colors p-2"
                             >
                               {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
                           {accountErrors.confirmPassword && (
-                            <p className="text-red-400 text-xs">{accountErrors.confirmPassword}</p>
+                            <p className="text-red-500 text-[10px] font-black uppercase tracking-widest ml-1 mt-1">{accountErrors.confirmPassword}</p>
                           )}
                         </div>
                       </div>
                     </div>
 
                     <Button
-                      className="gaming-button w-full"
+                      className="gaming-button w-full h-auto py-5 rounded-2xl group relative overflow-hidden mt-4"
                       onClick={handleSaveClick}
                       disabled={savingAccount}
                     >
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Changes
+                      <div className="flex items-center justify-center gap-3">
+                        <Save className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                        <span className="uppercase font-black text-[10px] tracking-[.3em]">Commit Changes</span>
+                      </div>
                     </Button>
 
                     {/* Account Status Section */}
-                    <div className="border-t border-white/20 pt-6 mt-6">
-                      <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5" />
-                        Account Status
-                      </h3>
+                    <div className="pt-12">
+                      <div className="relative mb-8">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t border-white/5"></span>
+                        </div>
+                        <div className="relative flex justify-center text-[8px] uppercase font-black tracking-[.3em]">
+                          <span className="bg-[#0a0a0a] px-4 text-gray-600 italic">// Access Status</span>
+                        </div>
+                      </div>
 
-                      <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/20">
-                        <div>
-                          <p className="text-white font-medium">Account Status</p>
-                          <p className="text-gray-400 text-sm">
-                            {accountStatus ? 'Your account is currently active' : 'Your account is currently inactive'}
+                      <div className="flex flex-col md:flex-row items-center justify-between p-6 bg-white/[0.01] border border-white/[0.05] rounded-[24px] gap-6">
+                        <div className="text-center md:text-left">
+                          <h4 className="text-sm font-black text-white uppercase tracking-widest mb-1 flex items-center gap-2 justify-center md:justify-start">
+                            Account Visibility
+                            <div className={`w-1.5 h-1.5 rounded-full ${accountStatus ? 'bg-primary' : 'bg-red-500'} animate-pulse`}></div>
+                          </h4>
+                          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+                            {accountStatus ? 'Your profile is currently active and visible' : 'Your profile is currently offline'}
                           </p>
-                          {accountStatus ? (
-                            <p className="text-green-400 text-xs mt-1">✓ Active - You can use all features</p>
-                          ) : (
-                            <p className="text-red-400 text-xs mt-1">⚠ Inactive - Some features may be limited</p>
-                          )}
                         </div>
                         <Button
                           onClick={handleToggleAccountStatus}
                           disabled={togglingStatus}
-                          variant={accountStatus ? "destructive" : "default"}
-                          className={accountStatus ? "bg-red-600/20 text-red-400 border-red-500/30 hover:bg-red-600/30" : "gaming-button"}
+                          variant="outline"
+                          className={`w-full md:w-auto h-auto py-3 px-8 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${accountStatus ? 'border-red-500/20 text-red-500 hover:bg-red-500/10' : 'border-primary/20 text-primary hover:bg-primary/10'}`}
                         >
                           {togglingStatus ? (
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            <Loader2 className="h-3 w-3 mr-2 animate-spin" />
                           ) : (
-                            <AlertTriangle className="h-4 w-4 mr-2" />
+                            <AlertTriangle className="h-3 w-3 mr-2" />
                           )}
-                          {accountStatus ? 'Deactivate Account' : 'Activate Account'}
+                          {accountStatus ? 'Go Offline' : 'Initialize Profile'}
                         </Button>
                       </div>
                     </div>
 
                     {/* Account Deletion Section */}
-                    <div className="border-t border-red-500/30 pt-6 mt-6">
-                      <h3 className="text-red-400 font-medium mb-4 flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5" />
-                        Danger Zone
-                      </h3>
-
-                      <div className="p-4 bg-red-500/10 rounded-lg border border-red-500/30">
-                        <p className="text-red-300 text-sm mb-4">
-                          Once you delete your account, there is no going back. Please be certain.
+                    <div className="pt-8">
+                      <div className="p-6 bg-red-500/[0.02] border border-red-500/10 rounded-[24px]">
+                        <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest flex items-center gap-2 mb-2">
+                          <AlertTriangle className="h-3 w-3" />
+                          Danger Zone
+                        </h4>
+                        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-tight mb-4">
+                          Irreversible action. All profile data will be permanently deleted from the system.
                         </p>
                         <Button
                           onClick={() => setShowDeleteModal(true)}
-                          variant="destructive"
-                          className="bg-red-600/20 text-red-400 border-red-500/30 hover:bg-red-600/30"
+                          variant="ghost"
+                          className="w-full md:w-auto text-[10px] font-black text-red-500/50 hover:text-red-500 hover:bg-red-500/10 uppercase tracking-[.2em]"
                         >
-                          <AlertTriangle className="h-4 w-4 mr-2" />
                           Delete Account
                         </Button>
                       </div>
@@ -1132,66 +1139,77 @@ export default function ProfilePage() {
             )}
 
             {activeSection === "profile" && (
-              <div className="space-y-6">
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {onboardingErrors.general && (
-                  <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
-                    <p className="text-red-300 text-sm">{onboardingErrors.general}</p>
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                    <p className="text-red-400 text-[10px] font-black uppercase tracking-widest leading-relaxed">{onboardingErrors.general}</p>
                   </div>
                 )}
 
                 {/* Profile Picture Section */}
-                <Card className="gaming-card">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Image className="h-6 w-6" />
-                      Profile Picture
+                <Card className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl">
+                  <CardHeader className="pt-8 pb-4 px-8">
+                    <CardTitle className="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+                        <Camera className="h-4 w-4 text-primary" />
+                      </div>
+                      Identity Visuals
                     </CardTitle>
-                    <CardDescription className="text-gray-300">
-                      Upload a profile picture to personalize your account
+                    <CardDescription className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1">
+                      Upload your profile identification
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-6">
+                  <CardContent className="px-8 pb-8">
+                    <div className="flex flex-col sm:flex-row items-center gap-8">
                       {/* Current Profile Picture */}
-                      <div className="flex-shrink-0">
-                        <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center">
+                      <div className="relative group">
+                        <div className="w-32 h-32 rounded-[24px] overflow-hidden bg-white/[0.02] border border-white/10 flex items-center justify-center transition-all duration-500 group-hover:border-primary/40 ring-4 ring-transparent group-hover:ring-primary/10">
                           {profileImage ? (
                             <img
                               src={profileImage}
                               alt="Profile"
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
                           ) : (session?.user as any)?.image ? (
                             <img
                               src={(session?.user as any).image}
                               alt="Profile"
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
                           ) : (
-                            <User className="h-12 w-12 text-white" />
+                            <User className="h-10 w-10 text-gray-700 group-hover:text-primary transition-colors" />
                           )}
+                        </div>
+                        <div className="absolute -bottom-2 -right-2 p-2 bg-primary rounded-xl shadow-xl opacity-0 scale-50 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300">
+                          <CheckCircle2 className="h-3 w-3 text-black" />
                         </div>
                       </div>
 
                       {/* Upload Controls */}
-                      <div className="flex-1">
-                        <div className="space-y-3">
+                      <div className="flex-1 text-center sm:text-left space-y-4">
+                        <div className="space-y-1">
+                          <h4 className="text-sm font-black text-white uppercase tracking-widest">Avatar Signature</h4>
+                          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                            JPG / PNG / GIF • System Limit: 5MB
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
                           <Button
                             onClick={() => setShowImageModal(true)}
-                            className="gaming-button"
+                            className="h-auto py-3 px-6 bg-white/[0.03] border border-white/10 rounded-xl text-white hover:bg-white/[0.06] transition-all group"
                             disabled={uploadingImage}
                           >
-                            {uploadingImage ? (
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            ) : (
-                              <Upload className="h-4 w-4 mr-2" />
-                            )}
-                            {uploadingImage ? 'Uploading...' : 'Change Picture'}
+                            <div className="flex items-center gap-2">
+                              {uploadingImage ? (
+                                <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                              ) : (
+                                <Upload className="h-3 w-3 text-primary group-hover:scale-110 transition-transform" />
+                              )}
+                              <span className="text-[10px] font-black uppercase tracking-widest">
+                                {uploadingImage ? 'Uploading' : 'Update Visual'}
+                              </span>
+                            </div>
                           </Button>
-
-                          <p className="text-gray-400 text-sm">
-                            Supported formats: JPG, PNG, GIF (max 5MB)
-                          </p>
                         </div>
                       </div>
                     </div>
@@ -1199,148 +1217,162 @@ export default function ProfilePage() {
                 </Card>
 
                 {/* Bio Section */}
-                <Card className="gaming-card">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <User className="h-6 w-6" />
-                      About You
+                <Card className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl">
+                  <CardHeader className="pt-8 pb-4 px-8">
+                    <CardTitle className="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+                        <User className="h-4 w-4 text-primary" />
+                      </div>
+                      User Biography
                     </CardTitle>
-                    <CardDescription className="text-gray-300">
-                      Tell other gamers about yourself
+                    <CardDescription className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1">
+                      System identification and narrative
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="px-8 pb-8">
                     <Textarea
-                      placeholder="Share your gaming story, interests, or what you're looking for..."
+                      placeholder="Input your gaming background, specialization, and coaching goals..."
                       value={onboardingForm.bio}
                       onChange={(e) => setOnboardingForm(prev => ({ ...prev, bio: e.target.value }))}
-                      className="min-h-[120px] bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-gray-400"
+                      className="min-h-[160px] px-6 py-5 bg-white/[0.02] border border-white/10 rounded-[24px] text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium leading-relaxed resize-none"
                     />
                   </CardContent>
                 </Card>
 
                 {/* Categories Section */}
-                <Card className="gaming-card">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Star className="h-6 w-6" />
-                      Gaming Categories
+                <Card className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl">
+                  <CardHeader className="pt-8 pb-4 px-8">
+                    <CardTitle className="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+                        <Star className="h-4 w-4 text-primary" />
+                      </div>
+                      Specialization Tags
                     </CardTitle>
-                    <CardDescription className="text-gray-300">
-                      Select the categories that best describe your gaming activities
+                    <CardDescription className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1">
+                      Define your coaching focus
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="px-8 pb-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {GAMING_CATEGORIES.map((category, index) => (
-                        <div
-                          key={`${category.id}-${index}`}
-                          onClick={() => handleCategoryToggle(category.id)}
-                          className={`p-4 rounded-xl border-2 cursor-pointer transition-all backdrop-blur-sm ${selectedCategories.includes(category.id)
-                            ? 'border-green-500 bg-green-600/20 backdrop-blur-md'
-                            : 'border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/20'
-                            }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-2xl">{category.icon}</span>
-                            <div>
-                              <h3 className="text-white font-medium">{category.name}</h3>
-                              <p className="text-gray-400 text-sm">{category.description}</p>
+                      {GAMING_CATEGORIES.map((category, index) => {
+                        const isSelected = selectedCategories.includes(category.id);
+                        return (
+                          <div
+                            key={`${category.id}-${index}`}
+                            onClick={() => handleCategoryToggle(category.id)}
+                            className={`group p-5 rounded-[24px] border transition-all duration-500 cursor-pointer ${isSelected
+                              ? 'bg-primary border-primary shadow-[0_0_30px_rgba(var(--primary),0.2)]'
+                              : 'bg-white/[0.01] border-white/5 hover:bg-white/[0.03] hover:border-white/10'
+                              }`}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className={`text-2xl transition-transform duration-500 group-hover:scale-125 ${isSelected ? 'brightness-0' : ''}`}>
+                                {category.icon}
+                              </div>
+                              <div>
+                                <h3 className={`text-[10px] font-black uppercase tracking-widest ${isSelected ? 'text-black' : 'text-white'}`}>
+                                  {category.name}
+                                </h3>
+                                <p className={`text-[8px] font-bold uppercase tracking-widest mt-0.5 ${isSelected ? 'text-black/60' : 'text-gray-600'}`}>
+                                  {category.description}
+                                </p>
+                              </div>
+                              {isSelected && (
+                                <div className="ml-auto">
+                                  <CheckCircle2 className="h-4 w-4 text-black" />
+                                </div>
+                              )}
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>
 
                 {/* Games Section */}
-                <Card className="gaming-card">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Gamepad2 className="h-6 w-6" />
-                      Your Games
+                <Card className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl">
+                  <CardHeader className="pt-8 pb-4 px-8">
+                    <CardTitle className="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+                        <Gamepad2 className="h-4 w-4 text-primary" />
+                      </div>
+                      Deployment Library
                     </CardTitle>
-                    <CardDescription className="text-gray-300">
-                      Add the games you play and your skill level
+                    <CardDescription className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1">
+                      Supported Gaming Platforms
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="px-8 pb-8 space-y-8">
                     {/* Game Search */}
-                    <div>
-                      <label className="block text-white font-medium mb-2">Search Games</label>
-                      <div className="relative">
+                    <div className="space-y-4">
+                      <div className="relative group">
                         <Input
-                          placeholder="Search for games..."
+                          placeholder="Search central database for games..."
                           value={gameSearchQuery}
                           onChange={(e) => handleGameSearch(e.target.value)}
-                          className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400"
+                          className="px-6 py-7 bg-white/[0.02] border border-white/10 rounded-[20px] text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium pr-14"
                         />
-                        {searchingGames && (
-                          <Loader2 className="absolute right-3 top-3 h-5 w-5 animate-spin text-green-400" />
-                        )}
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2">
+                          {searchingGames ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                          ) : (
+                            <Tags className="h-4 w-4 text-gray-700 group-focus-within:text-primary transition-colors" />
+                          )}
+                        </div>
                       </div>
 
                       {/* Search Results */}
                       {searchResults.length > 0 && (
-                        <div className="mt-4 space-y-2">
+                        <div className="mt-4 space-y-3 p-4 bg-white/[0.01] border border-white/5 rounded-[24px] max-h-[400px] overflow-y-auto custom-scrollbar">
+                          <div className="flex items-center gap-2 px-2 mb-2">
+                            <span className="text-[8px] font-black text-gray-700 uppercase tracking-[.3em]">Query Results</span>
+                          </div>
                           {searchResults.map((game: Game, index) => {
                             const existingGame = selectedGames.find(g => g.gameId === game.id)
                             const isSelected = !!existingGame
 
                             return (
-                              <div key={`search-${game.id}-${index}`} className="flex items-center justify-between p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center">
+                              <div key={`search-${game.id}-${index}`} className="group flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.03] rounded-2xl hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-14 h-14 bg-white/[0.03] rounded-xl overflow-hidden border border-white/10 group-hover:border-primary/20 transition-all">
                                     {game.igdbCoverUrl ? (
                                       <img
                                         src={game.igdbCoverUrl}
                                         alt={game.name}
-                                        className="w-full h-full object-cover rounded-lg"
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                       />
                                     ) : (
-                                      <Gamepad2 className="h-6 w-6 text-white" />
+                                      <div className="w-full h-full flex items-center justify-center">
+                                        <Gamepad2 className="h-5 w-5 text-gray-700" />
+                                      </div>
                                     )}
                                   </div>
                                   <div>
-                                    <h3 className="text-white font-medium">{game.name}</h3>
-                                    <p className="text-gray-400 text-sm">
-                                      {game.genre} • {game.platform}
-                                      {game.platforms && game.platforms.length > 1 && (
-                                        <span className="text-xs text-gray-500 ml-1">
-                                          (+{game.platforms.length - 1} more)
-                                        </span>
-                                      )}
-                                    </p>
+                                    <h3 className="text-xs font-black text-white uppercase tracking-widest">{game.name}</h3>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <span className="text-[8px] font-bold text-gray-600 uppercase tracking-widest">{game.genre || 'Unknown Sector'}</span>
+                                      <div className="w-0.5 h-0.5 rounded-full bg-gray-800"></div>
+                                      <span className="text-[8px] font-bold text-gray-600 uppercase tracking-widest">{game.platform || 'Multi-Platform'}</span>
+                                    </div>
                                   </div>
                                 </div>
                                 <div className="flex gap-2">
                                   {isSelected ? (
-                                    <div className="flex items-center gap-2">
-                                      <Badge className="bg-green-600/20 text-green-300 border-green-500/30">
-                                        Added
-                                      </Badge>
-                                      <span className="text-xs text-gray-400">
-                                        ({selectedGames.filter(g => g.gameId === game.id).length} entries)
-                                      </span>
+                                    <div className="flex items-center gap-2 pr-2">
+                                      <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-lg">
+                                        <span className="text-[8px] font-black text-primary uppercase tracking-widest">Authenticated</span>
+                                      </div>
                                     </div>
                                   ) : (
-                                    <div className="flex gap-1">
+                                    <div className="flex gap-2">
                                       <Button
                                         size="sm"
                                         variant="outline"
-                                        className="border-green-500/30 text-green-400 hover:bg-green-500/20"
+                                        className="h-auto py-2 px-4 border-white/5 text-white/[0.4] hover:text-primary hover:border-primary/20 hover:bg-primary/5 rounded-xl transition-all"
                                         onClick={() => handleGameSelect(game)}
                                       >
-                                        Add
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="border-blue-500/30 text-blue-400 hover:bg-blue-500/20"
-                                        onClick={() => handleQuickAdd(game)}
-                                      >
-                                        Quick Add
+                                        <span className="text-[8px] font-black uppercase tracking-widest">Initialize</span>
                                       </Button>
                                     </div>
                                   )}
@@ -1354,28 +1386,26 @@ export default function ProfilePage() {
 
                     {/* Selected Games */}
                     {selectedGames.length > 0 && (
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="block text-white font-medium">Your Games</label>
+                      <div className="space-y-4 pt-6">
+                        <div className="flex items-center justify-between px-2">
+                          <label className="text-[8px] font-black text-gray-700 uppercase tracking-[.3em]">Game Inventory</label>
                           <Button
                             size="sm"
-                            variant="outline"
-                            className="border-red-500/30 text-red-400 hover:bg-red-500/20"
+                            variant="ghost"
+                            className="h-auto py-1 px-3 text-[8px] font-black text-red-500/40 hover:text-red-500 hover:bg-red-500/5 uppercase tracking-widest rounded-lg transition-all"
                             onClick={() => setSelectedGames([])}
                           >
                             Clear All
                           </Button>
                         </div>
-                        <div className="space-y-2">
+                        <div className="grid grid-cols-1 gap-3">
                           {(() => {
-                            // Group games by gameId to show only one entry per game
                             const groupedGames = selectedGames.reduce((acc, userGame) => {
                               const gameId = userGame.gameId
                               if (!acc[gameId]) {
                                 acc[gameId] = {
                                   gameId: userGame.gameId,
                                   name: userGame.name,
-                                  // Get all platforms and levels for this game
                                   platforms: selectedGames
                                     .filter(g => g.gameId === gameId)
                                     .map(g => ({ platform: g.platform, level: g.level }))
@@ -1387,27 +1417,31 @@ export default function ProfilePage() {
 
                             return Object.values(groupedGames).map((groupedGame: any, index) => {
                               const game = allGames.find(g => g.id === groupedGame.gameId) ||
-                                { id: groupedGame.gameId, slug: "", name: groupedGame.name || `Game ${groupedGame.gameId}`, genre: "", platform: "", platforms: [] } as Game
+                                { id: groupedGame.gameId, slug: "", name: groupedGame.name || `Asset ${groupedGame.gameId}`, genre: "", platform: "", platforms: [] } as Game
 
                               return (
-                                <div key={`${groupedGame.gameId}-${index}`} className="flex items-center justify-between p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
-                                  <div className="flex items-center gap-3">
-                                    <Gamepad2 className="h-6 w-6 text-green-400" />
+                                <div key={`${groupedGame.gameId}-${index}`} className="flex items-center justify-between p-4 bg-white/[0.01] border border-white/[0.05] rounded-[24px] hover:border-white/10 transition-all duration-300">
+                                  <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-white/[0.03] rounded-xl border border-white/5">
+                                      <Gamepad2 className="h-4 w-4 text-primary" />
+                                    </div>
                                     <div>
-                                      <h3 className="text-white font-medium">{game.name}</h3>
-                                      <p className="text-gray-400 text-sm">
-                                        {game.genre} • {groupedGame.platforms.length} platform{groupedGame.platforms.length > 1 ? 's' : ''}
-                                      </p>
+                                      <h3 className="text-xs font-black text-white uppercase tracking-widest">{game.name}</h3>
+                                      <div className="flex items-center gap-2 mt-1">
+                                        <span className="text-[8px] font-bold text-gray-600 uppercase tracking-widest">{game.genre || 'Sector Unassigned'}</span>
+                                        <div className="w-0.5 h-0.5 rounded-full bg-gray-800"></div>
+                                        <span className="text-[8px] font-bold text-primary uppercase tracking-widest">{groupedGame.platforms.length} Host{groupedGame.platforms.length > 1 ? 's' : ''} Online</span>
+                                      </div>
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <Button
                                       size="sm"
-                                      variant="outline"
-                                      className="border-red-500/30 text-red-400 hover:bg-red-500/20"
+                                      variant="ghost"
+                                      className="h-auto py-2 px-4 text-[8px] font-black text-gray-600 hover:text-red-500 hover:bg-red-500/5 uppercase tracking-widest rounded-xl transition-all"
                                       onClick={() => handleRemoveGame(groupedGame.gameId)}
                                     >
-                                      Remove
+                                      Remove Service
                                     </Button>
                                   </div>
                                 </div>
@@ -1425,97 +1459,119 @@ export default function ProfilePage() {
 
 
                 <Button
-                  className="gaming-button w-full"
+                  className="gaming-button w-full h-auto py-5 rounded-2xl group relative overflow-hidden mt-8 shadow-2xl"
                   onClick={handleOnboardingSave}
                   disabled={savingOnboarding}
                 >
-                  {savingOnboarding ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  ) : (
-                    <Save className="h-4 w-4 mr-2" />
-                  )}
-                  Save Profile
+                  <div className="flex items-center justify-center gap-3">
+                    {savingOnboarding ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                    )}
+                    <span className="uppercase font-black text-[10px] tracking-[.3em]">
+                      {savingOnboarding ? 'Synchronizing' : 'Commit Profile'}
+                    </span>
+                  </div>
                 </Button>
               </div>
             )}
 
             {activeSection === "payouts" && (
-              <Card className="gaming-card">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <CreditCard className="h-6 w-6" />
-                    Payout Settings
+              <Card className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <CardHeader className="pt-8 pb-4 px-8">
+                  <CardTitle className="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+                      <CreditCard className="h-4 w-4 text-primary" />
+                    </div>
+                    Financial Terminal
                   </CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Connect your Stripe account to receive payments from your coaching sessions.
+                  <CardDescription className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1">
+                    Manage monetary synchronization and payouts
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
+                <CardContent className="px-8 pb-8">
+                  <div className="space-y-8">
                     {!stripeOnboardingComplete ? (
-                      <div className="p-6 bg-blue-600/10 border border-blue-500/30 rounded-2xl">
-                        <div className="flex items-start gap-4">
-                          <div className="p-3 bg-blue-600/20 rounded-xl">
-                            <CreditCard className="h-6 w-6 text-blue-400" />
-                          </div>
-                          <div>
-                            <h3 className="text-white font-semibold mb-1">Get Paid for Coaching</h3>
-                            <p className="text-gray-300 text-sm mb-4">
-                              To receive payments from students, you need to link your bank account or debit card through Stripe. This is secure and only take a few minutes.
-                            </p>
-                            <Button
-                              onClick={handleStripeConnect}
-                              className="gaming-button"
-                              disabled={connectingStripe}
-                            >
+                      <div className="p-8 bg-blue-500/[0.02] border border-blue-500/10 rounded-[24px] relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                          <CreditCard className="h-24 w-24 text-blue-500 -rotate-12" />
+                        </div>
+                        <div className="relative z-10">
+                          <h3 className="text-sm font-black text-white uppercase tracking-widest mb-2 flex items-center gap-2">
+                            Revenue Initialization
+                            <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-ping"></span>
+                          </h3>
+                          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest leading-relaxed mb-6 max-w-md">
+                            To enable monetary reception from operations, direct synchronization with Stripe is required. This establishes a secure terminal for your financial assets.
+                          </p>
+                          <Button
+                            onClick={handleStripeConnect}
+                            className="h-auto py-3 px-8 bg-blue-600 text-white hover:bg-blue-500 rounded-xl transition-all shadow-lg shadow-blue-600/20 group"
+                            disabled={connectingStripe}
+                          >
+                            <div className="flex items-center gap-3">
                               {connectingStripe ? (
-                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                <Loader2 className="h-3 w-3 animate-spin" />
                               ) : (
-                                <ExternalLink className="h-4 w-4 mr-2" />
+                                <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                               )}
-                              {stripeAccountId ? "Complete Onboarding" : "Connect Stripe Account"}
-                            </Button>
-                          </div>
+                              <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                                {stripeAccountId ? "Resume Sync" : "Initialize Stripe"}
+                              </span>
+                            </div>
+                          </Button>
                         </div>
                       </div>
                     ) : (
-                      <div className="p-6 bg-emerald-600/10 border border-emerald-500/30 rounded-2xl">
-                        <div className="flex items-start gap-4">
-                          <div className="p-3 bg-emerald-600/20 rounded-xl">
-                            <CheckCircle2 className="h-6 w-6 text-emerald-400" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-white font-semibold mb-1">Stripe Connected</h3>
-                            <p className="text-gray-300 text-sm mb-4">
-                              Your account is successfully linked and you are ready to receive payments.
-                            </p>
-                            <div className="flex items-center gap-2 text-sm text-emerald-400 bg-emerald-400/10 w-fit px-3 py-1 rounded-full border border-emerald-400/20">
-                              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                              Active Account: {stripeAccountId}
+                      <div className="p-8 bg-primary/[0.02] border border-primary/10 rounded-[24px] relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-10">
+                          <CheckCircle2 className="h-24 w-24 text-primary" />
+                        </div>
+                        <div className="relative z-10">
+                          <h3 className="text-sm font-black text-white uppercase tracking-widest mb-2 flex items-center gap-2">
+                            Terminal Active
+                            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+                          </h3>
+                          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-6">
+                            Secure financial bridge established. Ready for asset distribution.
+                          </p>
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-xl">
+                              <span className="text-[8px] font-black text-primary uppercase tracking-[0.2em]">SID: {stripeAccountId}</span>
                             </div>
-                            <Button
-                              variant="outline"
-                              onClick={handleStripeConnect}
-                              className="mt-4 border-white/20 text-white hover:bg-white/10"
-                              disabled={connectingStripe}
-                            >
-                              <Settings className="h-4 w-4 mr-2" />
-                              Manage Stripe Account
-                            </Button>
                           </div>
+                          <Button
+                            variant="ghost"
+                            onClick={handleStripeConnect}
+                            className="h-auto py-3 px-6 text-[10px] font-black text-gray-400 hover:text-white hover:bg-white/[0.03] rounded-xl uppercase tracking-widest border border-white/5 transition-all"
+                            disabled={connectingStripe}
+                          >
+                            <Settings className="h-3 w-3 mr-2" />
+                            Manage Terminal
+                          </Button>
                         </div>
                       </div>
                     )}
 
-                    <div className="p-4 bg-white/5 border border-white/10 rounded-xl">
-                      <h4 className="text-white font-medium mb-2 flex items-center gap-2 text-sm">
-                        <AlertTriangle className="h-4 w-4 text-yellow-400" />
-                        Important Note
+                    <div className="p-6 bg-white/[0.01] border border-white/[0.05] rounded-[20px]">
+                      <h4 className="text-[8px] font-black text-gray-500 uppercase tracking-[.3em] mb-4 flex items-center gap-2">
+                        <AlertTriangle className="h-3 w-3 text-yellow-500/50" />
+                        Service Guidelines
                       </h4>
-                      <ul className="text-xs text-gray-400 space-y-1 list-disc pl-4">
-                        <li>All payments are processed securely via Stripe.</li>
-                        <li>GamingWithYou takes a 10% platform fee on all transactions.</li>
-                        <li>Payouts are subject to standard Stripe processing times.</li>
+                      <ul className="space-y-3">
+                        <li className="flex items-start gap-3">
+                          <div className="w-1 h-1 rounded-full bg-gray-800 mt-1"></div>
+                          <span className="text-[9px] font-bold text-gray-600 uppercase tracking-tight">Encrypted processing via Stripe infrastructure.</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="w-1 h-1 rounded-full bg-gray-800 mt-1"></div>
+                          <span className="text-[9px] font-bold text-gray-600 uppercase tracking-tight">System fee: 10% per transaction for platform maintenance.</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="w-1 h-1 rounded-full bg-gray-800 mt-1"></div>
+                          <span className="text-[9px] font-bold text-gray-600 uppercase tracking-tight">Asset distribution subject to standard latency cycles.</span>
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -1528,48 +1584,70 @@ export default function ProfilePage() {
 
       {/* Game Setup Modal */}
       {showGameSetupModal && selectedGameForSetup && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-          <div className="bg-slate-800/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 w-full max-w-md sm:max-w-lg lg:max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white text-lg font-semibold">Add {selectedGameForSetup.name}</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setShowGameSetupModal(false)
-                  setSelectedPlatforms([])
-                  setSelectedSkillLevels({})
-                }}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[9999] p-4 animate-in fade-in duration-300">
+          <div className="bg-[#0a0a0c]/95 border border-white/10 backdrop-blur-2xl rounded-[32px] p-0 w-full max-w-lg overflow-hidden shadow-2xl">
+            <div className="p-8 space-y-8">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+                      <Gamepad2 className="h-5 w-5 text-primary" />
+                    </div>
+                    Asset Configuration
+                  </h3>
+                  <button
+                    onClick={() => {
+                      setShowGameSetupModal(false)
+                      setSelectedPlatforms([])
+                      setSelectedSkillLevels({})
+                    }}
+                    className="p-2 text-gray-600 hover:text-white transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-12">
+                  Configure service details for: {selectedGameForSetup.name}
+                </p>
+              </div>
 
-            {/* Platform Selection with Skill Levels */}
-            <div className="mb-6">
-              <label className="block text-white font-medium mb-3">Select Platforms & Skill Levels</label>
-              <div className="space-y-3">
+              <div className="space-y-6 max-h-[50vh] overflow-y-auto px-1 custom-scrollbar">
                 {(selectedGameForSetup.platforms && selectedGameForSetup.platforms.length > 0 ?
                   Array.from(new Set(selectedGameForSetup.platforms.map(p => p.name))) :
                   ["PC", "PlayStation", "Xbox", "Nintendo", "Mobile", "VR", "Other"]
                 ).map((platform) => (
-                  <div key={`platform-${platform}`} className="flex items-center p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={`border-white/20 text-white hover:bg-white/10 text-sm py-2 backdrop-blur-sm ${selectedPlatforms.includes(platform)
-                        ? 'bg-green-600/80 border-green-500 backdrop-blur-md'
-                        : 'bg-white/10'
-                        }`}
-                      onClick={() => handlePlatformToggle(platform)}
-                    >
-                      {platform}
-                    </Button>
+                  <div key={`platform-${platform}`} className="space-y-3 p-5 bg-white/[0.01] border border-white/[0.05] rounded-[24px] hover:bg-white/[0.02] transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => handlePlatformToggle(platform)}
+                          className={`w-5 h-5 rounded-md border transition-all flex items-center justify-center ${selectedPlatforms.includes(platform)
+                            ? 'bg-primary border-primary'
+                            : 'bg-transparent border-white/10'
+                            }`}
+                        >
+                          {selectedPlatforms.includes(platform) && <CheckCircle2 className="h-3 w-3 text-black" />}
+                        </button>
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${selectedPlatforms.includes(platform) ? 'text-white' : 'text-gray-600'}`}>
+                          {platform}
+                        </span>
+                      </div>
+                      {selectedPlatforms.includes(platform) && (
+                        <div className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest 
+                          ${selectedSkillLevels[platform] === 'beginner' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
+                            selectedSkillLevels[platform] === 'intermediate' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
+                              selectedSkillLevels[platform] === 'advanced' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' :
+                                selectedSkillLevels[platform] === 'expert' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
+                                  'bg-primary/10 text-primary border border-primary/20'
+                          }`}>
+                          {selectedSkillLevels[platform] || 'Low'}
+                        </div>
+                      )}
+                    </div>
+
                     {selectedPlatforms.includes(platform) && (
-                      <div className="flex items-center gap-4 ml-4 flex-1">
-                        <span className="text-white text-sm mr-2">Skill:</span>
-                        <div className="flex gap-3">
+                      <div className="flex items-center gap-4 pt-2 pl-8">
+                        <div className="flex gap-4">
                           {[1, 2, 3, 4].map((level) => {
                             const skillValue = level === 1 ? 'beginner' :
                               level === 2 ? 'intermediate' :
@@ -1580,51 +1658,43 @@ export default function ProfilePage() {
                               <button
                                 key={`skill-${platform}-${level}`}
                                 onClick={() => handleModalSkillLevelChange(platform, skillValue)}
-                                className={`w-4 h-4 rounded-full transition-all backdrop-blur-sm ${isSelected
-                                  ? 'bg-green-500 scale-125 shadow-lg'
-                                  : 'bg-white/30 hover:bg-white/50 hover:scale-110'
+                                className={`w-3 h-3 rounded-full transition-all relative ${isSelected
+                                  ? 'bg-primary scale-125 shadow-[0_0_10px_rgba(var(--primary),0.5)]'
+                                  : 'bg-white/10 hover:bg-white/30'
                                   }`}
                                 title={skillValue}
-                              />
+                              >
+                                {isSelected && <div className="absolute inset-0 bg-primary blur-sm scale-150 opacity-50"></div>}
+                              </button>
                             )
                           })}
                         </div>
-                        <span className={`ml-auto px-3 py-1 rounded-full text-xs font-semibold 
-                          ${selectedSkillLevels[platform] === 'beginner' ? 'bg-green-600/30 text-green-200 border border-green-400/40' :
-                            selectedSkillLevels[platform] === 'intermediate' ? 'bg-yellow-600/30 text-yellow-200 border border-yellow-400/40' :
-                              selectedSkillLevels[platform] === 'advanced' ? 'bg-orange-600/30 text-orange-200 border border-orange-400/40' :
-                                selectedSkillLevels[platform] === 'expert' ? 'bg-red-600/30 text-red-200 border border-red-400/40' :
-                                  'bg-white/10 text-white border border-white/20'
-                          }
-                        `}>
-                          {selectedSkillLevels[platform] === 'beginner' ? 'Beginner' :
-                            selectedSkillLevels[platform] === 'intermediate' ? 'Intermediate' :
-                              selectedSkillLevels[platform] === 'advanced' ? 'Advanced' :
-                                selectedSkillLevels[platform] === 'expert' ? 'Expert' : 'Beginner'}
-                        </span>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/10">
-              <Button
-                variant="outline"
-                onClick={() => setShowGameSetupModal(false)}
-                className="flex-1 border-white/20 text-white hover:bg-white/10"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleAddGameFromModal}
-                className="flex-1 gaming-button"
-                disabled={selectedPlatforms.length === 0}
-              >
-                Add {selectedPlatforms.length > 0 ? `(${selectedPlatforms.length} platform${selectedPlatforms.length > 1 ? 's' : ''})` : ''}
-              </Button>
+              <div className="pt-4 flex flex-col gap-3">
+                <Button
+                  className="gaming-button h-auto py-5 rounded-2xl w-full group overflow-hidden relative"
+                  onClick={handleAddGameFromModal}
+                  disabled={selectedPlatforms.length === 0}
+                >
+                  <div className="relative z-10 flex items-center justify-center gap-3">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">
+                      Finalize Asset {selectedPlatforms.length > 0 ? `(${selectedPlatforms.length})` : ''}
+                    </span>
+                  </div>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="h-auto py-3 text-[8px] font-black text-gray-600 hover:text-white uppercase tracking-widest"
+                  onClick={() => setShowGameSetupModal(false)}
+                >
+                  Abort Access
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -1632,62 +1702,56 @@ export default function ProfilePage() {
 
       {/* Image Upload Modal */}
       <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
-        <DialogContent className="bg-slate-900 border-white/20 text-white max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <Image className="h-6 w-6 text-emerald-400" />
-              Upload Profile Picture
-            </DialogTitle>
-            <DialogDescription className="text-gray-400">
-              Choose an image to upload as your profile picture
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="bg-[#0a0a0c]/95 border border-white/10 backdrop-blur-2xl text-white p-0 rounded-[32px] overflow-hidden shadow-2xl max-w-lg w-[95vw]">
+          <div className="p-8 space-y-8">
+            <div className="space-y-2">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+                    <Camera className="h-5 w-5 text-primary" />
+                  </div>
+                  Visual Uplink
+                </DialogTitle>
+              </DialogHeader>
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-12">
+                Synchronize personal identification data
+              </p>
+            </div>
 
-          <div className="space-y-4">
-            {/* Drag & Drop Area */}
-            <div
-              onDrop={handleImageDrop}
-              onDragOver={handleDragOver}
-              className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center hover:border-emerald-400/50 transition-colors cursor-pointer"
-            >
+            <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-white/5 rounded-[24px] bg-white/[0.01] hover:bg-white/[0.02] hover:border-white/10 transition-all cursor-pointer group relative overflow-hidden">
               <input
                 type="file"
+                id="image-upload"
+                className="absolute inset-0 opacity-0 cursor-pointer z-20"
                 accept="image/*"
                 onChange={handleImageSelect}
-                className="hidden"
-                id="image-upload"
                 disabled={uploadingImage}
               />
-              <label htmlFor="image-upload" className="cursor-pointer">
-                <div className="space-y-3">
-                  <div className="mx-auto w-16 h-16 bg-emerald-600/20 rounded-full flex items-center justify-center">
-                    <Upload className="h-8 w-8 text-emerald-400" />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">Drop image here or click to browse</p>
-                    <p className="text-gray-400 text-sm mt-1">
-                      JPG, PNG, GIF up to 5MB
-                    </p>
-                  </div>
+              <div className="relative z-10 flex flex-col items-center text-center">
+                <div className="p-5 bg-white/[0.03] rounded-2xl border border-white/5 mb-4 group-hover:scale-110 transition-transform duration-500">
+                  <Upload className="h-8 w-8 text-primary/40 group-hover:text-primary transition-colors" />
                 </div>
-              </label>
+                <h4 className="text-xs font-black text-white uppercase tracking-widest mb-1">Engage Upload</h4>
+                <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+                  Drop file here or click to browse
+                </p>
+              </div>
             </div>
 
             {uploadingImage && (
-              <div className="flex items-center gap-3 p-3 bg-emerald-600/20 border border-emerald-500/30 rounded-lg">
-                <Loader2 className="h-5 w-5 animate-spin text-emerald-400" />
-                <span className="text-emerald-300">Uploading image...</span>
+              <div className="flex items-center gap-3 p-4 bg-primary/[0.02] border border-primary/10 rounded-xl animate-pulse">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <span className="text-[9px] font-black text-primary uppercase tracking-widest">Uploading visual asset...</span>
               </div>
             )}
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col gap-3">
               <Button
-                variant="outline"
+                variant="ghost"
+                className="h-auto py-3 text-[8px] font-black text-gray-600 hover:text-white uppercase tracking-widest mt-2"
                 onClick={() => setShowImageModal(false)}
-                className="flex-1 border-white/20 text-white hover:bg-white/10"
-                disabled={uploadingImage}
               >
-                Cancel
+                Disconnect Link
               </Button>
             </div>
           </div>
@@ -1696,112 +1760,117 @@ export default function ProfilePage() {
 
       {/* Confirmation Modal */}
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
-        <DialogContent className="bg-slate-900 border-white/20 text-white max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <Eye className="h-6 w-6 text-emerald-400" />
-              Confirm Changes
-            </DialogTitle>
-            <DialogDescription className="text-gray-400">
-              Please confirm your changes by re-entering the modified information
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            {confirmErrors.general && (
-              <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
-                <p className="text-red-300 text-sm">{confirmErrors.general}</p>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="confirmUsername" className="text-white flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Confirm Username
-                </Label>
-                <Input
-                  id="confirmUsername"
-                  value={confirmForm.username}
-                  onChange={(e) => setConfirmForm(prev => ({ ...prev, username: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                  placeholder="Re-enter username"
-                />
-                {confirmErrors.username && (
-                  <p className="text-red-400 text-xs">{confirmErrors.username}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmEmail" className="text-white flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  Confirm Email
-                </Label>
-                <Input
-                  id="confirmEmail"
-                  type="email"
-                  value={confirmForm.email}
-                  onChange={(e) => setConfirmForm(prev => ({ ...prev, email: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                  placeholder="Re-enter email"
-                />
-                {confirmErrors.email && (
-                  <p className="text-red-400 text-xs">{confirmErrors.email}</p>
-                )}
-              </div>
-
-              {accountForm.newPassword && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirmNewPassword" className="text-white flex items-center gap-2">
-                    <Lock className="h-4 w-4" />
-                    Confirm New Password
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="confirmNewPassword"
-                      type={showConfirmNewPassword ? "text" : "password"}
-                      value={confirmForm.newPassword}
-                      onChange={(e) => setConfirmForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                      className="bg-white/10 border-white/20 text-white placeholder-gray-400 pr-10"
-                      placeholder="Re-enter new password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                    >
-                      {showConfirmNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
+        <DialogContent className="bg-[#0a0a0c]/95 border border-white/10 backdrop-blur-2xl text-white p-0 rounded-[32px] overflow-hidden shadow-2xl max-w-md w-[95vw]">
+          <div className="p-8 space-y-8">
+            <div className="space-y-2">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+                    <Eye className="h-5 w-5 text-primary" />
                   </div>
-                  {confirmErrors.newPassword && (
-                    <p className="text-red-400 text-xs">{confirmErrors.newPassword}</p>
-                  )}
-                </div>
-              )}
+                  Review Parameters
+                </DialogTitle>
+              </DialogHeader>
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-12">
+                Verify and commit modified account data
+              </p>
             </div>
 
-            <div className="flex gap-3 pt-4">
-              <Button
-                className="gaming-button flex-1"
-                onClick={handleConfirmSave}
-                disabled={savingAccount}
-              >
-                {savingAccount ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                ) : (
-                  <Save className="h-4 w-4 mr-2" />
-                )}
-                Confirm & Save
-              </Button>
+            <div className="space-y-6">
+              {confirmErrors.general && (
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                  <p className="text-red-400 text-[10px] font-black uppercase tracking-widest leading-relaxed">{confirmErrors.general}</p>
+                </div>
+              )}
 
-              <Button
-                variant="outline"
-                className="border-white/20 text-white hover:bg-white/10 flex-1"
-                onClick={handleCancelConfirm}
-                disabled={savingAccount}
-              >
-                Cancel
-              </Button>
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="confirmUsername" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <User className="h-3 w-3" />
+                    Confirm Username
+                  </Label>
+                  <Input
+                    id="confirmUsername"
+                    value={confirmForm.username}
+                    onChange={(e) => setConfirmForm(prev => ({ ...prev, username: e.target.value }))}
+                    className="px-5 py-6 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium"
+                    placeholder="Enter username"
+                  />
+                  {confirmErrors.username && (
+                    <p className="text-red-500 text-[10px] font-black uppercase tracking-widest ml-1 mt-1">{confirmErrors.username}</p>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="confirmEmail" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <Mail className="h-3 w-3" />
+                    Confirm Email
+                  </Label>
+                  <Input
+                    id="confirmEmail"
+                    type="email"
+                    value={confirmForm.email}
+                    onChange={(e) => setConfirmForm(prev => ({ ...prev, email: e.target.value }))}
+                    className="px-5 py-6 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 text-sm font-medium"
+                    placeholder="Enter email"
+                  />
+                  {confirmErrors.email && (
+                    <p className="text-red-500 text-[10px] font-black uppercase tracking-widest ml-1 mt-1">{confirmErrors.email}</p>
+                  )}
+                </div>
+
+                {accountForm.newPassword && (
+                  <div className="space-y-3">
+                    <Label htmlFor="confirmNewPassword" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                      <Lock className="h-3 w-3" />
+                      Confirm New Key
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="confirmNewPassword"
+                        type={showConfirmNewPassword ? "text" : "password"}
+                        value={confirmForm.newPassword}
+                        onChange={(e) => setConfirmForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                        className="px-5 py-6 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-300 pr-14 text-sm font-medium tracking-widest"
+                        placeholder="Enter new key"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-white transition-colors p-2"
+                      >
+                        {showConfirmNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    {confirmErrors.newPassword && (
+                      <p className="text-red-500 text-[10px] font-black uppercase tracking-widest ml-1 mt-1">{confirmErrors.newPassword}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 flex flex-col gap-3">
+                <Button
+                  className="gaming-button h-auto py-5 rounded-2xl w-full group overflow-hidden relative"
+                  onClick={handleConfirmSave}
+                  disabled={savingAccount}
+                >
+                  <div className="relative z-10 flex items-center justify-center gap-3">
+                    {savingAccount ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 group-hover:scale-110 transition-transform" />}
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">
+                      Secure Commit
+                    </span>
+                  </div>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="h-auto py-3 text-[8px] font-black text-gray-600 hover:text-white uppercase tracking-widest"
+                  onClick={handleCancelConfirm}
+                  disabled={savingAccount}
+                >
+                  Abort Sync
+                </Button>
+              </div>
             </div>
           </div>
         </DialogContent>
@@ -1809,96 +1878,100 @@ export default function ProfilePage() {
 
       {/* Delete Account Modal */}
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-        <DialogContent className="bg-slate-900 border-red-500/30 text-white max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-red-400 flex items-center gap-2">
-              <AlertTriangle className="h-6 w-6" />
-              Delete Account
-            </DialogTitle>
-            <DialogDescription className="text-gray-400">
-              This action cannot be undone. This will permanently delete your account and remove all your data.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            {deleteErrors.general && (
-              <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
-                <p className="text-red-300 text-sm">{deleteErrors.general}</p>
-              </div>
-            )}
-
-            {deleteErrors.success && (
-              <div className="p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
-                <p className="text-green-300 text-sm">{deleteErrors.success}</p>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="deletePassword" className="text-white flex items-center gap-2">
-                  <Lock className="h-4 w-4" />
-                  Password
-                </Label>
-                <Input
-                  id="deletePassword"
-                  type="password"
-                  value={deleteForm.password}
-                  onChange={(e) => setDeleteForm(prev => ({ ...prev, password: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                  placeholder="Enter your password"
-                />
-                {deleteErrors.password && (
-                  <p className="text-red-400 text-xs">{deleteErrors.password}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmDelete" className="text-white flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Type DELETE to confirm
-                </Label>
-                <Input
-                  id="confirmDelete"
-                  value={deleteForm.confirmText}
-                  onChange={(e) => setDeleteForm(prev => ({ ...prev, confirmText: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                  placeholder="Type DELETE"
-                />
-                {deleteErrors.confirmText && (
-                  <p className="text-red-400 text-xs">{deleteErrors.confirmText}</p>
-                )}
-              </div>
+        <DialogContent className="bg-[#0a0a0c]/95 border border-red-500/20 backdrop-blur-2xl text-white p-0 rounded-[32px] overflow-hidden shadow-2xl max-w-md w-[95vw]">
+          <div className="p-8 space-y-8">
+            <div className="space-y-2">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-black text-red-500 uppercase tracking-tighter flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-red-500/5 border border-red-500/10">
+                    <AlertTriangle className="h-5 w-5" />
+                  </div>
+                  Account Deletion
+                </DialogTitle>
+              </DialogHeader>
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-12">
+                Irreversible data destruction protocol
+              </p>
             </div>
 
-            <div className="flex gap-3 pt-4">
-              <Button
-                className="bg-red-600/20 text-red-400 border-red-500/30 hover:bg-red-600/30 flex-1"
-                onClick={handleDeleteAccount}
-                disabled={deletingAccount}
-              >
-                {deletingAccount ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <AlertTriangle className="h-4 w-4 mr-2" />
-                )}
-                Delete Account
-              </Button>
+            <div className="space-y-6">
+              {deleteErrors.general && (
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                  <p className="text-red-400 text-[10px] font-black uppercase tracking-widest leading-relaxed">{deleteErrors.general}</p>
+                </div>
+              )}
 
-              <Button
-                variant="outline"
-                className="border-white/20 text-white hover:bg-white/10 flex-1"
-                onClick={() => {
-                  setShowDeleteModal(false)
-                  setDeleteForm({ password: "", confirmText: "" })
-                  // Don't clear errors if there's a success message
-                  if (!deleteErrors.success) {
-                    setDeleteErrors({})
-                  }
-                }}
-                disabled={deletingAccount}
-              >
-                Cancel
-              </Button>
+              {deleteErrors.success && (
+                <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-2xl">
+                  <p className="text-green-400 text-[10px] font-black uppercase tracking-widest leading-relaxed">{deleteErrors.success}</p>
+                </div>
+              )}
+
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="deletePassword" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <Lock className="h-3 w-3" />
+                    Account Password
+                  </Label>
+                  <Input
+                    id="deletePassword"
+                    type="password"
+                    value={deleteForm.password}
+                    onChange={(e) => setDeleteForm(prev => ({ ...prev, password: e.target.value }))}
+                    className="px-5 py-6 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-red-500/40 focus:border-red-500/40 transition-all duration-300 text-sm font-medium tracking-widest"
+                    placeholder="Enter key"
+                  />
+                  {deleteErrors.password && (
+                    <p className="text-red-500 text-[10px] font-black uppercase tracking-widest ml-1 mt-1">{deleteErrors.password}</p>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="confirmDelete" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <AlertTriangle className="h-3 w-3" />
+                    Confirmation
+                  </Label>
+                  <Input
+                    id="confirmDelete"
+                    value={deleteForm.confirmText}
+                    onChange={(e) => setDeleteForm(prev => ({ ...prev, confirmText: e.target.value }))}
+                    className="px-5 py-6 bg-white/[0.02] border border-white/10 rounded-2xl text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-red-500/40 focus:border-red-500/40 transition-all duration-300 text-sm font-black uppercase tracking-[0.4em]"
+                    placeholder="Type DELETE"
+                  />
+                  {deleteErrors.confirmText && (
+                    <p className="text-red-500 text-[10px] font-black uppercase tracking-widest ml-1 mt-1">{deleteErrors.confirmText}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-4 flex flex-col gap-3">
+                <Button
+                  className="h-auto py-5 bg-red-600/10 border border-red-500/30 text-red-500 hover:bg-red-600/20 rounded-2xl w-full group overflow-hidden relative"
+                  onClick={handleDeleteAccount}
+                  disabled={deletingAccount}
+                >
+                  <div className="relative z-10 flex items-center justify-center gap-3">
+                    {deletingAccount ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldAlert className="h-4 w-4 group-hover:scale-110 transition-transform" />}
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">
+                      Confirm Deletion
+                    </span>
+                  </div>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="h-auto py-3 text-[8px] font-black text-gray-600 hover:text-white uppercase tracking-widest"
+                  onClick={() => {
+                    setShowDeleteModal(false)
+                    setDeleteForm({ password: "", confirmText: "" })
+                    if (!deleteErrors.success) {
+                      setDeleteErrors({})
+                    }
+                  }}
+                  disabled={deletingAccount}
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
           </div>
         </DialogContent>

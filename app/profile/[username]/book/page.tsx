@@ -254,13 +254,7 @@ export default function BookSessionPage() {
   )
 
   return (
-    <div className="min-h-screen bg-[#020205] text-white selection:bg-green-500/30 overflow-x-hidden">
-      {/* Darkened Background Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(34,197,94,0.02),transparent_70%)]"></div>
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.02]"></div>
-      </div>
-
+    <div className="min-h-screen bg-transparent text-white selection:bg-green-500/30 overflow-x-hidden">
       <div className="relative z-10 max-w-5xl mx-auto px-6">
         {/* Compact Header */}
         <div className="py-6 flex items-center justify-between border-b border-white/[0.02] mb-8">
