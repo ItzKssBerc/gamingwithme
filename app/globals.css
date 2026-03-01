@@ -25,6 +25,12 @@
     --ring: 142.1 76.2% 36.3%;
     --radius: 0.5rem;
   }
+
+  html,
+  body {
+    background-color: #050505 !important;
+    color: white;
+  }
 }
 
 .glass-panel {
@@ -91,12 +97,4 @@
 
 .animate-ui-pulse {
   animation: ui-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.app-background {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-color: #0a0a0c;
-  pointer-events: none;
 }
