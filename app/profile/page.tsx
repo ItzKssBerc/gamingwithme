@@ -1503,7 +1503,7 @@ export default function ProfilePage() {
                             <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-ping"></span>
                           </h3>
                           <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest leading-relaxed mb-6 max-w-md">
-                            To enable monetary reception from operations, direct synchronization with Stripe is required. This establishes a secure terminal for your financial assets.
+                            To start receiving payments for your sessions, you'll need to link your account with Stripe. This ensures your earnings are handled safely and securely.
                           </p>
                           <Button
                             onClick={handleStripeConnect}
@@ -1534,7 +1534,7 @@ export default function ProfilePage() {
                             <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
                           </h3>
                           <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-6">
-                            Secure financial bridge established. Ready for asset distribution.
+                            Connection active. Your payout terminal is ready.
                           </p>
                           <div className="flex items-center gap-3 mb-6">
                             <div className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-xl">

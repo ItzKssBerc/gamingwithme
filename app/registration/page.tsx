@@ -153,7 +153,7 @@ export default function RegistrationPage() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* ... same form fields ... */}
                   <div className="space-y-2">
-                    <label htmlFor="username" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <label htmlFor="username" className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
                       <User className="h-3 w-3" />
                       Username
                     </label>
@@ -169,7 +169,7 @@ export default function RegistrationPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="email" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <label htmlFor="email" className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
                       <Mail className="h-3 w-3" />
                       Email Address
                     </label>
@@ -185,7 +185,7 @@ export default function RegistrationPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="password" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <label htmlFor="password" className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
                       <Lock className="h-3 w-3" />
                       Password
                     </label>
@@ -218,7 +218,7 @@ export default function RegistrationPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="confirmPassword" className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <label htmlFor="confirmPassword" className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
                       <Lock className="h-3 w-3" />
                       Confirm Password
                     </label>

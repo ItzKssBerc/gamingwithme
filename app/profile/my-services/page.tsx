@@ -66,10 +66,7 @@ export default function MyServicesPage() {
         {/* Dashboard Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 border-b border-white/[0.05] pb-12">
           <div className="max-w-2xl">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="w-8 h-[2px] bg-primary"></span>
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Service.Dashboard // v2.0</span>
-            </div>
+
             <h1 className="text-6xl md:text-7xl font-black tracking-tighter mb-6 leading-[0.9]">
               My <span className="text-white/20">Coaching</span><br />Services
             </h1>

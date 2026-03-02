@@ -59,10 +59,10 @@ export default function Navigation() {
 
   return (
     <nav className={`sticky top-0 z-50 transition-colors duration-500 ${isScrolled
-      ? 'bg-black/80 backdrop-blur-md border-b border-white/[0.02]'
-      : 'bg-black border-b border-white/[0.05]'
+      ? 'bg-black/80 backdrop-blur-md border-b border-[#19FF00]/60'
+      : 'bg-black border-b border-[#19FF00]/60'
       }`}>
-      <div className="container mx-auto px-4">
+      <div className="w-full px-8">
         <div className="grid grid-cols-3 items-center h-20">
           {/* Logo - col - balra igazítva */}
           <div className="col-span-1 flex items-center justify-start">
@@ -75,7 +75,7 @@ export default function Navigation() {
                 className="h-12 w-auto opacity-80"
                 priority
               />
-              <span className="text-xl font-black text-gray-200 font-orbitron tracking-wider" translate="no">GamingWithMe</span>
+              <span className="text-xl font-black text-[#19FF00] font-orbitron tracking-wider" translate="no">GamingWithMe</span>
             </Link>
           </div>
 
@@ -87,27 +87,27 @@ export default function Navigation() {
           {/* Desktop Navigation - col - középre igazítva */}
           <div className="col-span-1 hidden md:flex items-center justify-center">
             <div className="flex items-center space-x-8">
-              <Link href="/games" className="text-[11px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
+              <Link href="/games" className="text-sm font-black uppercase tracking-widest text-white hover:text-[#19FF00] transition-colors">
                 Games
               </Link>
-              <Link href="/gamers" className="text-[11px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
+              <Link href="/gamers" className="text-sm font-black uppercase tracking-widest text-white hover:text-[#19FF00] transition-colors">
                 Gamers
               </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="text-[11px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors flex items-center gap-1 px-2 py-1 rounded-md">
+                  <button className="text-sm font-black uppercase tracking-widest text-white hover:text-[#19FF00] transition-colors flex items-center gap-1 px-2 py-1 rounded-md">
                     Support <ChevronDown className="h-3 w-3" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-black/90 border border-white/[0.05] text-white rounded-xl shadow-2xl min-w-[140px] backdrop-blur-xl" align="start">
-                  <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                <DropdownMenuContent className="bg-black/95 border border-[#19FF00]/40 text-white rounded-xl shadow-2xl shadow-[#19FF00]/5 min-w-[140px] backdrop-blur-xl" align="start">
+                  <DropdownMenuItem asChild className="hover:bg-[#19FF00]/10 focus:bg-[#19FF00]/10 rounded-lg mx-1 my-0.5">
                     <Link href="/support/contactus" className="flex items-center space-x-2 cursor-pointer py-2 px-3">
-                      <span className="text-[10px] font-black uppercase tracking-widest">Contact us</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest hover:text-[#19FF00]">Contact us</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="hover:bg-white/5 focus:bg-white/5 rounded-lg mx-1 my-0.5">
+                  <DropdownMenuItem asChild className="hover:bg-[#19FF00]/10 focus:bg-[#19FF00]/10 rounded-lg mx-1 my-0.5">
                     <Link href="/support/faq" className="flex items-center space-x-2 cursor-pointer py-2 px-3">
-                      <span className="text-[10px] font-black uppercase tracking-widest">FAQ</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest hover:text-[#19FF00]">FAQ</span>
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -178,12 +178,12 @@ export default function Navigation() {
               </div>
             ) : (
               <>
-                <Button asChild className="h-9 min-w-[100px] justify-center bg-white/[0.08] border border-white/[0.1] text-gray-300 hover:text-white hover:bg-white/[0.15] transition-all duration-300 font-orbitron tracking-widest text-[10px] uppercase font-black rounded-lg">
+                <Button asChild className="h-11 min-w-[140px] justify-center bg-blue-500/20 hover:bg-blue-500/20 border border-blue-500/60 hover:border-blue-500/60 text-white hover:text-[#19FF00] shadow-lg shadow-blue-500/10 transition-colors duration-300 font-orbitron tracking-widest text-sm uppercase font-black rounded-lg">
                   <Link href="/login">
                     Login
                   </Link>
                 </Button>
-                <Button asChild className="h-9 min-w-[100px] justify-center bg-green-600/80 border border-green-500/50 text-black shadow-lg hover:bg-green-500 transition-all duration-300 font-orbitron tracking-widest text-[10px] uppercase font-black rounded-lg">
+                <Button asChild className="h-11 min-w-[140px] justify-center bg-[#19FF00]/20 hover:bg-[#19FF00]/20 border border-[#19FF00]/60 hover:border-[#19FF00]/60 text-white hover:text-blue-500 shadow-lg shadow-[#19FF00]/10 transition-colors duration-300 font-orbitron tracking-widest text-sm uppercase font-black rounded-lg">
                   <Link href="/registration">
                     Sign up
                   </Link>
@@ -209,7 +209,7 @@ export default function Navigation() {
             <div className="flex flex-col space-y-4">
               <Link
                 href="/games"
-                className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest"
+                className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2 text-xs font-black uppercase tracking-widest"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Gamepad2 className="h-4 w-4" />
@@ -217,7 +217,7 @@ export default function Navigation() {
               </Link>
               <Link
                 href="/gamers"
-                className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest"
+                className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2 text-xs font-black uppercase tracking-widest"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Users className="h-4 w-4" />
@@ -226,7 +226,7 @@ export default function Navigation() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="text-gray-400 hover:text-white transition-colors flex items-center justify-between w-full space-x-2 text-[10px] font-black uppercase tracking-widest">
+                  <button className="text-gray-400 hover:text-white transition-colors flex items-center justify-between w-full space-x-2 text-xs font-black uppercase tracking-widest">
                     <div className="flex items-center space-x-2">
                       <Settings className="h-4 w-4" />
                       <span>Support</span>
