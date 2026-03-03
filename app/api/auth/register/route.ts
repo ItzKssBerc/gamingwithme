@@ -7,12 +7,16 @@ const registerSchema = z.object({
   username: z.string().min(3).max(20),
   email: z.string().email(),
   password: z.string().min(8),
+  role: z.enum(["gamer", "coach"]).optional(),
+  nickname: z.string().optional(),
+  bio: z.string().optional(),
+  clan: z.string().optional(),
 })
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { username, email, password } = registerSchema.parse(body)
+    const { username, email, password, role, nickname, bio, clan } = registerSchema.parse(body)
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
@@ -40,6 +44,10 @@ export async function POST(request: NextRequest) {
         username,
         email,
         password: hashedPassword,
+        role: role || "gamer",
+        avatar: nickname, // Using nickname as avatar/display name logic if needed, or bio
+        bio: bio || "",
+        clan: clan || "",
         isVerified: false,
       },
       select: {
@@ -52,9 +60,9 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json(
-      { 
+      {
         message: "User created successfully",
-        user 
+        user
       },
       { status: 201 }
     )

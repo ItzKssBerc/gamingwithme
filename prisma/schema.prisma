@@ -17,9 +17,11 @@ model User {
   password          String?
   bio               String?
   avatar            String?
+  clan              String?
   isAdmin           Boolean  @default(false)
   isVerified        Boolean  @default(false)
   isActive          Boolean  @default(true)
+  role              String   @default("gamer") // gamer, coach
   stripeAccountId   String?  @unique
   stripeOnboardingComplete Boolean @default(false)
   onboardingCompleted Boolean  @default(false)
