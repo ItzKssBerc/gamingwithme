@@ -278,10 +278,10 @@ export default function RegistrationPage() {
           {Array.from({ length: formData.role === 'coach' ? 5 : 4 }, (_, i) => i + 1).map((step) => (
             <div key={step} className="flex flex-col items-center z-10">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${currentStep > step
-                  ? 'bg-[#19FF00] border-[#19FF00] shadow-[0_0_20px_rgba(25,255,0,0.3)]'
-                  : currentStep === step
-                    ? 'bg-blue-700 border-blue-700 text-white shadow-[0_0_20px_rgba(29,78,216,0.5)]'
-                    : 'bg-black border-white/10 text-gray-500'
+                ? 'bg-[#19FF00] border-[#19FF00] shadow-[0_0_20px_rgba(25,255,0,0.3)]'
+                : currentStep === step
+                  ? 'bg-blue-700 border-blue-700 text-white shadow-[0_0_20px_rgba(29,78,216,0.5)]'
+                  : 'bg-black border-white/10 text-gray-500'
                 }`}>
                 {currentStep > step ? <CheckCircle className="h-5 w-5 text-blue-700" /> : step}
               </div>
@@ -612,9 +612,6 @@ export default function RegistrationPage() {
         {currentStep === 3 && (
           <Card className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-right-4 duration-500">
             <CardHeader className="text-center pt-8 pb-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-[#19FF00]/10 border border-[#19FF00]/20 mb-6">
-                <Star className="h-8 w-8 text-[#19FF00]" />
-              </div>
               <CardTitle className="text-4xl font-black text-white uppercase tracking-tighter leading-none mb-2">
                 Profile Details
               </CardTitle>
@@ -920,9 +917,6 @@ export default function RegistrationPage() {
         {currentStep === 5 && (
           <Card className="bg-[#0a0a0a]/90 border border-white/10 backdrop-blur-md p-2 rounded-[32px] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-right-4 duration-500">
             <CardHeader className="text-center pt-8 pb-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-blue-500/10 border border-blue-500/20 mb-6 font-bold text-blue-500 text-2xl">
-                S
-              </div>
               <CardTitle className="text-4xl font-black text-white uppercase tracking-tighter leading-none mb-2">
                 Monetization
               </CardTitle>
